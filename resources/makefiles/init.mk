@@ -10,11 +10,11 @@ graph: | $(BUILD)
 refresh: init
 	cd $(BUILD); $(TF_REFRESH)
 
-init: | $(TF_PORVIDER) $(MODULE_VARS)
+init: | $(TF_PROVIDER) $(MODULE_VARS)
 
 $(BUILD): init_build_dir
 
-$(TF_PORVIDER): update_provider
+$(TF_PROVIDER): update_provider
 
 $(MODULE_VARS): update_vars
 
@@ -30,6 +30,6 @@ update_vars:	| $(BUILD)
 
 update_provider: | $(BUILD)
 	# Generate tf provider
-	$(SCRIPTS)/gen-provider.sh > $(TF_PORVIDER)
+	$(SCRIPTS)/gen-provider.sh > $(TF_PROVIDER)
 
 .PHONY: init show show_state graph refresh update_vars update_provider init_build_dir
