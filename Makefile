@@ -45,7 +45,7 @@ MODULE_VARS=$(BUILD)/module_vars.tf
 VPC_MODULE=$(MODULES)/vpc
 
 # Terraform files
-TF_PORVIDER := $(BUILD)/provider.tf
+TF_PROVIDER := $(BUILD)/provider.tf
 TF_DESTROY_PLAN := $(BUILD)/destroy.tfplan
 TF_APPLY_PLAN := $(BUILD)/destroy.tfplan
 TF_STATE := $(BUILD)/terraform.tfstate
