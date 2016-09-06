@@ -31,24 +31,39 @@ AZ_SA_EAST_1=sa-east-1a,sa-east-1b,sa-east-1c
 # Working Directories
 ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 SCRIPTS := $(ROOT_DIR)scripts
-MODULES := $(ROOT_DIR)modules
 RESOURCES := $(ROOT_DIR)resources
-TF_RESOURCES := $(ROOT_DIR)resources/terraforms
 BUILD := $(ROOT_DIR)build
-CONFIG := $(BUILD)/cloud-config
-CERTS := $(BUILD)/certs
-SITE_CERT := $(CERTS)/site.pem
-POLICIES := $(BUILD)/policies
-# scripts that are to be uploaded on coreos as a resource and run their
-RESOURCE_SCRIPTS := $(BUILD)/scripts
-MODULE_VARS=$(BUILD)/module_vars.tf
-VPC_MODULE=$(MODULES)/vpc
+
+INFRASTRUCTURE_MODULES := $(ROOT_DIR)infrastructure-modules
+INFRA_DEV := $(INFRASTRUCTURE_MODULES)/dev
+INFRA_QA := $(INFRASTRUCTURE_MODULES)/qa
+INFRA_PROD := $(INFRASTRUCTURE_MODULES)/prod
+INFRA_GLOBAL_ADMIRAL := $(INFRASTRUCTURE_MODULES)/global-admiral
+
+# Environment Build Directories
+BUILD_DEV := $(BUILD)/dev
+BUILD_QA := $(BUILD)/qa
+BUILD_PROD := $(BUILD)/prod
+BUILD_GLOBAL_ADMIRAL := $(BUILD)/global-admiral
+
+# Environment specific files
+MODULE_VARS_DEV=$(BUILD_DEV)/module_vars.tf
+MODULE_VARS_QA=$(BUILD_QA)/module_vars.tf
+MODULE_VARS_PROD=$(BUILD_PROD)/module_vars.tf
+MODULE_VARS_GLOBAL_ADMIRAL=$(BUILD_GLOBAL_ADMIRAL)/module_vars.tf
 
 # Terraform files
-TF_PROVIDER := $(BUILD)/provider.tf
-TF_DESTROY_PLAN := $(BUILD)/destroy.tfplan
-TF_APPLY_PLAN := $(BUILD)/destroy.tfplan
-TF_STATE := $(BUILD)/terraform.tfstate
+TF_PROVIDER_DEV := $(BUILD_DEV)/provider.tf
+TF_STATE_DEV := $(BUILD_DEV)/terraform.tfstate
+
+TF_PROVIDER_QA := $(BUILD_QA)/provider.tf
+TF_STATE_QA := $(BUILD_QA)/terraform.tfstate
+
+TF_PROVIDER_PROD := $(BUILD_PROD)/provider.tf
+TF_STATE_PROD := $(BUILD_PROD)/terraform.tfstate
+
+TF_PROVIDER_GLOBAL_ADMIRAL := $(BUILD_GLOBAL_ADMIRAL)/provider.tf
+TF_STATE_GLOBAL_ADMIRAL := $(BUILD_GLOBAL_ADMIRAL)/terraform.tfstate
 
 # Terraform commands
 TF_GET := terraform get -update
