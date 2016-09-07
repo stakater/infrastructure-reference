@@ -11,6 +11,12 @@ refresh_global_admiral: init_global_admiral
 	cd $(BUILD); $(TF_REFRESH)
 
 init_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) $(MODULE_VARS_GLOBAL_ADMIRAL)
+	cd $(BUILD_GLOBAL_ADMIRAL); \
+	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "global-admiral/terraform.tfstate"
+
+pull_global_admiral_state:
+	cd $(BUILD_GLOBAL_ADMIRAL);\
+	terraform remote pull;
 
 $(TF_PROVIDER_GLOBAL_ADMIRAL): update_provider_global_admiral
 

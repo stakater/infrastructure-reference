@@ -11,6 +11,12 @@ refresh_qa: init_qa
 	cd $(BUILD); $(TF_REFRESH)
 
 init_qa: | $(TF_PROVIDER_QA) $(MODULE_VARS_QA)
+	cd $(BUILD_QA); \
+	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "qa/terraform.tfstate"
+
+pull_qa_state:
+	cd $(BUILD_QA);\
+	terraform remote pull;
 
 $(TF_PROVIDER_QA): update_provider_qa
 

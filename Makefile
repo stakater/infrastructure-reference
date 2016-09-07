@@ -52,19 +52,13 @@ MODULE_VARS_QA=$(BUILD_QA)/module_vars.tf
 MODULE_VARS_PROD=$(BUILD_PROD)/module_vars.tf
 MODULE_VARS_GLOBAL_ADMIRAL=$(BUILD_GLOBAL_ADMIRAL)/module_vars.tf
 
-# Terraform files
+# Terraform provider files
 TF_PROVIDER_DEV := $(BUILD_DEV)/provider.tf
-TF_STATE_DEV := $(BUILD_DEV)/terraform.tfstate
-
 TF_PROVIDER_QA := $(BUILD_QA)/provider.tf
-TF_STATE_QA := $(BUILD_QA)/terraform.tfstate
-
 TF_PROVIDER_PROD := $(BUILD_PROD)/provider.tf
-TF_STATE_PROD := $(BUILD_PROD)/terraform.tfstate
-
 TF_PROVIDER_GLOBAL_ADMIRAL := $(BUILD_GLOBAL_ADMIRAL)/provider.tf
-TF_STATE_GLOBAL_ADMIRAL := $(BUILD_GLOBAL_ADMIRAL)/terraform.tfstate
 
+TF_STATE_BUCKET_NAME := stakater-terraform-state
 # Terraform commands
 TF_GET := terraform get -update
 TF_SHOW := terraform show -module-depth=2
@@ -73,6 +67,7 @@ TF_PLAN := terraform plan -module-depth=2
 TF_APPLY := terraform apply
 TF_REFRESH := terraform refresh
 TF_DESTROY := terraform destroy -force
+
 ##########################
 ## End of customization ##
 ##########################

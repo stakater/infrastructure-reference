@@ -11,6 +11,12 @@ refresh_dev: init_dev
 	cd $(BUILD); $(TF_REFRESH)
 
 init_dev: | $(TF_PROVIDER_DEV) $(MODULE_VARS_DEV)
+	cd $(BUILD_DEV); \
+	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "dev/terraform.tfstate"
+
+pull_dev_state:
+	cd $(BUILD_DEV);\
+	terraform remote pull;
 
 $(TF_PROVIDER_DEV): update_provider_dev
 
