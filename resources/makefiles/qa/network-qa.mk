@@ -20,7 +20,7 @@ plan_network_qa: init_network_qa
 						 -target module.network.module.private_app_subnet \
 						 -target module.network;
 
-refresh_network_qa: | $(TF_PROVIDER_QA)
+refresh_network_qa: | $(TF_PROVIDER_QA) pull_qa_state
 	cd $(BUILD_QA); \
 	$(TF_REFRESH) -target module.network.module.vpc \
 								-target module.network.module.private_persistence_subnet \
@@ -30,7 +30,7 @@ refresh_network_qa: | $(TF_PROVIDER_QA)
 								-target module.network.module.private_app_subnet \
 								-target module.network;
 
-destroy_network_qa: | $(TF_PROVIDER_QA)
+destroy_network_qa: | $(TF_PROVIDER_QA) pull_qa_state
 	cd $(BUILD_QA); \
 	$(TF_DESTROY) -target module.network \
 								-target module.network.module.network_acl \

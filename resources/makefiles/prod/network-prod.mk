@@ -20,7 +20,7 @@ plan_network_prod: init_network_prod
 						 -target module.network.module.private_app_subnet \
 						 -target module.network;
 
-refresh_network_prod: | $(TF_PROVIDER_PROD)
+refresh_network_prod: | $(TF_PROVIDER_PROD) pull_prod_state
 	cd $(BUILD_PROD); \
 	$(TF_REFRESH) -target module.network.module.vpc \
 								-target module.network.module.private_persistence_subnet \
@@ -30,7 +30,7 @@ refresh_network_prod: | $(TF_PROVIDER_PROD)
 								-target module.network.module.private_app_subnet \
 								-target module.network;
 
-destroy_network_prod: | $(TF_PROVIDER_PROD)
+destroy_network_prod: | $(TF_PROVIDER_PROD) pull_prod_state
 	cd $(BUILD_PROD); \
 	$(TF_DESTROY) -target module.network \
 								-target module.network.module.network_acl \

@@ -11,6 +11,12 @@ refresh_prod: init_prod
 	cd $(BUILD); $(TF_REFRESH)
 
 init_prod: | $(TF_PROVIDER_PROD) $(MODULE_VARS_PROD)
+	cd $(BUILD_PROD); \
+	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "prod/terraform.tfstate"
+
+pull_prod_state:
+	cd $(BUILD_PROD);\
+	terraform remote pull;
 
 $(TF_PROVIDER_PROD): update_provider_prod
 

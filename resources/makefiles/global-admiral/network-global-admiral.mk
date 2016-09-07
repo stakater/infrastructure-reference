@@ -20,7 +20,7 @@ plan_network_global_admiral: init_network_global_admiral
 						 -target module.network.module.private_app_subnet \
 						 -target module.network;
 
-refresh_network_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL)
+refresh_network_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral_state
 	cd $(BUILD_GLOBAL_ADMIRAL); \
 	$(TF_REFRESH) -target module.network.module.vpc \
 								-target module.network.module.private_persistence_subnet \
@@ -30,7 +30,7 @@ refresh_network_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL)
 								-target module.network.module.private_app_subnet \
 								-target module.network;
 
-destroy_network_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL)
+destroy_network_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral_state
 	cd $(BUILD_GLOBAL_ADMIRAL); \
 	$(TF_DESTROY) -target module.network \
 								-target module.network.module.network_acl \
