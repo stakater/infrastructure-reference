@@ -108,5 +108,6 @@ push_tf_state:
 
 # Load all resouces makefile
 include resources/makefiles/*.mk
+include resources/makefiles/*/*.mk
 
 .PHONY: all destroy destroy_all clean_all help pull_tf_state push_tf_state
