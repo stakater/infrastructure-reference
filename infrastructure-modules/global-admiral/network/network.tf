@@ -1,5 +1,5 @@
 module "network" {
-    source = "github.com/stakater/blueprint-network-aws.git//modules?ref=vpc-peering"
+    source = "github.com/stakater/blueprint-network-aws.git//modules"
 
     vpc_cidr = "10.0.0.0/16"
     name = "${var.stack_name}-global-admiral"
