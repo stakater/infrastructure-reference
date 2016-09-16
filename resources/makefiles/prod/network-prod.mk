@@ -6,6 +6,7 @@ network_prod: plan_network_prod
 							-target module.network.module.nat \
 							-target module.network.module.network_acl \
 							-target module.network.module.private_app_subnet \
+							-target module.network.module.vpc-peering \
 							-target module.network;
 # Specifiy nested modules explicitly while using terraform apply, plan and destroy
 # https://github.com/hashicorp/terraform/issues/5870
@@ -18,6 +19,7 @@ plan_network_prod: init_network_prod
 						 -target module.network.module.nat \
 						 -target module.network.module.network_acl \
 						 -target module.network.module.private_app_subnet \
+						 -target module.network.module.vpc-peering \
 						 -target module.network;
 
 refresh_network_prod: | $(TF_PROVIDER_PROD) pull_prod_state
@@ -28,11 +30,13 @@ refresh_network_prod: | $(TF_PROVIDER_PROD) pull_prod_state
 								-target module.network.module.nat \
 								-target module.network.module.network_acl \
 								-target module.network.module.private_app_subnet \
+								-target module.network.module.vpc-peering \
 								-target module.network;
 
 destroy_network_prod: | $(TF_PROVIDER_PROD) pull_prod_state
 	cd $(BUILD_PROD); \
 	$(TF_DESTROY) -target module.network \
+								-target module.network.module.vpc-peering \
 								-target module.network.module.network_acl \
 								-target module.network.module.private_app_subnet \
 								-target module.network.module.nat \
