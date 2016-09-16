@@ -9,4 +9,19 @@ module "network" {
     private_persistence_subnets =  ["10.2.1.0/24", "10.2.2.0/24", "10.2.3.0/24", "10.2.4.0/24", "10.2.5.0/24", "10.2.6.0/24"]
 
     azs =  "${var.availability_zones}"
+
+    # variables for peering this vpc with another vpc
+    peer_owner_id = "${var.aws_account["id"]}"
+    peer_vpc_id  = "${data.terraform_remote_state.global_admiral_state.vpc_id}"
+    peer_vpc_cidr = "${data.terraform_remote_state.global_admiral_state.vpc_cidr}"
+    peer_private_app_route_table_ids = "${data.terraform_remote_state.global_admiral_state.private_app_route_table_ids}"
+}
+
+data "terraform_remote_state" "global_admiral_state" {
+  backend = "s3"
+  config {
+      bucket = "${var.tf_state_bucket_name}"
+      key = "global-admiral/terraform.tfstate"
+      region = "${var.aws_account["default_region"]}"
+  }
 }

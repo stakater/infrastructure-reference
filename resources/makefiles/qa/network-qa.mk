@@ -6,6 +6,7 @@ network_qa: plan_network_qa
 							-target module.network.module.nat \
 							-target module.network.module.network_acl \
 							-target module.network.module.private_app_subnet \
+							-target module.network.module.vpc-peering \
 							-target module.network;
 # Specifiy nested modules explicitly while using terraform apply, plan and destroy
 # https://github.com/hashicorp/terraform/issues/5870
@@ -18,6 +19,7 @@ plan_network_qa: init_network_qa
 						 -target module.network.module.nat \
 						 -target module.network.module.network_acl \
 						 -target module.network.module.private_app_subnet \
+						 -target module.network.module.vpc-peering \
 						 -target module.network;
 
 refresh_network_qa: | $(TF_PROVIDER_QA) pull_qa_state
@@ -28,11 +30,13 @@ refresh_network_qa: | $(TF_PROVIDER_QA) pull_qa_state
 								-target module.network.module.nat \
 								-target module.network.module.network_acl \
 								-target module.network.module.private_app_subnet \
+								-target module.network.module.vpc-peering \
 								-target module.network;
 
 destroy_network_qa: | $(TF_PROVIDER_QA) pull_qa_state
 	cd $(BUILD_QA); \
 	$(TF_DESTROY) -target module.network \
+								-target module.network.module.vpc-peering \
 								-target module.network.module.network_acl \
 								-target module.network.module.private_app_subnet \
 								-target module.network.module.nat \

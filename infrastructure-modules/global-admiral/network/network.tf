@@ -10,3 +10,16 @@ module "network" {
 
     azs =  "${var.availability_zones}"
 }
+
+# Output to be accessible by remote state
+output "vpc_id" {
+  value = "${module.network.vpc_id}"
+}
+
+output "vpc_cidr" {
+  value = "${module.network.vpc_cidr}"
+}
+
+output "private_app_route_table_ids" {
+  value = "${module.network.private_app_route_table_ids}"
+}
