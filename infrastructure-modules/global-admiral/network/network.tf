@@ -1,5 +1,5 @@
 module "network" {
-    source = "github.com/stakater/blueprint-network-aws.git//modules"
+    source = "github.com/stakater/blueprint-network-aws.git//modules?ref=vpc-peering"
 
     vpc_cidr = "10.0.0.0/16"
     name = "${var.stack_name}-global-admiral"
@@ -9,4 +9,12 @@ module "network" {
     private_persistence_subnets =  ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
 
     azs =  "${var.availability_zones}"
+}
+
+output "vpc_id" {
+  value = "${module.network.vpc_id}"
+}
+
+output "vpc_cidr" {
+  value = "${module.network.vpc_cidr}"
 }
