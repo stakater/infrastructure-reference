@@ -1,8 +1,10 @@
 network_dev: plan_network_dev
 	cd $(BUILD_DEV); \
+	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-dev-config -c bastion-host-dev; \
 	$(TF_APPLY) -target module.network.module.vpc \
 							-target module.network.module.private_persistence_subnet \
 							-target module.network.module.public_subnet \
+							-target module.network.module.bastion-host \
 							-target module.network.module.nat \
 							-target module.network.module.network_acl \
 							-target module.network.module.private_app_subnet \
@@ -16,6 +18,7 @@ plan_network_dev: init_network_dev
 	$(TF_PLAN) -target module.network.module.vpc \
 	           -target module.network.module.private_persistence_subnet \
 						 -target module.network.module.public_subnet \
+						 -target module.network.module.bastion-host \
 						 -target module.network.module.nat \
 						 -target module.network.module.network_acl \
 						 -target module.network.module.private_app_subnet \
@@ -27,6 +30,7 @@ refresh_network_dev: | $(TF_PROVIDER_DEV) pull_dev_state
 	$(TF_REFRESH) -target module.network.module.vpc \
 								-target module.network.module.private_persistence_subnet \
 								-target module.network.module.public_subnet \
+								-target module.network.module.bastion-host \
 								-target module.network.module.nat \
 								-target module.network.module.network_acl \
 								-target module.network.module.private_app_subnet \
@@ -40,6 +44,7 @@ destroy_network_dev: | $(TF_PROVIDER_DEV) pull_dev_state
 								-target module.network.module.network_acl \
 								-target module.network.module.private_app_subnet \
 								-target module.network.module.nat \
+								-target module.network.module.bastion-host \
 								-target module.network.module.public_subnet \
 								-target module.network.module.private_persistence_subnet \
 								-target module.network.module.vpc;

@@ -10,6 +10,9 @@ STACK_NAME := stakater-reference
 # a list of allowed AWS account IDs should be defined:
 #ALLOWED_ACCOUNT_IDS := "123456789012","012345678901"
 
+# Bucket which stores terraform remote state
+TF_STATE_BUCKET_NAME := stakater-terraform-state
+
 # For get-vars.sh
 COREOS_UPDATE_CHANNEL=beta
 VM_TYPE=hvm
@@ -58,7 +61,6 @@ TF_PROVIDER_QA := $(BUILD_QA)/provider.tf
 TF_PROVIDER_PROD := $(BUILD_PROD)/provider.tf
 TF_PROVIDER_GLOBAL_ADMIRAL := $(BUILD_GLOBAL_ADMIRAL)/provider.tf
 
-TF_STATE_BUCKET_NAME := stakater-terraform-state
 # Terraform commands
 TF_GET := terraform get -update
 TF_SHOW := terraform show -module-depth=2
