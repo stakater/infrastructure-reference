@@ -1,8 +1,10 @@
 network_global_admiral: plan_network_global_admiral
 	cd $(BUILD_GLOBAL_ADMIRAL); \
+	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-global-admiral-config -c bastion-host-ga; \
 	$(TF_APPLY) -target module.network.module.vpc \
 							-target module.network.module.private_persistence_subnet \
 							-target module.network.module.public_subnet \
+							-target module.network.module.bastion-host \
 							-target module.network.module.nat \
 							-target module.network.module.network_acl \
 							-target module.network.module.private_app_subnet \
@@ -15,6 +17,7 @@ plan_network_global_admiral: init_network_global_admiral
 	$(TF_PLAN) -target module.network.module.vpc \
 	           -target module.network.module.private_persistence_subnet \
 						 -target module.network.module.public_subnet \
+						 -target module.network.module.bastion-host \
 						 -target module.network.module.nat \
 						 -target module.network.module.network_acl \
 						 -target module.network.module.private_app_subnet \
@@ -25,6 +28,7 @@ refresh_network_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admi
 	$(TF_REFRESH) -target module.network.module.vpc \
 								-target module.network.module.private_persistence_subnet \
 								-target module.network.module.public_subnet \
+								-target module.network.module.bastion-host \
 								-target module.network.module.nat \
 								-target module.network.module.network_acl \
 								-target module.network.module.private_app_subnet \
@@ -32,10 +36,12 @@ refresh_network_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admi
 
 destroy_network_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral_state
 	cd $(BUILD_GLOBAL_ADMIRAL); \
+	$(SCRIPTS)/aws-keypair.sh -d bastion-host; \
 	$(TF_DESTROY) -target module.network \
 								-target module.network.module.network_acl \
 								-target module.network.module.private_app_subnet \
 								-target module.network.module.nat \
+								-target module.network.module.bastion-host \
 								-target module.network.module.public_subnet \
 								-target module.network.module.private_persistence_subnet \
 								-target module.network.module.vpc;
@@ -44,7 +50,7 @@ clean_network_global_admiral: destroy_network_global_admiral
 	rm -f $(BUILD_GLOBAL_ADMIRAL)/network.tf
 
 init_network_global_admiral: init_global_admiral
-		cp -rf $(INFRA_GLOBAL_ADMIRAL)/network/*.tf $(BUILD_GLOBAL_ADMIRAL)
+		cp -rf $(INFRA_GLOBAL_ADMIRAL)/network/*.tf $(BUILD_GLOBAL_ADMIRAL);
 		cd $(BUILD_GLOBAL_ADMIRAL); $(TF_GET);
 
 .PHONY: network_global_admiral destroy_network_global_admiral refresh_network_global_admiral plan_network_global_admiral init_network_global_admiral clean_network_global_admiral

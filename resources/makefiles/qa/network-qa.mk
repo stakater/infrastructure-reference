@@ -1,8 +1,10 @@
 network_qa: plan_network_qa
 	cd $(BUILD_QA); \
+	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-qa-config -c bastion-host-qa; \
 	$(TF_APPLY) -target module.network.module.vpc \
 							-target module.network.module.private_persistence_subnet \
 							-target module.network.module.public_subnet \
+							-target module.network.module.bastion-host \
 							-target module.network.module.nat \
 							-target module.network.module.network_acl \
 							-target module.network.module.private_app_subnet \
@@ -16,6 +18,7 @@ plan_network_qa: init_network_qa
 	$(TF_PLAN) -target module.network.module.vpc \
 	           -target module.network.module.private_persistence_subnet \
 						 -target module.network.module.public_subnet \
+						 -target module.network.module.bastion-host \
 						 -target module.network.module.nat \
 						 -target module.network.module.network_acl \
 						 -target module.network.module.private_app_subnet \
@@ -27,6 +30,7 @@ refresh_network_qa: | $(TF_PROVIDER_QA) pull_qa_state
 	$(TF_REFRESH) -target module.network.module.vpc \
 								-target module.network.module.private_persistence_subnet \
 								-target module.network.module.public_subnet \
+								-target module.network.module.bastion-host \
 								-target module.network.module.nat \
 								-target module.network.module.network_acl \
 								-target module.network.module.private_app_subnet \
@@ -40,6 +44,7 @@ destroy_network_qa: | $(TF_PROVIDER_QA) pull_qa_state
 								-target module.network.module.network_acl \
 								-target module.network.module.private_app_subnet \
 								-target module.network.module.nat \
+								-target module.network.module.bastion-host \
 								-target module.network.module.public_subnet \
 								-target module.network.module.private_persistence_subnet \
 								-target module.network.module.vpc;
