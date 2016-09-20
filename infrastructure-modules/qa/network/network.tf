@@ -9,6 +9,12 @@ module "network" {
     private_persistence_subnets =  ["10.2.1.0/24", "10.2.2.0/24", "10.2.3.0/24", "10.2.4.0/24", "10.2.5.0/24", "10.2.6.0/24"]
 
     azs =  "${var.availability_zones}"
+    aws_region = "${var.aws_account["default_region"]}"
+
+    # bastion-host variables
+    config_bucket_name = "${module.config-bucket.bucket_name}"
+    config_bucket_arn = "${module.config-bucket.arn}"
+    bastion_host_keypair = "bastion-host-qa"
 
     # variables for peering this vpc with another vpc
     peer_owner_id = "${var.aws_account["id"]}"
