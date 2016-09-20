@@ -87,6 +87,7 @@ Available resources: network
 
 For example: `make plan_network` to show what resources are planned for network
 
+###NOTE: The bucket name specified for `TF_STATE_BUCKET_NAME` in the Makefile should exist and should be accessible.
 
 
 ###To Destroy
