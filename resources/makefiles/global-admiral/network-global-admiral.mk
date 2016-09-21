@@ -36,7 +36,7 @@ refresh_network_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admi
 
 destroy_network_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral_state
 	cd $(BUILD_GLOBAL_ADMIRAL); \
-	$(SCRIPTS)/aws-keypair.sh -d bastion-host; \
+	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-global-admiral-config -d bastion-host-ga; \
 	$(TF_DESTROY) -target module.network \
 								-target module.network.module.network_acl \
 								-target module.network.module.private_app_subnet \

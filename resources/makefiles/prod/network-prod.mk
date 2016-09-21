@@ -39,6 +39,7 @@ refresh_network_prod: | $(TF_PROVIDER_PROD) pull_prod_state
 
 destroy_network_prod: | $(TF_PROVIDER_PROD) pull_prod_state
 	cd $(BUILD_PROD); \
+	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-prod-config -d bastion-host-prod; \
 	$(TF_DESTROY) -target module.network \
 								-target module.network.module.vpc-peering \
 								-target module.network.module.network_acl \

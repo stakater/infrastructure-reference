@@ -39,6 +39,7 @@ refresh_network_qa: | $(TF_PROVIDER_QA) pull_qa_state
 
 destroy_network_qa: | $(TF_PROVIDER_QA) pull_qa_state
 	cd $(BUILD_QA); \
+	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-qa-config -d bastion-host-qa; \
 	$(TF_DESTROY) -target module.network \
 								-target module.network.module.vpc-peering \
 								-target module.network.module.network_acl \

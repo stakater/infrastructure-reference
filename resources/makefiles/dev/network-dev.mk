@@ -39,6 +39,7 @@ refresh_network_dev: | $(TF_PROVIDER_DEV) pull_dev_state
 
 destroy_network_dev: | $(TF_PROVIDER_DEV) pull_dev_state
 	cd $(BUILD_DEV); \
+	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-dev-config -d bastion-host-dev; \
 	$(TF_DESTROY) -target module.network \
 								-target module.network.module.vpc-peering \
 								-target module.network.module.network_acl \
