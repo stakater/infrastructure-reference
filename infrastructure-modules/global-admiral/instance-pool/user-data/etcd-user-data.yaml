@@ -1,0 +1,30 @@
+#cloud-config
+
+# gocd cloud-config
+coreos:
+  etcd2:
+    proxy: on
+    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+  update:
+    reboot-strategy: off
+  units:
+    - name: etcd2.service
+      command: start
+    - name: hello-world.service
+      command: start
+      content: |
+        [Unit]
+        Description=tutum hello world server
+        After=docker.service
+        Requires=docker.service
+        [Service]
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull tutum/hello-world
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
+                                  -p 8080:80 \
+                                  tutum/hello-world"
+        ExecStop=/usr/bin/docker stop %n
+        RestartSec=10
+        Restart=always
