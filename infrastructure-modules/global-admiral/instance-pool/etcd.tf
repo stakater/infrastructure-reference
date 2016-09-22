@@ -121,3 +121,54 @@ resource "aws_security_group_rule" "sg_etcd_8080" {
     create_before_destroy = true
   }
 }
+
+####################################
+# ASG Scaling Policies
+####################################
+## Provisions autoscaling policies and associated resources
+module "etcd_scale_up_policy" {
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=asg-lc"
+
+  # Resource tags
+  name = "${var.stack_name}-ga-etcd-scaleup-policy"
+
+  # ASG parameters
+  asg_name = "${module.etcd.asg_name}"
+
+  # Notification parameters
+  notifications = "autoscaling:EC2_INSTANCE_LAUNCH_ERROR,autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
+
+  # Monitor parameters
+  adjustment_type          = "PercentChangeInCapacity"
+  scaling_adjustment       = 30
+  cooldown                 = 300
+  min_adjustment_magnitude = 2
+  comparison_operator      = "GreaterThanOrEqualToThreshold"
+  evaluation_periods       = 2
+  metric_name              = "CPUUtilization"
+  period                   = 120
+  threshold                = 10
+}
+
+module "etcd_scale_down_policy" {
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=asg-lc"
+
+  # Resource tags
+  name = "${var.stack_name}-ga-etcd-scaledown-policy"
+
+  # ASG parameters
+  asg_name = "${module.etcd.asg_name}"
+
+  # Notification parameters
+  notifications = "autoscaling:EC2_INSTANCE_LAUNCH_ERROR,autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
+
+  # Monitor parameters
+  adjustment_type     = "ChangeInCapacity"
+  scaling_adjustment  = 2
+  cooldown            = 300
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  period              = 120
+  threshold           = 10
+}
