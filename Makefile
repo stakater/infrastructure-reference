@@ -14,7 +14,7 @@ STACK_NAME := stakater-reference
 TF_STATE_BUCKET_NAME := stakater-terraform-state
 
 # For get-vars.sh
-COREOS_UPDATE_CHANNEL=beta
+COREOS_UPDATE_CHANNEL=stable
 VM_TYPE=hvm
 
 # Supported Subnet AWS availability zones
