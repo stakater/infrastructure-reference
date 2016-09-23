@@ -136,6 +136,7 @@ module "etcd_scale_up_policy" {
 
   # ASG parameters
   asg_name = "${module.etcd.asg_name}"
+  asg_id   = "${module.etcd.asg_id}"
 
   # Notification parameters
   notifications = "autoscaling:EC2_INSTANCE_LAUNCH_ERROR,autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
@@ -160,6 +161,7 @@ module "etcd_scale_down_policy" {
 
   # ASG parameters
   asg_name = "${module.etcd.asg_name}"
+  asg_id   = "${module.etcd.asg_id}"
 
   # Notification parameters
   notifications = "autoscaling:EC2_INSTANCE_LAUNCH_ERROR,autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
