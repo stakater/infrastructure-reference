@@ -19,8 +19,10 @@ module "etcd" {
   user_data        = "${file("./user-data/etcd-user-data.yaml")}"
   key_name         = "etcd"
   root_vol_size    = 12
-  ebs_device_name  = "/dev/sdb"
-  ebs_vol_size     = 12
+  data_ebs_device_name  = "/dev/sdf"
+  data_ebs_vol_size     = 12
+  logs_ebs_device_name  = "/dev/sdg"
+  logs_ebs_vol_size     = 12
 
   # ASG parameters
   max_size         = "2"
@@ -77,7 +79,7 @@ resource "aws_elb" "elb" {
   connection_draining       = true
 
   tags {
-    Name        = "${var.stack_name}"
+    Name        = "${var.stack_name}-etcd"
     managed_by  = "Stakater"
   }
 
