@@ -1,30 +1,111 @@
 #cloud-config
-
-# gocd cloud-config
 coreos:
   etcd2:
-    proxy: on
+    advertise-client-urls: http://$private_ipv4:2379
+    initial-advertise-peer-urls: http://$private_ipv4:2380
     listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
-  update:
-    reboot-strategy: off
+    listen-peer-urls: http://$private_ipv4:2380
+  fleet:
+    metadata: env=${stack_name},platform=ec2,provider=aws,role=etcd2
+    public-ip: $private_ipv4
   units:
     - name: etcd2.service
       command: start
-    - name: hello-world.service
+      drop-ins:
+        - name: 60-etcd-peers.conf
+          content: |
+              [Service]
+              EnvironmentFile=/etc/sysconfig/etcd-peers
+    - name: fleet.service
+      command: start
+    - name: format-disk.service
       command: start
       content: |
         [Unit]
-        Description=tutum hello world server
-        After=docker.service
-        Requires=docker.service
+        Description=Formats the disk drive
         [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        Environment="LABEL=var-lib-docker"
+        Environment="DEV=/dev/xvdf"
+        # Make Dev letter is same as the ebs device mounted e.g. xvdf for sdf
+        # Do not wipe the disk if it's already being used, so the docker images persistent cross reboot.
+        ExecStart=-/bin/bash -c "if ! findfs LABEL=$LABEL > /tmp/label.$LABEL; then wipefs -a -f $DEV && mkfs.ext4 -T news -F -L $LABEL $DEV && echo wiped; fi"
+    - name: var-lib-docker.mount
+      command: start
+      content: |
+        [Unit]
+        Description=Mount disk to /var/lib/docker
+        Requires=format-disk.service
+        After=format-disk.service
+        Before=docker.service
+        [Mount]
+        What=/dev/xvdf
+        Where=/var/lib/docker
+        Type=ext4
+    - name: docker.service
+      command: start
+      drop-ins:
+        - name: 60-docker-wait-for-var-lib.conf
+          content: |
+              [Unit]
+              Requires=var-lib-docker.mount
+              After=var-lib-docker.mount
+              [Service]
+              Restart=always
+              RestartSec=5
+    - name: etcd-init.service
+      command: start
+      content: |
+        [Unit]
+        Description=etcd init
+        Requires=docker.service
+        After=docker.service
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
         EnvironmentFile=/etc/environment
-        TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull tutum/hello-world
-        ExecStartPre=-/usr/bin/docker rm %n
-        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
-                                  -p 8080:80 \
-                                  tutum/hello-world"
-        ExecStop=/usr/bin/docker stop %n
-        RestartSec=10
-        Restart=always
+        TimeoutStartSec=10min
+        ExecStart=/opt/bin/etcd-init.sh
+        [Install]
+        WantedBy=multi-user.target
+write_files:
+  - path: /opt/bin/update-window.sh
+    permissions: 0700
+    owner: root
+    content: |
+        #!/bin/bash
+        # If etcd is active, this uses locksmith. Otherwise, it randomly delays the reboot.
+        delay=$(/usr/bin/expr $RANDOM % 3600 )
+        rebootflag='NEED_REBOOT'
+        hostip=$(hostname -i | tr -d ' ')
+        ismember=$(etcdctl member list |grep -Eo "(http://$hostip:2380)")
+
+        if update_engine_client -status | grep $rebootflag;
+        then
+            echo -n "etcd2 is "
+            if systemctl is-active etcd2 && [[ $ismember != "" ]];
+            then
+                echo "Update reboot with locksmithctl."
+                locksmithctl reboot
+            else
+                echo "Update reboot in $delay seconds."
+                sleep $delay
+                reboot
+            fi
+        fi
+        exit 0
+  - path: /opt/bin/etcd-init.sh
+    permissions: 0700
+    owner: root
+    content: |
+      #!/bin/bash
+
+      # dyamically create/join the etcd cluster by querying autoscaling group
+      # see https://github.com/dockerage/etcd-aws-cluster
+      image=dockerage/etcd-aws-cluster
+      /usr/bin/docker run -v /etc/sysconfig/:/etc/sysconfig/ $image
+
+      # upload etcd initial-cluster urls to s3 bucket for cluster's etcd_proxy
+      /usr/bin/docker run -e S3BUCKET="${s3_bucket_uri}" -v /etc/sysconfig/:/etc/sysconfig/ --entrypoint /etcd-aws-proxy $image
