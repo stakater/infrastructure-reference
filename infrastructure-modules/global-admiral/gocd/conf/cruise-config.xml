@@ -70,10 +70,20 @@
         <jobs>
           <job name="Build">
             <tasks>
+	      <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>/gocd-data/scripts/compile-code.sh #{APP_NAME} #{ENVIRONMENT}</arg>
+                <runif status="any" />
+              </exec>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>/gocd-data/scripts/test-code.sh #{APP_NAME} #{ENVIRONMENT}</arg>
+                <runif status="passed" />
+              </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>/gocd-data/scripts/build-docker-image.sh #{APP_NAME} #{ENVIRONMENT} ${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER} #{APP_DOCKER_IMAGE}</arg>
-                <runif status="any" />
+                <runif status="passed" />
               </exec>
             </tasks>
           </job>
