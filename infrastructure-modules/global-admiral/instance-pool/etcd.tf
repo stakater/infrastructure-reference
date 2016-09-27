@@ -15,29 +15,58 @@ module "etcd" {
   ami              = "${var.ami}"
   instance_type    = "t2.micro"
   iam_assume_role_policy = "${file("./policy/assume-role-policy.json")}"
-  iam_role_policy = "${data.template_file.etcd_policy.rendered}"
-  user_data        = "${file("./user-data/etcd-user-data.yaml")}"
+  iam_role_policy  = "${data.template_file.etcd-policy.rendered}"
+  user_data        = "${data.template_file.bootstrap-user-data.rendered}"
   key_name         = "etcd"
-  root_vol_size    = 12
+  root_vol_size    = 20
   data_ebs_device_name  = "/dev/sdf"
   data_ebs_vol_size     = 12
   logs_ebs_device_name  = "/dev/sdg"
   logs_ebs_vol_size     = 12
 
   # ASG parameters
-  max_size         = "2"
+  max_size         = "1"
   min_size         = "1"
   min_elb_capacity = "1"
   load_balancers   = "${aws_elb.elb.id}"
 }
 
 ## Template files
-data "template_file" "etcd_policy" {
+data "template_file" "etcd-policy" {
   template = "${file("./policy/etcd-role-policy.json")}"
 
   vars {
-    s3_bucket_arn = "${module.config-bucket.arn}"
+    config_bucket_arn = "${module.config-bucket.arn}"
+    cloudinit_bucket_arn = "${module.cloudinit-bucket.arn}"
   }
+}
+
+data "template_file" "bootstrap-user-data" {
+  template = "${file("./user-data/bootstrap-user-data.sh.tmpl")}"
+
+  vars {
+    config_bucket_name = "${module.cloudinit-bucket.bucket_name}"
+    module_name = "etcd"
+    additional_user_data_script = ""
+  }
+}
+
+data "template_file" "etcd-user-data" {
+  template = "${file("./user-data/etcd-user-data.yaml")}"
+
+  vars {
+    stack_name = "${var.stack_name}"
+    s3_bucket_uri = "s3://${module.cloudinit-bucket.bucket_name}"
+  }
+}
+
+# Upload CoreOS cloud-config to a s3 bucket; bootstrap-user-data.sh script in user-data will download
+# the cloud-config upon reboot to configure the system. This avoids rebuilding machines when
+# changing cloud-config.
+resource "aws_s3_bucket_object" "etcd_cloud_config" {
+  bucket = "${module.cloudinit-bucket.bucket_name}"
+  key = "etcd/cloud-config.yaml"
+  content = "${data.template_file.etcd-user-data.rendered}"
 }
 
 ## Creates ELB security group
@@ -84,7 +113,7 @@ resource "aws_elb" "elb" {
   }
 
   listener {
-    instance_port     = 8080
+    instance_port     = 2379
     instance_protocol = "http"
     lb_port           = 80
     lb_protocol       = "http"
@@ -111,10 +140,23 @@ resource "aws_lb_cookie_stickiness_policy" "elb_stickiness_policy" {
 }
 
 ## Adds security group rules
-resource "aws_security_group_rule" "sg_etcd_8080" {
+resource "aws_security_group_rule" "sg_etcd" {
   type                     = "ingress"
-  from_port                = 8080
-  to_port                  = 8080
+  from_port                = 2379
+  to_port                  = 2380
+  protocol                 = "tcp"
+  cidr_blocks              = ["${module.network.vpc_cidr}"]
+  security_group_id        = "${module.etcd.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group_rule" "sg_fleet" {
+  type                     = "ingress"
+  from_port                = 4001
+  to_port                  = 4001
   protocol                 = "tcp"
   cidr_blocks              = ["${module.network.vpc_cidr}"]
   security_group_id        = "${module.etcd.security_group_id}"
@@ -175,4 +217,9 @@ module "etcd_scale_down_policy" {
   metric_name         = "CPUUtilization"
   period              = 120
   threshold           = 10
+}
+
+# Output to be accessible by remote state
+output "etcd_security_group_id" {
+  value = "${module.etcd.security_group_id}"
 }
