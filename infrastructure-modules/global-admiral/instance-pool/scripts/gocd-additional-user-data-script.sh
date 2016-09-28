@@ -26,6 +26,7 @@ fileList+=("gocd/scripts/gocd.parameteres.txt")
 fileList+=("gocd/scripts/read-parameter.sh")
 fileList+=("gocd/scripts/launch-ami.sh")
 fileList+=("gocd/scripts/test-code.sh")
+fileList+=("gocd/scripts/compile-code.sh")
 
 # Download all files in the list
 for f in "${fileList[@]}"
@@ -103,6 +104,10 @@ fi
 if [ -f ${gocdDownloadDir}/test-code.sh ] ;
 then
   cp ${gocdDownloadDir}/test-code.sh ${gocdScriptsDir}/test-code.sh
+fi
+if [ -f ${gocdDownloadDir}/compile-code.sh ] ;
+then
+  cp ${gocdDownloadDir}/compile-code.sh ${gocdScriptsDir}/compile-code.sh
 fi
 
 # Delete temporary downloads folder
