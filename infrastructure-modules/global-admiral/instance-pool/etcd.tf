@@ -45,7 +45,8 @@ data "template_file" "bootstrap-user-data" {
   template = "${file("./user-data/bootstrap-user-data.sh.tmpl")}"
 
   vars {
-    config_bucket_name = "${module.cloudinit-bucket.bucket_name}"
+    config_bucket_name = "${module.config-bucket.bucket_name}"
+    cloudinit_bucket_name = "${module.cloudinit-bucket.bucket_name}"
     module_name = "etcd"
     additional_user_data_script = ""
   }
@@ -56,7 +57,7 @@ data "template_file" "etcd-user-data" {
 
   vars {
     stack_name = "${var.stack_name}"
-    s3_bucket_uri = "s3://${module.cloudinit-bucket.bucket_name}"
+    s3_bucket_uri = "s3://${module.config-bucket.bucket_name}"
   }
 }
 
@@ -101,6 +102,7 @@ resource "aws_security_group" "sg_elb" {
 
 ## Creates ELB
 resource "aws_elb" "elb" {
+  name                      = "${var.stack_name}-etcd"
   security_groups           = ["${aws_security_group.sg_elb.id}"]
   subnets                   = ["${split(",",module.network.public_subnet_ids)}"]
   internal                  = false
