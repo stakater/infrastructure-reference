@@ -59,6 +59,7 @@ accountId=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/docu
 ############################
 # Bucket path for the cloud-config.yaml
 configBucket=${config_bucket_name}
+cloudInitBucket=${cloudinit_bucket_name}
 module=${module_name}
 
 # Path to cloud-config.yaml
@@ -81,17 +82,17 @@ cd $${workDir}
 #
 # And replace ipv4 vars in clould-config.yaml
 # because oem-cloudinit.service does it only on native "user-data", i.e. this script.
-resource="/$${configBucket}/$${cloudConfigYaml}"
+resource="/$${cloudInitBucket}/$${cloudConfigYaml}"
 create_string_to_sign
 signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac $${s3Secret} -binary | base64)
 filePath=$${cloudConfigYaml}
 debug_log
-curl -L -s -H "Host: $${configBucket}.s3.amazonaws.com" \
+curl -L -s -H "Host: $${cloudInitBucket}.s3.amazonaws.com" \
   -H "Content-Type: $${contentType}" \
   -H "Authorization: AWS $${s3Key}:$${signature}" \
   -H "x-amz-security-token:$${s3Token}" \
   -H "Date: $${dateValue}" \
-  https://$${configBucket}.s3.amazonaws.com/$${filePath} \
+  https://$${cloudInitBucket}.s3.amazonaws.com/$${filePath} \
   | sed "s#\\$private_ipv4#$private_ipv4#g; s#\\$public_ipv4#$public_ipv4#g" \
   > $${workDir}/cloud-config.yaml
 
