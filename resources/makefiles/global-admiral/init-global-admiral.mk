@@ -14,6 +14,7 @@ init_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) $(MODULE_VARS_GLOBAL_ADMIRA
 	cd $(BUILD_GLOBAL_ADMIRAL); \
 	mkdir -p policy; \
 	mkdir -p user-data; \
+	mkdir -p scripts; \
 	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "global-admiral/terraform.tfstate"
 
 pull_global_admiral_state:
