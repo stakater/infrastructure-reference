@@ -73,9 +73,9 @@ fi
 # if script files from script folder have been dwnloaded, copy to `gocd-data` directory
 gocdScriptsDir="${gocdDataDir}/scripts/"
 mkdir -p ${gocdScriptsDir}
-if [ -f ${gocdDownloadDir}/bake-ami.sh ] ;
+if [ -f ${gocdDownloadDir}/build-ami.sh ] ;
 then
-  cp ${gocdDownloadDir}/bake-ami.sh ${gocdScriptsDir}/bake-ami.sh
+  cp ${gocdDownloadDir}/build-ami.sh ${gocdScriptsDir}/build-ami.sh
 fi
 if [ -f ${gocdDownloadDir}/build-docker-image.sh ] ;
 then
@@ -110,5 +110,6 @@ then
   cp ${gocdDownloadDir}/compile-code.sh ${gocdScriptsDir}/compile-code.sh
 fi
 
+chmod +x ${gocdScriptsDir}/*
 # Delete temporary downloads folder
 rm -rf ${gocdDownloadDir}
