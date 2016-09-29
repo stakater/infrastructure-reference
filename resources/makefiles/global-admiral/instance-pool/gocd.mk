@@ -95,15 +95,15 @@ destroy_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 								-target aws_s3_bucket_object.gocd_sudoers;
 
 clean_gocd_global_admiral: destroy_gocd_global_admiral
-	rm -f $(BUILD_GLOBAL_ADMIRAL)/instance-pool.tf
+	rm -f $(BUILD_GLOBAL_ADMIRAL)/gocd.tf
 
-init_gocd_global_admiral: init_global_admiral
-		mkdir -p $(BUILD_GLOBAL_ADMIRAL)/gocd-data; \
+init_gocd_global_admiral: init_instance_pool_global_admiral
+		mkdir -p $(BUILD_GLOBAL_ADMIRAL)/data/gocd; \
 		cp -rf $(INFRA_GLOBAL_ADMIRAL)/instance-pool/gocd.tf $(BUILD_GLOBAL_ADMIRAL);
 		cp -rf $(INFRA_GLOBAL_ADMIRAL)/instance-pool/policy/gocd* $(BUILD_GLOBAL_ADMIRAL)/policy;
 		cp -rf $(INFRA_GLOBAL_ADMIRAL)/instance-pool/scripts/gocd* $(BUILD_GLOBAL_ADMIRAL)/scripts;
 		cp -rf $(INFRA_GLOBAL_ADMIRAL)/instance-pool/user-data/gocd* $(BUILD_GLOBAL_ADMIRAL)/user-data;
-		cp -rf $(INFRA_GLOBAL_ADMIRAL)/instance-pool/gocd-data/* $(BUILD_GLOBAL_ADMIRAL)/gocd-data;
+		cp -rf $(INFRA_GLOBAL_ADMIRAL)/instance-pool/data/gocd/* $(BUILD_GLOBAL_ADMIRAL)/data/gocd;
 		cd $(BUILD_GLOBAL_ADMIRAL); $(TF_GET);
 
 .PHONY: gocd_global_admiral destroy_gocd_global_admiral refresh_gocd_global_admiral plan_gocd_global_admiral init_gocd_global_admiral clean_gocd_global_admiral
