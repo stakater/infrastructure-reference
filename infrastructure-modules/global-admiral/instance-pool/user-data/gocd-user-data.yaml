@@ -53,6 +53,22 @@ coreos:
               [Service]
               Restart=always
               RestartSec=5
+    - name: install-docker-compose.service
+      command: start
+      content: |
+        [Unit]
+        Description=Install Docker compose
+        Requires=docker.service
+        After=docker.service
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=10min
+        ExecStart=/opt/bin/install-docker-compose.sh
+        [Install]
+        WantedBy=multi-user.target
     - name: gocd-server.service
       command: start
       content: |
@@ -129,12 +145,13 @@ coreos:
                 -e AGENT_KEY=123456789zxcvb \
                 -v /var/run/docker.sock:/var/run/docker.sock \
                 -v /usr/bin/docker:/usr/bin/docker \
+                -v /opt/bin/docker-compose:/opt/bin/docker-compose \
                 -v /usr/lib/libdevmapper.so.1.02:/usr/lib/libdevmapper.so.1.02 \
                 -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
-                -v /gocd-data/route53:/gocd-data/route53 \
+                -v /gocd-data:/gocd-data \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
@@ -161,12 +178,13 @@ coreos:
                 -e AGENT_KEY=123456789mnbvcx \
                 -v /var/run/docker.sock:/var/run/docker.sock \
                 -v /usr/bin/docker:/usr/bin/docker \
+                -v /opt/bin/docker-compose:/opt/bin/docker-compose \
                 -v /usr/lib/libdevmapper.so.1.02:/usr/lib/libdevmapper.so.1.02 \
                 -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
-                -v /gocd-data/route53:/gocd-data/route53 \
+                -v /gocd-data:/gocd-data \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
@@ -193,12 +211,13 @@ coreos:
                 -e AGENT_KEY=123456789lkjhgf \
                 -v /var/run/docker.sock:/var/run/docker.sock \
                 -v /usr/bin/docker:/usr/bin/docker \
+                -v /opt/bin/docker-compose:/opt/bin/docker-compose \
                 -v /usr/lib/libdevmapper.so.1.02:/usr/lib/libdevmapper.so.1.02 \
                 -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
-                -v /gocd-data/route53:/gocd-data/route53 \
+                -v /gocd-data:/gocd-data \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
@@ -225,12 +244,13 @@ coreos:
                 -e AGENT_KEY=123456789ytrewq \
                 -v /var/run/docker.sock:/var/run/docker.sock \
                 -v /usr/bin/docker:/usr/bin/docker \
+                -v /opt/bin/docker-compose:/opt/bin/docker-compose \
                 -v /usr/lib/libdevmapper.so.1.02:/usr/lib/libdevmapper.so.1.02 \
                 -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
-                -v /gocd-data/route53:/gocd-data/route53 \
+                -v /gocd-data:/gocd-data \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
@@ -265,3 +285,11 @@ write_files:
             fi
         fi
         exit 0
+  - path: /opt/bin/install-docker-compose.sh
+    permissions: 0700
+    owner: root
+    content: |
+        #!/bin/bash
+        mkdir -p /opt/bin
+        curl -L `curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r '.assets[].browser_download_url | select(contains("Linux") and contains("x86_64"))'` > /opt/bin/docker-compose
+        chmod +x /opt/bin/docker-compose
