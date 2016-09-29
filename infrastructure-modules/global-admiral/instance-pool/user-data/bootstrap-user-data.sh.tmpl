@@ -50,14 +50,11 @@ instanceProfile=$(curl -s http://169.254.169.254/latest/meta-data/iam/info \
         | jq -r '.InstanceProfileArn' \
 	| sed  's#.*instance-profile/##')
 
-# AWS Account
-accountId=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .'accountId')
-
 ############################
 ## External Input Variables
 ## From terraform template
 ############################
-# Bucket path for the cloud-config.yaml
+stackName=${stack_name}
 configBucket=${config_bucket_name}
 cloudInitBucket=${cloudinit_bucket_name}
 module=${module_name}
@@ -78,7 +75,7 @@ workDir="/root/cloudinit"
 mkdir -m 700 -p $${workDir}
 cd $${workDir}
 
-# Download coreos-cluster-cloudinit/<profile>/clould-config.yaml
+# Download <bucket_name>/<module>/clould-config.yaml
 #
 # And replace ipv4 vars in clould-config.yaml
 # because oem-cloudinit.service does it only on native "user-data", i.e. this script.
@@ -138,7 +135,7 @@ fi
 ################################################################
 # Additional user-data script will be inserted here (if any)
 ################################################################
-${additional_user_data_script}
+${additional_user_data_scripts}
 ################################################################
 ################################################################
 
