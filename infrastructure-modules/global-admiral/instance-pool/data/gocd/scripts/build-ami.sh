@@ -1,5 +1,5 @@
 #!/bin/bash
-# THis shell script builds Amazon Machine Images (AMI) 
+# THis shell script builds Amazon Machine Images (AMI)
 #-----------------------------------------------------
 # Argument1: APP_NAME
 # Argument2: APP_IMAGE_BUILD_VERSION
@@ -30,7 +30,7 @@ sudo git pull origin master;
 
 sudo docker run -d --name packer_${GO_PIPELINE_NAME} -v /app/amibaker:/usr/src/app stakater/packer
 
-sudo cp -f /etc/registry_certificates/ca.crt /app/amibaker/baker-data/ca.crt;
+sudo cp -f /etc/registry-certificates/ca.crt /app/amibaker/baker-data/ca.crt;
 macAddress=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/);
 vpc_id=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$macAddress/vpc-id);
 subnet_id=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$macAddress/subnet-id);

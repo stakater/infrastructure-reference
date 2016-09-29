@@ -119,7 +119,7 @@ coreos:
                 -v /gocd-data/sudoers:/etc/sudoers.d \
                 -v /gocd-data:/gocd-data \
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
-                -v /etc/registry_certificates:/etc/registry_certificates \
+                -v /etc/registry-certificates:/etc/registry-certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
                 stakater/gocd-agent:16.5.0-3305"
@@ -152,7 +152,7 @@ coreos:
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
                 -v /gocd-data:/gocd-data \
-                -v /etc/registry_certificates:/etc/registry_certificates \
+                -v /etc/registry-certificates:/etc/registry-certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
                 stakater/gocd-agent:16.5.0-3305"
@@ -185,7 +185,7 @@ coreos:
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
                 -v /gocd-data:/gocd-data \
-                -v /etc/registry_certificates:/etc/registry_certificates \
+                -v /etc/registry-certificates:/etc/registry-certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
                 stakater/gocd-agent:16.5.0-3305"
@@ -218,7 +218,7 @@ coreos:
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
                 -v /gocd-data:/gocd-data \
-                -v /etc/registry_certificates:/etc/registry_certificates \
+                -v /etc/registry-certificates:/etc/registry-certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
                 stakater/gocd-agent:16.5.0-3305"
@@ -251,7 +251,7 @@ coreos:
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
                 -v /gocd-data:/gocd-data \
-                -v /etc/registry_certificates:/etc/registry_certificates \
+                -v /etc/registry-certificates:/etc/registry-certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
                 stakater/gocd-agent:16.5.0-3305"
