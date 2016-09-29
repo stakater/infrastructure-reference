@@ -45,10 +45,11 @@ data "template_file" "bootstrap-user-data" {
   template = "${file("./user-data/bootstrap-user-data.sh.tmpl")}"
 
   vars {
+    stack_name = "${var.stack_name}"
     config_bucket_name = "${module.config-bucket.bucket_name}"
     cloudinit_bucket_name = "${module.cloudinit-bucket.bucket_name}"
     module_name = "etcd"
-    additional_user_data_script = ""
+    additional_user_data_scripts = ""
   }
 }
 

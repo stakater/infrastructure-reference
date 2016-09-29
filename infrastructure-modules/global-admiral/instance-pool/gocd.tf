@@ -45,10 +45,12 @@ data "template_file" "gocd-bootstrap-user-data" {
   template = "${file("./user-data/bootstrap-user-data.sh.tmpl")}"
 
   vars {
+    stack_name = "${var.stack_name}"
     config_bucket_name = "${module.config-bucket.bucket_name}"
     cloudinit_bucket_name = "${module.cloudinit-bucket.bucket_name}"
     module_name = "gocd"
-    additional_user_data_script = "${file("./scripts/gocd-additional-user-data-script.sh")}"
+    additional_user_data_scripts = "${file("./scripts/gocd-additional-user-data-script.sh")}
+    ${file("./scripts/download-registry-certificates.sh")}"
   }
 }
 
