@@ -221,8 +221,3 @@ module "etcd_scale_down_policy" {
   period              = 120
   threshold           = 10
 }
-
-# Output to be accessible by remote state
-output "etcd_security_group_id" {
-  value = "${module.etcd.security_group_id}"
-}
