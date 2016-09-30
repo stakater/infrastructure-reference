@@ -45,8 +45,8 @@ destroy_docker_registry_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_glo
 	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-global-admiral-config -d docker-registry; \
 	$(TF_DESTROY) -target aws_lb_cookie_stickiness_policy.docker-registry-elb-stickiness-policy \
 	              -target aws_route53_record.docker-registry \
-	              -target module.docker-registry \
 	              -target aws_security_group_rule.sg_docker_registry \
+	              -target module.docker-registry \
 								-target module.docker-registry_scale_up_policy \
 								-target module.docker-registry_scale_down_policy \
 								-target module.docker-registry.module.auto-scaling-group \
