@@ -1,6 +1,6 @@
 ## Provisions basic autoscaling group
 module "etcd" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=asg-lc"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool"
 
   # Resource tags
   name = "${var.stack_name}-ga-etcd"
@@ -174,7 +174,7 @@ resource "aws_security_group_rule" "sg_fleet" {
 ####################################
 ## Provisions autoscaling policies and associated resources
 module "etcd_scale_up_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=asg-lc"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
 
   # Resource tags
   name = "${var.stack_name}-ga-etcd-scaleup-policy"
@@ -199,7 +199,7 @@ module "etcd_scale_up_policy" {
 }
 
 module "etcd_scale_down_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=asg-lc"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
 
   # Resource tags
   name = "${var.stack_name}-ga-etcd-scaledown-policy"
@@ -220,4 +220,9 @@ module "etcd_scale_down_policy" {
   metric_name         = "CPUUtilization"
   period              = 120
   threshold           = 10
+}
+
+# Outputs to be accessible through remote state
+output "etcd-security-group-id" {
+  value = "${module.etcd.security_group_id}"
 }

@@ -1,6 +1,6 @@
 ## Provisions basic autoscaling group
 module "gocd" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=asg-lc"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool"
 
   # Resource tags
   name = "${var.stack_name}-ga-gocd"
@@ -227,7 +227,7 @@ resource "aws_security_group_rule" "sg_gocd" {
 ####################################
 ## Provisions autoscaling policies and associated resources
 module "gocd_scale_up_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=asg-lc"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
 
   # Resource tags
   name = "${var.stack_name}-ga-gocd-scaleup-policy"
@@ -252,7 +252,7 @@ module "gocd_scale_up_policy" {
 }
 
 module "gocd_scale_down_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=asg-lc"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
 
   # Resource tags
   name = "${var.stack_name}-ga-gocd-scaledown-policy"
