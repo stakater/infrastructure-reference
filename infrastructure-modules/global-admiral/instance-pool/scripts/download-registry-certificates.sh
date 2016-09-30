@@ -26,7 +26,7 @@ curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
 # else delete the downloaded files
 if [ -f ${regCertDir}/ca.pem ] && grep -q "BEGIN CERTIFICATE" ${regCertDir}/ca.pem ;
 then
-  dockerCertDir="/etc/docker/certs.d/registry.${stackName}.local:5000/"
+  dockerCertDir="/etc/docker/certs.d/registry.${stackName}.local/"
   mkdir -p ${dockerCertDir}
   #NOTE: Rename the ca.pem file to ca.crt
   mv ${regCertDir}/ca.pem ${regCertDir}/ca.crt
