@@ -9,6 +9,7 @@ docker_registry_global_admiral: plan_docker_registry_global_admiral
 							-target module.docker-registry_scale_up_policy \
 							-target module.docker-registry_scale_down_policy \
 							-target module.docker-registry \
+							-target aws_route53_record.docker-registry \
 							-target aws_lb_cookie_stickiness_policy.docker-registry-elb-stickiness-policy;
 # Specifiy nested modules explicitly while using terraform apply, plan and destroy
 # https://github.com/hashicorp/terraform/issues/5870
@@ -23,6 +24,7 @@ plan_docker_registry_global_admiral: init_docker_registry_global_admiral
 						 -target module.docker-registry_scale_down_policy \
 						 -target aws_security_group_rule.sg_docker_registry \
 						 -target module.docker-registry \
+						 -target aws_route53_record.docker-registry \
 						 -target aws_lb_cookie_stickiness_policy.docker-registry-elb-stickiness-policy;
 
 refresh_docker_registrys_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral_state
@@ -35,12 +37,14 @@ refresh_docker_registrys_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_gl
 								-target module.docker-registry_scale_down_policy \
 								-target aws_security_group_rule.sg_docker_registry \
 								-target module.docker-registry \
+								-target aws_route53_record.docker-registry \
 								-target aws_lb_cookie_stickiness_policy.docker-registry-elb-stickiness-policy;
 
 destroy_docker_registry_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral_state
 	cd $(BUILD_GLOBAL_ADMIRAL); \
 	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-global-admiral-config -d docker-registry; \
 	$(TF_DESTROY) -target aws_lb_cookie_stickiness_policy.docker-registry-elb-stickiness-policy \
+	              -target aws_route53_record.docker-registry \
 	              -target module.docker-registry \
 	              -target aws_security_group_rule.sg_docker_registry \
 								-target module.docker-registry_scale_up_policy \
