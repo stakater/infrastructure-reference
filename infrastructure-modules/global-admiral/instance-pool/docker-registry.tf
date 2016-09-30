@@ -103,9 +103,9 @@ resource "aws_security_group" "docker-registry-sg-elb" {
     create_before_destroy = true
   }
 
-  # Allow HTTP traffic
+  # Allow HTTP traffic inside vpc only
   ingress {
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${module.network.vpc_cidr}"]
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -134,7 +134,7 @@ resource "aws_elb" "docker-registry-elb" {
   }
 
   listener {
-    instance_port     = 8153
+    instance_port     = 5000
     instance_protocol = "http"
     lb_port           = 80
     lb_protocol       = "http"
@@ -160,11 +160,24 @@ resource "aws_lb_cookie_stickiness_policy" "docker-registry-elb-stickiness-polic
       lb_port = 80
 }
 
+# Route53 record
+resource "aws_route53_record" "docker-registry" {
+  zone_id = "${module.route53-private.zone_id}"
+  name = "registry"
+  type = "A"
+
+  alias {
+    name = "${aws_elb.docker-registry-elb.dns_name}"
+    zone_id = "${aws_elb.docker-registry-elb.zone_id}"
+    evaluate_target_health = true
+  }
+}
+
 ## Adds security group rules
 resource "aws_security_group_rule" "sg_docker_registry" {
   type                     = "ingress"
-  from_port                = 8153
-  to_port                  = 8153
+  from_port                = 5000
+  to_port                  = 5000
   protocol                 = "tcp"
   cidr_blocks              = ["${module.network.vpc_cidr}"]
   security_group_id        = "${module.docker-registry.security_group_id}"
@@ -225,4 +238,11 @@ module "docker_registry_scale_down_policy" {
   metric_name         = "CPUUtilization"
   period              = 120
   threshold           = 10
+}
+
+
+# Outputs to be accessible by remote state
+# For allowing other VPCs to interact with docker-registry
+output "docker-registry-sg-id" {
+  value = "${aws_security_group.docker-registry-sg-elb.id}"
 }
