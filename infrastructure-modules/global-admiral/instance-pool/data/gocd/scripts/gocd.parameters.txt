@@ -1,4 +1,4 @@
-DOCKER_REGISTRY=registry.stakater-test.local:5000
-APP_DOCKER_OPTS=-p 8080:8080 -p 8443:8443 -p 443:443
+DOCKER_REGISTRY=registry.stakater-test.local
+APP_DOCKER_OPTS=-p 8080:8080
 ROUTE53_HOSTED_ZONE_NAME=stakater-test.local.
 
