@@ -9,5 +9,6 @@ destroy_instance_pool_global_admiral: destroy_gocd_global_admiral destroy_docker
 init_instance_pool_global_admiral: init_global_admiral
 	cp -rf $(INFRA_GLOBAL_ADMIRAL)/instance-pool/policy/assume-role-policy.json $(BUILD_GLOBAL_ADMIRAL)/policy;
 	cp -rf $(INFRA_GLOBAL_ADMIRAL)/instance-pool/user-data/bootstrap* $(BUILD_GLOBAL_ADMIRAL)/user-data;
+	cp -rf $(INFRA_GLOBAL_ADMIRAL)/instance-pool/scripts/download-registry-certificates.sh $(BUILD_GLOBAL_ADMIRAL)/scripts;
 
 .PHONY: instance_pool_global_admiral destroy_instance_pool_global_admiral refresh_instance_pool_global_admiral plan_instance_pool_global_admiral
