@@ -7,6 +7,8 @@ coreos:
     public-ip: $private_ipv4
     metadata: "env=${stack_name},platform=ec2,provider=aws,role=gocd"
     etcd_key_prefix: "/stakater/dev/worker"
+  update:
+    reboot-strategy: off
   units:
     - name: etcd2.service
       command: start
