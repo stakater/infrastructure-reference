@@ -14,10 +14,10 @@
         "s3:*"
       ],
       "Resource": [
-        "${config_bucket_arn}/worker-dev",
-        "${config_bucket_arn}/worker-dev/*",
-        "${cloudinit_bucket_arn}/worker-dev",
-        "${cloudinit_bucket_arn}/worker-dev/*"
+        "${config_bucket_arn}/worker",
+        "${config_bucket_arn}/worker/*",
+        "${cloudinit_bucket_arn}/worker",
+        "${cloudinit_bucket_arn}/worker/*"
       ]
     },
     {

@@ -1,6 +1,6 @@
 module "efs" {
   source = "github.com/stakater/blueprint-storage-aws.git//modules/efs/file-system"
-  name = "${var.stack_name}"
+  name = "${var.stack_name}-dev"
   vpc_id = "${module.network.vpc_id}"
   vpc_cidr = "${module.network.vpc_cidr}"
 }
