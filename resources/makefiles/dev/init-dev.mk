@@ -12,8 +12,13 @@ refresh_dev: init_dev
 
 init_dev: | $(TF_PROVIDER_DEV) $(MODULE_VARS_DEV)
 	cd $(BUILD_DEV); \
-	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "dev/terraform.tfstate"
-
+	mkdir -p policy; \
+	mkdir -p user-data; \
+	mkdir -p scripts; \
+	mkdir -p data; \
+	cp -rf $(INFRA_DEV)/utilities/remote-config.tf $(BUILD_DEV); \
+	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "dev/terraform.tfstate"; \
+	
 pull_dev_state:
 	cd $(BUILD_DEV);\
 	terraform remote pull;
