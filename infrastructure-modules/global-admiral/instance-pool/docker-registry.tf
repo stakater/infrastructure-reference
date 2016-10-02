@@ -18,11 +18,11 @@ module "docker-registry" {
   iam_role_policy  = "${data.template_file.docker-registry-policy.rendered}"
   user_data        = "${data.template_file.docker-registry-bootstrap-user-data.rendered}"
   key_name         = "docker-registry"
-  root_vol_size    = 30
+  root_vol_size    = 50
   data_ebs_device_name  = "/dev/sdh"  # mount to /opt/data (for registry data)
   data_ebs_vol_size     = 100
   logs_ebs_device_name  = "/dev/sdg"
-  logs_ebs_vol_size     = 12
+  logs_ebs_vol_size     = 20
 
   # ASG parameters
   max_size         = "1"
