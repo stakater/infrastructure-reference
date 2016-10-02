@@ -12,6 +12,11 @@ refresh_prod: init_prod
 
 init_prod: | $(TF_PROVIDER_PROD) $(MODULE_VARS_PROD)
 	cd $(BUILD_PROD); \
+	mkdir -p policy; \
+	mkdir -p user-data; \
+	mkdir -p scripts; \
+	mkdir -p data; \
+	cp -rf $(INFRA_PROD)/utilities/remote-config.tf $(BUILD_PROD); \
 	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "prod/terraform.tfstate"
 
 pull_prod_state:
