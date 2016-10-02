@@ -28,7 +28,7 @@ module "worker" {
   max_size         = "2"
   min_size         = "2"
   min_elb_capacity = "2"
-  load_balancers   = "${aws_elb.worker-elb.id}"
+  load_balancers   = "${aws_elb.worker-elb.id},${aws_elb.worker-elb-internal.id}" # Assign both ELBs to instance-pool module
 }
 
 ## Template files
@@ -132,6 +132,35 @@ resource "aws_elb" "worker-elb" {
     lb_protocol       = "http"
   }
 
+  health_check {
+    healthy_threshold   = 10
+    unhealthy_threshold = 2
+    timeout             = 5
+    target              = "TCP:22"
+    interval            = 30
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+## Internal load balancer in private app subnets instead of public subnets
+# So that fleet can be accessed through peered vpc i.e. global-admiral
+# (As peering is at private-app level and not at public level)
+resource "aws_elb" "worker-elb-internal" {
+  name                      = "${var.stack_name}-dev-wrkr-int"
+  security_groups           = ["${aws_security_group.worker-sg-elb.id}"]
+  subnets                   = ["${split(",",module.network.private_app_subnet_ids)}"]
+  internal                  = true
+  cross_zone_load_balancing = true
+  connection_draining       = true
+
+  tags {
+    Name        = "${var.stack_name}-dev-worker-internal"
+    managed_by  = "Stakater"
+  }
+
   # Fleet
   listener {
     instance_port     = 4001
@@ -152,7 +181,6 @@ resource "aws_elb" "worker-elb" {
     create_before_destroy = true
   }
 }
-
 # ELB Stickiness policy
 resource "aws_lb_cookie_stickiness_policy" "worker-elb-stickiness-policy" {
       name = "${aws_elb.worker-elb.name}-stickiness"
@@ -173,6 +201,17 @@ resource "aws_route53_record" "worker" {
   }
 }
 
+resource "aws_route53_record" "worker-internal" {
+  zone_id = "${data.terraform_remote_state.global-admiral.route53_private_zone_id}"
+  name = "worker-dev-fleet"
+  type = "A"
+
+  alias {
+    name = "${aws_elb.worker-elb-internal.dns_name}"
+    zone_id = "${aws_elb.worker-elb-internal.zone_id}"
+    evaluate_target_health = true
+  }
+}
 
 ####################################
 # ASG Scaling Policies

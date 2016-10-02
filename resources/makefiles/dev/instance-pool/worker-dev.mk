@@ -10,6 +10,7 @@ worker_dev: plan_worker_dev
 							-target module.worker-scale-down-policy \
 							-target module.worker \
 							-target aws_route53_record.worker \
+							-target aws_route53_record.worker-internal \
 							-target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
 							-target aws_security_group_rule.sg-worker-registry \
 							-target aws_security_group_rule.sg-worker-etcd;
@@ -27,6 +28,7 @@ plan_worker_dev: init_worker_dev
 						 -target module.worker-scale-down-policy \
 						 -target module.worker \
 						 -target aws_route53_record.worker \
+						 -target aws_route53_record.worker-internal \
 						 -target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
 						 -target aws_security_group_rule.sg-worker-registry \
 						 -target aws_security_group_rule.sg-worker-etcd;
@@ -42,6 +44,7 @@ refresh_worker_dev: | $(TF_PROVIDER_DEV) pull_dev_state
 								-target module.worker-scale-down-policy \
 								-target module.worker \
 								-target aws_route53_record.worker \
+								-target aws_route53_record.worker-internal \
 								-target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
 								-target aws_security_group_rule.sg-worker-registry \
 								-target aws_security_group_rule.sg-worker-etcd;
@@ -52,6 +55,7 @@ destroy_worker_dev: | $(TF_PROVIDER_DEV) pull_dev_state
 	$(TF_DESTROY) -target aws_security_group_rule.sg-worker-registry \
 								-target aws_security_group_rule.sg-worker-etcd \
 								-target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
+								-target aws_route53_record.worker-internal \
 	              -target aws_route53_record.worker \
 								-target aws_security_group_rule.sg-worker-fleet \
 	              -target aws_security_group_rule.sg-worker \
@@ -60,7 +64,10 @@ destroy_worker_dev: | $(TF_PROVIDER_DEV) pull_dev_state
 								-target module.worker-scale-down-policy \
 								-target module.worker.module.auto-scaling-group \
 								-target module.worker.module.launch-configuration \
-								-target aws_s3_bucket_object.worker-cloud-config;
+								-target aws_s3_bucket_object.worker-cloud-config \
+								-target aws_security_group.worker-sg-elb \
+								-target aws_elb.worker-dev \
+								-target aws_elb.worker-dev-internal;
 
 clean_worker_dev: destroy_worker_dev
 	rm -f $(BUILD_DEV)/worker.tf
