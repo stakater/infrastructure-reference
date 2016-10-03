@@ -13,4 +13,3 @@ value=''
 value=`cat ${PROPERTIES_FILE} | grep ${KEY} | cut -d'=' -f2`
 
 echo ${value}
-

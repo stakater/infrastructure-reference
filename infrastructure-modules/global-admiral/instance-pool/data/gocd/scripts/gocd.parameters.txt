@@ -1,4 +1,4 @@
-DOCKER_REGISTRY=registry.stakater-test.local
+DOCKER_REGISTRY=registry.stakater-reference.local
 APP_DOCKER_OPTS=-p 8080:8080
-ROUTE53_HOSTED_ZONE_NAME=stakater-test.local.
-
+DEV_CLUSTER_ENDPOINT=worker-dev-fleet.stakater-reference.local
+QA_CLUSTER_ENDPOINT=worker-qa-fleet.stakater-reference.local
