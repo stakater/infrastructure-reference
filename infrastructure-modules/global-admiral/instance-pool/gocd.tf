@@ -112,7 +112,7 @@ resource "aws_s3_bucket_object" "gocd_launch_ami" {
 }
 resource "aws_s3_bucket_object" "gocd_read_parameter" {
   bucket = "${module.config-bucket.bucket_name}"
-  key = "gocd/scripts/read-parameters.sh"
+  key = "gocd/scripts/read-parameter.sh"
   source = "./data/gocd/scripts/read-parameter.sh"
 }
 resource "aws_s3_bucket_object" "gocd_test" {
