@@ -9,7 +9,7 @@ gocd_global_admiral: plan_gocd_global_admiral
 							-target aws_s3_bucket_object.gocd_docker_cleanup \
 							-target aws_s3_bucket_object.gocd_gocd_parameters \
 							-target aws_s3_bucket_object.gocd_launch_ami \
-							-target aws_s3_bucket_object.gocd_read_parameters \
+							-target aws_s3_bucket_object.gocd_read_parameter \
 							-target aws_s3_bucket_object.gocd_test \
 							-target aws_s3_bucket_object.gocd_cruise_config \
 							-target aws_s3_bucket_object.gocd_passwd \
@@ -34,7 +34,7 @@ plan_gocd_global_admiral: init_gocd_global_admiral
 						 -target aws_s3_bucket_object.gocd_docker_cleanup \
 						 -target aws_s3_bucket_object.gocd_gocd_parameters \
 						 -target aws_s3_bucket_object.gocd_launch_ami \
-						 -target aws_s3_bucket_object.gocd_read_parameters \
+						 -target aws_s3_bucket_object.gocd_read_parameter \
 						 -target aws_s3_bucket_object.gocd_test \
 						 -target aws_s3_bucket_object.gocd_cruise_config \
 						 -target aws_s3_bucket_object.gocd_passwd \
@@ -57,7 +57,7 @@ refresh_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 								-target aws_s3_bucket_object.gocd_docker_cleanup \
 								-target aws_s3_bucket_object.gocd_gocd_parameters \
 								-target aws_s3_bucket_object.gocd_launch_ami \
-								-target aws_s3_bucket_object.gocd_read_parameters \
+								-target aws_s3_bucket_object.gocd_read_parameter \
 								-target aws_s3_bucket_object.gocd_test \
 								-target aws_s3_bucket_object.gocd_cruise_config \
 								-target aws_s3_bucket_object.gocd_passwd \
@@ -88,7 +88,7 @@ destroy_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 								-target aws_s3_bucket_object.gocd_docker_cleanup \
 								-target aws_s3_bucket_object.gocd_gocd_parameters \
 								-target aws_s3_bucket_object.gocd_launch_ami \
-								-target aws_s3_bucket_object.gocd_read_parameters \
+								-target aws_s3_bucket_object.gocd_read_parameter \
 								-target aws_s3_bucket_object.gocd_test \
 								-target aws_s3_bucket_object.gocd_cruise_config \
 								-target aws_s3_bucket_object.gocd_passwd \
