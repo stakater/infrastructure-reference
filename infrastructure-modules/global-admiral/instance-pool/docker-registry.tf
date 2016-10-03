@@ -20,7 +20,7 @@ module "docker-registry" {
   key_name         = "docker-registry"
   root_vol_size    = 50
   data_ebs_device_name  = "/dev/sdh"  # mount to /opt/data (for registry data)
-  data_ebs_vol_size     = 100
+  data_ebs_vol_size     = 150
   logs_ebs_device_name  = "/dev/sdg"
   logs_ebs_vol_size     = 20
 
@@ -119,12 +119,13 @@ resource "aws_security_group" "docker-registry-sg-elb" {
   }
 }
 
-## Creates ELB
+## Creates internal elb ELB within in private-app subnets
+# So that it is accessible by peered VPCs
 resource "aws_elb" "docker-registry-elb" {
   name                      = "${var.stack_name}-registry"
   security_groups           = ["${aws_security_group.docker-registry-sg-elb.id}"]
-  subnets                   = ["${split(",",module.network.public_subnet_ids)}"]
-  internal                  = false
+  subnets                   = ["${split(",", module.network.private_app_subnet_ids)}"]
+  internal                  = true
   cross_zone_load_balancing = true
   connection_draining       = true
 
@@ -135,9 +136,9 @@ resource "aws_elb" "docker-registry-elb" {
 
   listener {
     instance_port     = 5000
-    instance_protocol = "http"
+    instance_protocol = "tcp"
     lb_port           = 80
-    lb_protocol       = "http"
+    lb_protocol       = "tcp"
   }
 
   health_check {
@@ -147,17 +148,6 @@ resource "aws_elb" "docker-registry-elb" {
     target              = "TCP:22"
     interval            = 30
   }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-# ELB Stickiness policy
-resource "aws_lb_cookie_stickiness_policy" "docker-registry-elb-stickiness-policy" {
-      name = "${aws_elb.docker-registry-elb.name}-stickiness"
-      load_balancer = "${aws_elb.docker-registry-elb.id}"
-      lb_port = 80
 }
 
 # Route53 record
@@ -245,4 +235,12 @@ module "docker_registry_scale_down_policy" {
 # For allowing other VPCs to interact with docker-registry
 output "docker-registry-sg-id" {
   value = "${aws_security_group.docker-registry-sg-elb.id}"
+}
+# To add in other vpc's route53 entry
+output "registry_elb_dns_name" {
+  value = "${aws_elb.docker-registry-elb.dns_name}"
+}
+
+output "registry_elb_zone_id" {
+  value = "${aws_elb.docker-registry-elb.zone_id}"
 }
