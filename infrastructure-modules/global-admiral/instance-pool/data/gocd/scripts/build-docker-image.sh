@@ -13,6 +13,12 @@ ENVIRONMENT=$2
 APP_IMAGE_BUILD_VERSION=$3
 APP_DOCKER_IMAGE=$4
 
+# Check number of parameters equals 4
+if [ "$#" -ne 4 ]; then
+    echo "ERROR: [Build Docker Image] Illegal number of parameters"
+    exit 1
+fi
+
 # Remove special characters from app name
 SIMPLE_APP_NAME=${APP_NAME//[_-]/}
 
@@ -30,7 +36,10 @@ then
 fi;
 
 # Remove old war files from project root directory
-sudo rm -r ./*.war
+if [ -f ./*.war ];
+then
+   sudo rm -r ./*.war
+fi;
 
 # Copy war file to root directory
 sudo cp -f /app/${APP_NAME}/*.war ./

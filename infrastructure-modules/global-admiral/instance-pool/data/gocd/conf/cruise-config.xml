@@ -53,7 +53,7 @@
         <git url="" branch="master" />
       </materials>
     </pipeline>
-    <pipeline name="app-deploy-prod" template="stakater_build_ami">
+    <pipeline name="app-create-ami-prod" template="stakater_build_ami">
       <params>
         <param name="SOURCE_DIR" />
 	<param name="APP_NAME">test_app</param>
@@ -61,6 +61,16 @@
       </params>
       <materials>
         <pipeline pipelineName="app-build-prod" stageName="Build" />
+      </materials>
+    </pipeline>
+    <pipeline name="app-deploy-prod" template="stakater_launch_ami">
+      <params>
+        <param name="SOURCE_DIR" />
+        <param name="APP_NAME">test_app</param>
+        <param name="APP_DOCKER_IMAGE"></param>
+      </params>
+      <materials>
+        <pipeline pipelineName="app-create-ami-prod" stageName="Build-AMI" />
       </materials>
     </pipeline>
   </pipelines>
@@ -107,13 +117,28 @@
     </pipeline>
     <pipeline name="stakater_build_ami">
       <stage name="Build-AMI" fetchMaterials="false">
-        <approval type="manual" />
         <jobs>
-          <job name="Run">
+          <job name="Build-AMI">
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>/gocd-data/scripts/build-ami.sh #{APP_NAME} ${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER} $(uuid -v4) #{APP_DOCKER_IMAGE}</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="stakater_launch_ami">
+      <stage name="Launch-AMI" fetchMaterials="false">
+        <approval type="manual" />
+        <jobs>
+          <job name="Launch-AMI">
+            <tasks>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>/gocd-data/scripts/launch-ami.sh #{APP_NAME}</arg>
                 <runif status="passed" />
               </exec>
             </tasks>

@@ -7,13 +7,24 @@
 # Argument4: APP_DOCKER_IMAGE
 #-----------------------------------------------------
 
+PROPERTIES_FILE=/gocd-data/scripts/gocd.parameters.txt
+
 # Get parameter values
-APP_DOCKER_OPTS=`/gocd-data/scripts/read-parameter.sh APP_DOCKER_OPTS`
-DOCKER_REGISTRY=`/gocd-data/scripts/read-parameter.sh DOCKER_REGISTRY`
+APP_DOCKER_OPTS=`/gocd-data/scripts/read-parameter.sh ${PROPERTIES_FILE} APP_DOCKER_OPTS`
+DOCKER_REGISTRY=`/gocd-data/scripts/read-parameter.sh ${PROPERTIES_FILE} DOCKER_REGISTRY`
 APP_NAME=$1
 APP_IMAGE_BUILD_VERSION=$2
 BUILD_UUID=$3
 APP_DOCKER_IMAGE=$4
+
+echo "APP_DOCKER_OPTS: ${APP_DOCKER_OPTS}";
+echo "DOCKER_REGISTRY: ${DOCKER_REGISTRY}";
+
+# Check number of parameters equals 4
+if [ "$#" -ne 4 ]; then
+    echo "ERROR: [Build AMI] Illegal number of parameters"
+    exit 1
+fi
 
 # AMI Baker
 if [ ! -d "/app/amibaker" ];
@@ -30,7 +41,7 @@ sudo git pull origin master;
 
 sudo docker run -d --name packer_${GO_PIPELINE_NAME} -v /app/amibaker:/usr/src/app stakater/packer
 
-sudo cp -f /etc/registry-certificates/ca.crt /app/amibaker/baker-data/ca.crt;
+sudo cp -f /etc/registry_certificates/ca.crt /app/amibaker/baker-data/ca.crt;
 macAddress=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/);
 vpc_id=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$macAddress/vpc-id);
 subnet_id=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$macAddress/subnet-id);
@@ -62,5 +73,5 @@ echo "$AMI_ID"
 # Remove docker container
 sudo docker rm -vf packer_${GO_PIPELINE_NAME}
 
-# Launch AMI
-/gocd-data/scripts/launch-ami.sh  ${AMI_ID} ${vpc_id} ${subnet_id} ${aws_region}
+# Write AMI parameters to file
+/gocd-data/scripts/write-ami-parameters.sh ${APP_NAME} ${AMI_ID} ${vpc_id} ${subnet_id} ${aws_region}

@@ -9,6 +9,12 @@
 APP_NAME=$1
 ENVIRONMENT=$2
 
+# Check number of parameters equal 2
+if [ "$#" -ne 2 ]; then
+    echo "ERROR: [Compile Code] Illegal number of parameters"
+    exit 1
+fi
+
 # Remove special characters from app name
 APP_NAME=${APP_NAME//[_-]/}
 
