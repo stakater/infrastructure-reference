@@ -5,7 +5,7 @@ coreos:
     listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
   fleet:
     public-ip: $private_ipv4
-    metadata: "env=${stack_name},platform=ec2,provider=aws,role=gocd"
+    metadata: "env=${stack_name},platform=ec2,provider=aws,role=worker"
     etcd_key_prefix: "/stakater/qa/worker"
   update:
     reboot-strategy: off

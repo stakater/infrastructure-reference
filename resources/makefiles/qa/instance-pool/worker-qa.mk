@@ -10,6 +10,7 @@ worker_qa: plan_worker_qa
 							-target module.worker-scale-down-policy \
 							-target module.worker \
 							-target aws_route53_record.worker \
+							-target aws_route53_record.worker-internal \
 							-target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
 							-target aws_security_group_rule.sg-worker-registry \
 							-target aws_security_group_rule.sg-worker-etcd;
@@ -27,6 +28,7 @@ plan_worker_qa: init_worker_qa
 						 -target module.worker-scale-down-policy \
 						 -target module.worker \
 						 -target aws_route53_record.worker \
+						 -target aws_route53_record.worker-internal \
 						 -target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
 						 -target aws_security_group_rule.sg-worker-registry \
 						 -target aws_security_group_rule.sg-worker-etcd;
@@ -42,6 +44,7 @@ refresh_worker_qa: | $(TF_PROVIDER_QA) pull_qa_state
 								-target module.worker-scale-down-policy \
 								-target module.worker \
 								-target aws_route53_record.worker \
+								-target aws_route53_record.worker-internal \
 								-target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
 								-target aws_security_group_rule.sg-worker-registry \
 								-target aws_security_group_rule.sg-worker-etcd;
@@ -52,6 +55,7 @@ destroy_worker_qa: | $(TF_PROVIDER_QA) pull_qa_state
 	$(TF_DESTROY) -target aws_security_group_rule.sg-worker-registry \
 								-target aws_security_group_rule.sg-worker-etcd \
 								-target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
+								-target aws_route53_record.worker-internal \
 	              -target aws_route53_record.worker \
 								-target aws_security_group_rule.sg-worker-fleet \
 	              -target aws_security_group_rule.sg-worker \
