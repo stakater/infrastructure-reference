@@ -3,6 +3,7 @@
 AWS_PROFILE=${AWS_PROFILE}
 STACK_NAME=${STACK_NAME}
 
+# Input located at the end of the script
 # Default key name
 key=${STACK_NAME}
 # Default bucket name
