@@ -120,6 +120,11 @@ resource "aws_s3_bucket_object" "gocd_test" {
   key = "gocd/scripts/test-code.sh"
   source = "./data/gocd/scripts/test-code.sh"
 }
+resource "aws_s3_bucket_object" "gocd_write_ami_parameters" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/write-ami-parameters.sh"
+  source = "./data/gocd/scripts/write-ami-parameters.sh"
+}
 resource "aws_s3_bucket_object" "gocd_cruise_config" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/conf/cruise-config.xml"

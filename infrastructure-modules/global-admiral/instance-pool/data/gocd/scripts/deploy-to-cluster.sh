@@ -5,10 +5,11 @@
 # Argument2: APP_DOCKER_IMAGE
 #-----------------------------------
 
+GOCD_PARAMS_FILE="/gocd-data/scripts/gocd.parameters.txt"
 # Get parameter values
-APP_DOCKER_OPTS=`/gocd-data/scripts/read-parameter.sh APP_DOCKER_OPTS`
-DEV_CLUSTER_ENDPOINT=`/gocd-data/scripts/read-parameter.sh DEV_CLUSTER_ENDPOINT`
-QA_CLUSTER_ENDPOINT=`/gocd-data/scripts/read-parameter.sh QA_CLUSTER_ENDPOINT`
+APP_DOCKER_OPTS=`/gocd-data/scripts/read-parameter.sh ${GOCD_PARAMS_FILE} APP_DOCKER_OPTS`
+DEV_CLUSTER_ENDPOINT=`/gocd-data/scripts/read-parameter.sh ${GOCD_PARAMS_FILE} DEV_CLUSTER_ENDPOINT`
+QA_CLUSTER_ENDPOINT=`/gocd-data/scripts/read-parameter.sh ${GOCD_PARAMS_FILE} QA_CLUSTER_ENDPOINT`
 APP_NAME=$1
 CLUSTER_ENV=$2
 APP_DOCKER_IMAGE=$3

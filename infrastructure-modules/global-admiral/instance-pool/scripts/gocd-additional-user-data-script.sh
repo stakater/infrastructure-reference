@@ -27,6 +27,7 @@ fileList+=("gocd/scripts/read-parameter.sh")
 fileList+=("gocd/scripts/launch-ami.sh")
 fileList+=("gocd/scripts/test-code.sh")
 fileList+=("gocd/scripts/compile-code.sh")
+fileList+=("gocd/scripts/write-ami-parameters.sh")
 
 # Download all files in the list
 for f in "${fileList[@]}"
@@ -108,6 +109,10 @@ fi
 if [ -f ${gocdDownloadDir}/compile-code.sh ] ;
 then
   cp ${gocdDownloadDir}/compile-code.sh ${gocdScriptsDir}/compile-code.sh
+fi
+if [ -f ${gocdDownloadDir}/write-ami-parameters.sh ] ;
+then
+  cp ${gocdDownloadDir}/write-ami-parameters.sh ${gocdScriptsDir}/write-ami-parameters.sh
 fi
 
 chmod +x ${gocdScriptsDir}/*

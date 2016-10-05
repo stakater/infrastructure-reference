@@ -11,6 +11,7 @@ gocd_global_admiral: plan_gocd_global_admiral
 							-target aws_s3_bucket_object.gocd_launch_ami \
 							-target aws_s3_bucket_object.gocd_read_parameter \
 							-target aws_s3_bucket_object.gocd_test \
+							-target aws_s3_bucket_object.gocd_write_ami_parameters \
 							-target aws_s3_bucket_object.gocd_cruise_config \
 							-target aws_s3_bucket_object.gocd_passwd \
 							-target aws_s3_bucket_object.gocd_sudoers \
@@ -36,6 +37,7 @@ plan_gocd_global_admiral: init_gocd_global_admiral
 						 -target aws_s3_bucket_object.gocd_launch_ami \
 						 -target aws_s3_bucket_object.gocd_read_parameter \
 						 -target aws_s3_bucket_object.gocd_test \
+						 -target aws_s3_bucket_object.gocd_write_ami_parameters \
 						 -target aws_s3_bucket_object.gocd_cruise_config \
 						 -target aws_s3_bucket_object.gocd_passwd \
 						 -target aws_s3_bucket_object.gocd_sudoers \
@@ -59,6 +61,7 @@ refresh_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 								-target aws_s3_bucket_object.gocd_launch_ami \
 								-target aws_s3_bucket_object.gocd_read_parameter \
 								-target aws_s3_bucket_object.gocd_test \
+								-target aws_s3_bucket_object.gocd_write_ami_parameters \
 								-target aws_s3_bucket_object.gocd_cruise_config \
 								-target aws_s3_bucket_object.gocd_passwd \
 								-target aws_s3_bucket_object.gocd_sudoers \
@@ -89,6 +92,7 @@ destroy_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 								-target aws_s3_bucket_object.gocd_gocd_parameters \
 								-target aws_s3_bucket_object.gocd_launch_ami \
 								-target aws_s3_bucket_object.gocd_read_parameter \
+								-target aws_s3_bucket_object.gocd_write_ami_parameters \
 								-target aws_s3_bucket_object.gocd_test \
 								-target aws_s3_bucket_object.gocd_cruise_config \
 								-target aws_s3_bucket_object.gocd_passwd \
