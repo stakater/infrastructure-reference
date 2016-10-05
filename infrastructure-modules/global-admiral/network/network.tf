@@ -17,7 +17,7 @@ module "network" {
     bastion_host_keypair = "bastion-host-ga"
 }
 
-# Output to be accessible by remote state
+# Output to be accessible through remote state
 output "vpc_id" {
   value = "${module.network.vpc_id}"
 }

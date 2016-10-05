@@ -14,8 +14,8 @@
         "s3:*"
       ],
       "Resource": [
-        "${config_bucket_arn}",
-        "${config_bucket_arn}/*",
+        "${config_bucket_arn}/etcd",
+        "${config_bucket_arn}/etcd/*",
         "${cloudinit_bucket_arn}/etcd",
         "${cloudinit_bucket_arn}/etcd/*"
       ]

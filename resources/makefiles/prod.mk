@@ -1,9 +1,9 @@
-prod: storage_prod network_prod
+prod: storage_prod network_prod utilities_prod aurora_db_prod efs_prod
 
-plan_prod: plan_storage_prod plan_network_prod
+plan_prod: plan_storage_prod plan_network_prod plan_utilities_prod plan_aurora_db_prod plan_efs_prod
 
-refresh_prod: refresh_storage_prod refresh_network_prod
+refresh_prod: refresh_storage_prod refresh_network_prod refresh_utilities_prod refresh_aurora_db_prod refresh_efs_prod
 
-destroy_prod: destroy_network_prod destroy_storage_prod
+destroy_prod: destroy_efs_prod destroy_aurora_db_prod destroy_utilities_prod destroy_network_prod destroy_storage_prod
 
 .PHONY: prod destroy_prod refresh_prod plan_prod

@@ -1,6 +1,6 @@
 ## Provisions basic autoscaling group
 module "etcd" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=asg-lc"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool"
 
   # Resource tags
   name = "${var.stack_name}-ga-etcd"
@@ -45,9 +45,11 @@ data "template_file" "bootstrap-user-data" {
   template = "${file("./user-data/bootstrap-user-data.sh.tmpl")}"
 
   vars {
-    config_bucket_name = "${module.cloudinit-bucket.bucket_name}"
+    stack_name = "${var.stack_name}"
+    config_bucket_name = "${module.config-bucket.bucket_name}"
+    cloudinit_bucket_name = "${module.cloudinit-bucket.bucket_name}"
     module_name = "etcd"
-    additional_user_data_script = ""
+    additional_user_data_scripts = ""
   }
 }
 
@@ -56,7 +58,7 @@ data "template_file" "etcd-user-data" {
 
   vars {
     stack_name = "${var.stack_name}"
-    s3_bucket_uri = "s3://${module.cloudinit-bucket.bucket_name}"
+    s3_bucket_uri = "s3://${module.config-bucket.bucket_name}"
   }
 }
 
@@ -101,6 +103,7 @@ resource "aws_security_group" "sg_elb" {
 
 ## Creates ELB
 resource "aws_elb" "elb" {
+  name                      = "${var.stack_name}-etcd"
   security_groups           = ["${aws_security_group.sg_elb.id}"]
   subnets                   = ["${split(",",module.network.public_subnet_ids)}"]
   internal                  = false
@@ -171,7 +174,7 @@ resource "aws_security_group_rule" "sg_fleet" {
 ####################################
 ## Provisions autoscaling policies and associated resources
 module "etcd_scale_up_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=asg-lc"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
 
   # Resource tags
   name = "${var.stack_name}-ga-etcd-scaleup-policy"
@@ -196,7 +199,7 @@ module "etcd_scale_up_policy" {
 }
 
 module "etcd_scale_down_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=asg-lc"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
 
   # Resource tags
   name = "${var.stack_name}-ga-etcd-scaledown-policy"
@@ -219,7 +222,7 @@ module "etcd_scale_down_policy" {
   threshold           = 10
 }
 
-# Output to be accessible by remote state
-output "etcd_security_group_id" {
+# Outputs to be accessible through remote state
+output "etcd-security-group-id" {
   value = "${module.etcd.security_group_id}"
 }

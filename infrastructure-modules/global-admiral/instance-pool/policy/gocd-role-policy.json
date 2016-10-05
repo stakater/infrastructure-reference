@@ -1,0 +1,89 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "${config_bucket_arn}/gocd",
+        "${config_bucket_arn}/gocd/*",
+        "${cloudinit_bucket_arn}/gocd",
+        "${cloudinit_bucket_arn}/gocd/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:List*",
+        "s3:Get*"
+      ],
+      "Resource": [
+        "${config_bucket_arn}/etcd/initial-cluster",
+        "${config_bucket_arn}/docker-registry/registry-certificates/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:Describe*",
+        "autoscaling:Describe*"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:*",
+        "SNS:*",
+        "ec2:*",
+        "autoscaling:*",
+        "elasticloadbalancing:*",
+        "cloudwatch:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "PackerPolicy",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:AttachVolume",
+        "ec2:CreateVolume",
+        "ec2:DeleteVolume",
+        "ec2:CreateKeypair",
+        "ec2:DeleteKeypair",
+        "ec2:DescribeSubnets",
+        "ec2:CreateSecurityGroup",
+        "ec2:DeleteSecurityGroup",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:CreateImage",
+        "ec2:CopyImage",
+        "ec2:RunInstances",
+        "ec2:TerminateInstances",
+        "ec2:StopInstances",
+        "ec2:DescribeVolumes",
+        "ec2:DetachVolume",
+        "ec2:DescribeInstances",
+        "ec2:CreateSnapshot",
+        "ec2:DeleteSnapshot",
+        "ec2:DescribeSnapshots",
+        "ec2:DescribeImages",
+        "ec2:DescribeVPCs",
+        "ec2:RegisterImage",
+        "ec2:CreateTags",
+        "ec2:ModifyImageAttribute"
+      ],
+     "Resource": "*"
+   }
+  ]
+}

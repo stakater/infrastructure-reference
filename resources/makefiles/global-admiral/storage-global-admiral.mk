@@ -24,7 +24,7 @@ clean_storage_global_admiral: destroy_storage_global_admiral
 	rm -f $(BUILD_GLOBAL_ADMIRAL)/storage.tf
 
 init_storage_global_admiral: init_global_admiral
-		cp -rf $(INFRA_GLOBAL_ADMIRAL)/storage/*.tf $(BUILD_GLOBAL_ADMIRAL)
+		cp -rf $(INFRA_GLOBAL_ADMIRAL)/storage/storage.tf $(BUILD_GLOBAL_ADMIRAL)
 		cd $(BUILD_GLOBAL_ADMIRAL); $(TF_GET);
 
 .PHONY: storage_global_admiral destroy_storage_global_admiral refresh_storage_global_admiral plan_storage_global_admiral init_storage_global_admiral clean_storage_global_admiral
