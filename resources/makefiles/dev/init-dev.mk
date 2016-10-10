@@ -17,8 +17,8 @@ init_dev: | $(TF_PROVIDER_DEV) $(MODULE_VARS_DEV)
 	mkdir -p scripts; \
 	mkdir -p data; \
 	cp -rf $(INFRA_DEV)/utilities/remote-config.tf $(BUILD_DEV); \
-	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "dev/terraform.tfstate"; \
-	
+	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "$(TF_STATE_DEV_KEY)"; \
+
 pull_dev_state:
 	cd $(BUILD_DEV);\
 	terraform remote pull;

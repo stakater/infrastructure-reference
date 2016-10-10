@@ -17,8 +17,8 @@ init_qa: | $(TF_PROVIDER_QA) $(MODULE_VARS_QA)
 	mkdir -p scripts; \
 	mkdir -p data; \
 	cp -rf $(INFRA_QA)/utilities/remote-config.tf $(BUILD_QA); \
-	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "qa/terraform.tfstate"
-	
+	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "$(TF_STATE_QA_KEY)"
+
 pull_qa_state:
 	cd $(BUILD_QA);\
 	terraform remote pull;
