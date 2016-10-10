@@ -38,6 +38,8 @@ data "template_file" "gocd-policy" {
   vars {
     config_bucket_arn = "${module.config-bucket.arn}"
     cloudinit_bucket_arn = "${module.cloudinit-bucket.arn}"
+    prod_config_bucket_name = "${var.prod_config_bucket_name}"
+    prod_cloudinit_bucket_name = "${var.prod_cloudinit_bucket_name}"
   }
 }
 
@@ -60,6 +62,16 @@ data "template_file" "gocd-user-data" {
   vars {
     stack_name = "${var.stack_name}"
     s3_bucket_uri = "s3://${module.cloudinit-bucket.bucket_name}"
+  }
+}
+
+data "template_file" "gocd-prod-deploy-params-tmpl" {
+  template = "${file("./scripts/prod.parameters.txt.tmpl")}"
+
+  vars {
+    tf_state_bucket_name = "${var.tf_state_bucket_name}"
+    global_admiral_state_key = "${var.tf_state_global_admiral_key}"
+    prod_state_key = "${var.tf_state_prod_key}"
   }
 }
 
@@ -104,6 +116,11 @@ resource "aws_s3_bucket_object" "gocd_gocd_parameters" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/gocd.parameters.txt"
   source = "./data/gocd/scripts/gocd.parameters.txt"
+}
+resource "aws_s3_bucket_object" "gocd_prod_deploy_params" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/prod.parameters.txt"
+  content = "${data.template_file.gocd-prod-deploy-params-tmpl}"
 }
 resource "aws_s3_bucket_object" "gocd_launch_ami" {
   bucket = "${module.config-bucket.bucket_name}"
