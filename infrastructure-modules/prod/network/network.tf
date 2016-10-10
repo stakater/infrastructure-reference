@@ -22,3 +22,20 @@ module "network" {
     peer_vpc_cidr = "${data.terraform_remote_state.global-admiral.vpc_cidr}"
     peer_private_app_route_table_ids = "${data.terraform_remote_state.global-admiral.private_app_route_table_ids}"
 }
+
+# Output to be accessible through remote state
+output "vpc_id" {
+  value = "${module.network.vpc_id}"
+}
+
+output "vpc_cidr" {
+  value = "${module.network.vpc_cidr}"
+}
+
+output "private_app_subnet_ids" {
+  value = "${module.network.private_app_subnet_ids}"
+}
+
+output "public_subnet_ids" {
+  value = "${module.network.public_subnet_ids}"
+}

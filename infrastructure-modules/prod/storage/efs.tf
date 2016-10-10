@@ -12,3 +12,8 @@ module "efs-mount-targets" {
   mount-targets-count = "${length(var.availability_zones)}" # Send count for number of mount targets separately https://github.com/hashicorp/terraform/issues/3888
   security-groups = "${module.efs.efs-sg-id}"
 }
+
+# Outputs to be accessible by remote state
+output "efs-mount-target-dns-names" {
+  value = "${module.efs-mount-targets.dns-names}"
+}
