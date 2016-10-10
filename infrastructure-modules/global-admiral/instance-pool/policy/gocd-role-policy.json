@@ -28,8 +28,20 @@
       ],
       "Resource": [
         "${config_bucket_arn}/etcd/initial-cluster",
-        "${config_bucket_arn}/docker-registry/registry-certificates/*"
+        "${config_bucket_arn}/docker-registry/registry-certificates/*",
+        "arn:aws:s3:::${prod_cloudinit_bucket_name}/",
+        "arn:aws:s3:::${prod_cloudinit_bucket_name}/*"
       ]
+    },
+    {
+        "Effect": "Allow",
+        "Action": [
+            "s3:Put*"
+        ],
+        "Resource": [
+            "arn:aws:s3:::${prod_config_bucket_name}/keypairs",
+            "arn:aws:s3:::${prod_config_bucket_name}/keypairs/*"
+        ]
     },
     {
       "Effect": "Allow",
@@ -39,6 +51,15 @@
       ],
       "Resource": [
         "*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "route53:*"
+      ],
+      "Resource": [
+        "arn:aws:route53:::*"
       ]
     },
     {
