@@ -1,11 +1,11 @@
 module "config-bucket" {
   source = "github.com/stakater/blueprint-storage-aws.git//modules/s3"
-  name = "${var.stack_name}-prod-config"
+  name = "${var.prod_config_bucket_name}"
 }
 
 module "cloudinit-bucket" {
   source = "github.com/stakater/blueprint-storage-aws.git//modules/s3"
-  name = "${var.stack_name}-prod-cloudinit"
+  name = "${var.prod_cloudinit_bucket_name}"
 }
 
 # Outputs to be accessible through remote state
