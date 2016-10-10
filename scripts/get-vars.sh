@@ -9,6 +9,13 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 AWS_REGION=$($DIR/read_cfg.sh $HOME/.aws/config "profile $AWS_PROFILE" region)
 
 TF_STATE_BUCKET_NAME=${TF_STATE_BUCKET_NAME}
+TF_STATE_GLOBAL_ADMIRAL_KEY=${TF_STATE_GLOBAL_ADMIRAL_KEY}
+TF_STATE_DEV_KEY=${TF_STATE_DEV_KEY}
+TF_STATE_QA_KEY=${TF_STATE_QA_KEY}
+TF_STATE_PROD_KEY=${TF_STATE_PROD_KEY}
+
+PROD_CLOUDINIT_BUCKET_NAME=${PROD_CLOUDINIT_BUCKET_NAME}
+PROD_CONFIG_BUCKET_NAME=${PROD_CONFIG_BUCKET_NAME}
 # Get options from the command line
 while getopts ":c:z:t:" OPTION
 do
@@ -69,4 +76,10 @@ cat <<EOF
 variable "ami" { default = "`curl -s $url`" }
 variable "availability_zones" { default = [${tf_avail_zones} ] }
 variable "tf_state_bucket_name" { default = "${TF_STATE_BUCKET_NAME}" }
+variable "tf_state_global_admiral_key" { default = "${TF_STATE_GLOBAL_ADMIRAL_KEY}" }
+variable "tf_state_dev_key" { default = "${TF_STATE_DEV_KEY}" }
+variable "tf_state_qa_key" { default = "${TF_STATE_QA_KEY}" }
+variable "tf_state_prod_key" { default = "${TF_STATE_PROD_KEY}" }
+variable "prod_cloudinit_bucket_name" { default = "${PROD_CLOUDINIT_BUCKET_NAME}" }
+variable "prod_config_bucket_name" { default = "${PROD_CONFIG_BUCKET_NAME}" }
 EOF

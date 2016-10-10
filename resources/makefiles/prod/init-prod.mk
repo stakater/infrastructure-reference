@@ -17,7 +17,7 @@ init_prod: | $(TF_PROVIDER_PROD) $(MODULE_VARS_PROD)
 	mkdir -p scripts; \
 	mkdir -p data; \
 	cp -rf $(INFRA_PROD)/utilities/remote-config.tf $(BUILD_PROD); \
-	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "prod/terraform.tfstate"
+	$(SCRIPTS)/remote-config.sh -b $(TF_STATE_BUCKET_NAME) -k "$(TF_STATE_PROD_KEY)"
 
 pull_prod_state:
 	cd $(BUILD_PROD);\

@@ -12,7 +12,16 @@ STACK_NAME := stakater-reference
 
 # Bucket which stores terraform remote state
 TF_STATE_BUCKET_NAME := stakater-terraform-state
+TF_STATE_GLOBAL_ADMIRAL_KEY := global-admiral/terraform.tfstate
+TF_STATE_DEV_KEY := dev/terraform.tfstate
+TF_STATE_QA_KEY := qa/terraform.tfstate
+TF_STATE_PROD_KEY := prod/terraform.tfstate
 
+# Prod env bucket names defined here, as these are to be allowed
+# in policy of the instance that deploys to prod (e.g. GoCD) in order to
+# download cloudconfig and upload keypairs
+PROD_CLOUDINIT_BUCKET_NAME := $(STACK_NAME)-prod-cloudinit
+PROD_CONFIG_BUCKET_NAME := $(STACK_NAME)-prod-config
 # For get-vars.sh
 COREOS_UPDATE_CHANNEL=stable
 VM_TYPE=hvm

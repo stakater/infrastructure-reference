@@ -8,6 +8,7 @@ gocd_global_admiral: plan_gocd_global_admiral
 							-target aws_s3_bucket_object.gocd_deploy_to_cluster \
 							-target aws_s3_bucket_object.gocd_docker_cleanup \
 							-target aws_s3_bucket_object.gocd_gocd_parameters \
+							-target aws_s3_bucket_object.gocd_prod_deploy_params \
 							-target aws_s3_bucket_object.gocd_launch_ami \
 							-target aws_s3_bucket_object.gocd_read_parameter \
 							-target aws_s3_bucket_object.gocd_test \
@@ -34,6 +35,7 @@ plan_gocd_global_admiral: init_gocd_global_admiral
 						 -target aws_s3_bucket_object.gocd_deploy_to_cluster \
 						 -target aws_s3_bucket_object.gocd_docker_cleanup \
 						 -target aws_s3_bucket_object.gocd_gocd_parameters \
+						 -target aws_s3_bucket_object.gocd_prod_deploy_params \
 						 -target aws_s3_bucket_object.gocd_launch_ami \
 						 -target aws_s3_bucket_object.gocd_read_parameter \
 						 -target aws_s3_bucket_object.gocd_test \
@@ -58,6 +60,7 @@ refresh_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 								-target aws_s3_bucket_object.gocd_deploy_to_cluster \
 								-target aws_s3_bucket_object.gocd_docker_cleanup \
 								-target aws_s3_bucket_object.gocd_gocd_parameters \
+								-target aws_s3_bucket_object.gocd_prod_deploy_params \
 								-target aws_s3_bucket_object.gocd_launch_ami \
 								-target aws_s3_bucket_object.gocd_read_parameter \
 								-target aws_s3_bucket_object.gocd_test \
@@ -89,6 +92,7 @@ destroy_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 								-target aws_s3_bucket_object.gocd_compile_code \
 								-target aws_s3_bucket_object.gocd_deploy_to_cluster \
 								-target aws_s3_bucket_object.gocd_docker_cleanup \
+								-target aws_s3_bucket_object.gocd_prod_deploy_params \
 								-target aws_s3_bucket_object.gocd_gocd_parameters \
 								-target aws_s3_bucket_object.gocd_launch_ami \
 								-target aws_s3_bucket_object.gocd_read_parameter \
