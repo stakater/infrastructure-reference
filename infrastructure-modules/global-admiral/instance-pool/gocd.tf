@@ -7,7 +7,6 @@ module "gocd" {
 
   # VPC parameters
   vpc_id  = "${module.network.vpc_id}"
-  vpc_cidr  = "${module.network.vpc_cidr}"
   subnets = "${module.network.private_app_subnet_ids}"
   region  = "${var.aws_account["default_region"]}"
 
@@ -40,6 +39,7 @@ data "template_file" "gocd-policy" {
     cloudinit_bucket_arn = "${module.cloudinit-bucket.arn}"
     prod_config_bucket_name = "${var.prod_config_bucket_name}"
     prod_cloudinit_bucket_name = "${var.prod_cloudinit_bucket_name}"
+    tf_state_bucket_name = "${var.tf_state_bucket_name}"
   }
 }
 
@@ -66,7 +66,7 @@ data "template_file" "gocd-user-data" {
 }
 
 data "template_file" "gocd-prod-deploy-params-tmpl" {
-  template = "${file("./scripts/prod.parameters.txt.tmpl")}"
+  template = "${file("./data/gocd/scripts/prod.parameters.txt.tmpl")}"
 
   vars {
     tf_state_bucket_name = "${var.tf_state_bucket_name}"
@@ -107,6 +107,11 @@ resource "aws_s3_bucket_object" "gocd_deploy_to_cluster" {
   key = "gocd/scripts/deploy-to-cluster.sh"
   source = "./data/gocd/scripts/deploy-to-cluster.sh"
 }
+resource "aws_s3_bucket_object" "gocd_deploy_to_prod" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/deploy-to-prod.sh"
+  source = "./data/gocd/scripts/deploy-to-prod.sh"
+}
 resource "aws_s3_bucket_object" "gocd_docker_cleanup" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/docker-cleanup.sh"
@@ -120,7 +125,7 @@ resource "aws_s3_bucket_object" "gocd_gocd_parameters" {
 resource "aws_s3_bucket_object" "gocd_prod_deploy_params" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/prod.parameters.txt"
-  content = "${data.template_file.gocd-prod-deploy-params-tmpl}"
+  content = "${data.template_file.gocd-prod-deploy-params-tmpl.rendered}"
 }
 resource "aws_s3_bucket_object" "gocd_launch_ami" {
   bucket = "${module.config-bucket.bucket_name}"
@@ -230,20 +235,6 @@ resource "aws_lb_cookie_stickiness_policy" "gocd-elb-stickiness-policy" {
       lb_port = 80
 }
 
-## Adds security group rules
-resource "aws_security_group_rule" "sg_gocd" {
-  type                     = "ingress"
-  from_port                = 8153
-  to_port                  = 8153
-  protocol                 = "tcp"
-  cidr_blocks              = ["${module.network.vpc_cidr}"]
-  security_group_id        = "${module.gocd.security_group_id}"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 ####################################
 # ASG Scaling Policies
 ####################################
@@ -295,4 +286,49 @@ module "gocd_scale_down_policy" {
   metric_name         = "CPUUtilization"
   period              = 120
   threshold           = 10
+}
+
+
+##############################
+## Security Group Rules
+##############################
+# Allow ssh from within vpc
+resource "aws_security_group_rule" "sg-gocd-ssh" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  cidr_blocks              = ["${module.network.vpc_cidr}"]
+  security_group_id        = "${module.gocd.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# Allow Outgoing traffic
+resource "aws_security_group_rule" "sg-gocd-outgoing" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  cidr_blocks              = ["0.0.0.0/0"]
+  security_group_id        = "${module.gocd.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group_rule" "sg-gocd-app" {
+  type                     = "ingress"
+  from_port                = 8153
+  to_port                  = 8153
+  protocol                 = "tcp"
+  cidr_blocks              = ["${module.network.vpc_cidr}"]
+  security_group_id        = "${module.gocd.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }

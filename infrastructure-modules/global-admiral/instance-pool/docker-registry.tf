@@ -7,7 +7,6 @@ module "docker-registry" {
 
   # VPC parameters
   vpc_id  = "${module.network.vpc_id}"
-  vpc_cidr  = "${module.network.vpc_cidr}"
   subnets = "${module.network.private_app_subnet_ids}"
   region  = "${var.aws_account["default_region"]}"
 
@@ -163,20 +162,6 @@ resource "aws_route53_record" "docker-registry" {
   }
 }
 
-## Adds security group rules
-resource "aws_security_group_rule" "sg_docker_registry" {
-  type                     = "ingress"
-  from_port                = 5000
-  to_port                  = 5000
-  protocol                 = "tcp"
-  cidr_blocks              = ["${module.network.vpc_cidr}"]
-  security_group_id        = "${module.docker-registry.security_group_id}"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 ####################################
 # ASG Scaling Policies
 ####################################
@@ -230,6 +215,51 @@ module "docker_registry_scale_down_policy" {
   threshold           = 10
 }
 
+
+##############################
+## Security Group Rules
+##############################
+# Allow ssh from within vpc
+resource "aws_security_group_rule" "sg-docker-registry-ssh" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  cidr_blocks              = ["${module.network.vpc_cidr}"]
+  security_group_id        = "${module.docker-registry.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# Allow Outgoing traffic
+resource "aws_security_group_rule" "sg-docker-registry-outgoing" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  cidr_blocks              = ["0.0.0.0/0"]
+  security_group_id        = "${module.docker-registry.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+## Adds security group rules
+resource "aws_security_group_rule" "sg-docker-registry-app" {
+  type                     = "ingress"
+  from_port                = 5000
+  to_port                  = 5000
+  protocol                 = "tcp"
+  cidr_blocks              = ["${module.network.vpc_cidr}"]
+  security_group_id        = "${module.docker-registry.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
 # Outputs to be accessible by remote state
 # For allowing other VPCs to interact with docker-registry

@@ -6,8 +6,10 @@ etcd_global_admiral: plan_etcd_global_admiral
 							-target module.etcd.module.auto-scaling-group \
 							-target module.etcd_scale_up_policy \
 							-target module.etcd_scale_down_policy \
-							-target aws_security_group_rule.sg_etcd \
-							-target aws_security_group_rule.sg_fleet \
+							-target aws_security_group_rule.sg-etcd-ssh \
+							-target aws_security_group_rule.sg-etcd-outgoing \
+							-target aws_security_group_rule.sg-etcd \
+							-target aws_security_group_rule.sg-fleet \
 							-target module.etcd \
 							-target aws_lb_cookie_stickiness_policy.elb_stickiness_policy;
 # Specifiy nested modules explicitly while using terraform apply, plan and destroy
@@ -20,8 +22,10 @@ plan_etcd_global_admiral: init_etcd_global_admiral
 						 -target module.etcd.module.auto-scaling-group \
 						 -target module.etcd_scale_up_policy \
 						 -target module.etcd_scale_down_policy \
-						 -target aws_security_group_rule.sg_etcd \
-						 -target aws_security_group_rule.sg_fleet \
+						 -target aws_security_group_rule.sg-etcd-ssh \
+						 -target aws_security_group_rule.sg-etcd-outgoing \
+						 -target aws_security_group_rule.sg-etcd \
+						 -target aws_security_group_rule.sg-fleet \
 						 -target module.etcd \
 						 -target aws_lb_cookie_stickiness_policy.elb_stickiness_policy;
 
@@ -32,8 +36,10 @@ refresh_etcd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 								-target module.etcd.module.auto-scaling-group \
 								-target module.etcd_scale_up_policy \
 								-target module.etcd_scale_down_policy \
-								-target aws_security_group_rule.sg_etcd \
-								-target aws_security_group_rule.sg_fleet \
+								-target aws_security_group_rule.sg-etcd-ssh \
+								-target aws_security_group_rule.sg-etcd-outgoing \
+								-target aws_security_group_rule.sg-etcd \
+								-target aws_security_group_rule.sg-fleet \
 								-target module.etcd \
 								-target aws_lb_cookie_stickiness_policy.elb_stickiness_policy;
 
@@ -42,8 +48,10 @@ destroy_etcd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-global-admiral-config -d etcd; \
 	$(TF_DESTROY) -target aws_lb_cookie_stickiness_policy.elb_stickiness_policy \
 	              -target module.etcd \
-								-target aws_security_group_rule.sg_fleet \
-	              -target aws_security_group_rule.sg_etcd \
+								-target aws_security_group_rule.sg-etcd-ssh \
+								-target aws_security_group_rule.sg-etcd-outgoing \
+								-target aws_security_group_rule.sg-etcd \
+								-target aws_security_group_rule.sg-fleet \
 								-target module.etcd_scale_up_policy \
 								-target module.etcd_scale_down_policy \
 								-target module.etcd.module.auto-scaling-group \
