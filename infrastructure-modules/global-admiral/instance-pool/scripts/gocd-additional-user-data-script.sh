@@ -21,8 +21,10 @@ fileList+=("gocd/conf/passwd")
 fileList+=("gocd/scripts/build-ami.sh")
 fileList+=("gocd/scripts/build-docker-image.sh")
 fileList+=("gocd/scripts/deploy-to-cluster.sh")
+fileList+=("gocd/scripts/deploy-to-prod.sh")
 fileList+=("gocd/scripts/docker-cleanup.sh")
 fileList+=("gocd/scripts/gocd.parameters.txt")
+fileList+=("gocd/scripts/prod.parameters.txt")
 fileList+=("gocd/scripts/read-parameter.sh")
 fileList+=("gocd/scripts/launch-ami.sh")
 fileList+=("gocd/scripts/test-code.sh")
@@ -86,6 +88,10 @@ if [ -f ${gocdDownloadDir}/deploy-to-cluster.sh ] ;
 then
   cp ${gocdDownloadDir}/deploy-to-cluster.sh ${gocdScriptsDir}/deploy-to-cluster.sh
 fi
+if [ -f ${gocdDownloadDir}/deploy-to-prod.sh ] ;
+then
+  cp ${gocdDownloadDir}/deploy-to-prod.sh ${gocdScriptsDir}/deploy-to-prod.sh
+fi
 if [ -f ${gocdDownloadDir}/docker-cleanup.sh ] ;
 then
   cp ${gocdDownloadDir}/docker-cleanup.sh ${gocdScriptsDir}/docker-cleanup.sh
@@ -93,6 +99,10 @@ fi
 if [ -f ${gocdDownloadDir}/gocd.parameters.txt ] ;
 then
   cp ${gocdDownloadDir}/gocd.parameters.txt ${gocdScriptsDir}/gocd.parameters.txt
+fi
+if [ -f ${gocdDownloadDir}/prod.parameters.txt ] ;
+then
+  cp ${gocdDownloadDir}/prod.parameters.txt ${gocdScriptsDir}/prod.parameters.txt
 fi
 if [ -f ${gocdDownloadDir}/read-parameter.sh ] ;
 then
