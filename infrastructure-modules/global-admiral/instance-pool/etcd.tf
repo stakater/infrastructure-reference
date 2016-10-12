@@ -7,7 +7,6 @@ module "etcd" {
 
   # VPC parameters
   vpc_id  = "${module.network.vpc_id}"
-  vpc_cidr  = "${module.network.vpc_cidr}"
   subnets = "${module.network.private_app_subnet_ids}"
   region  = "${var.aws_account["default_region"]}"
 
@@ -142,8 +141,38 @@ resource "aws_lb_cookie_stickiness_policy" "elb_stickiness_policy" {
       lb_port = 80
 }
 
-## Adds security group rules
-resource "aws_security_group_rule" "sg_etcd" {
+##############################
+## Security Group Rules
+##############################
+# Allow ssh from within vpc
+resource "aws_security_group_rule" "sg-etcd-ssh" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  cidr_blocks              = ["${module.network.vpc_cidr}"]
+  security_group_id        = "${module.etcd.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# Allow Outgoing traffic
+resource "aws_security_group_rule" "sg-etcd-outgoing" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  cidr_blocks              = ["0.0.0.0/0"]
+  security_group_id        = "${module.etcd.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group_rule" "sg-etcd" {
   type                     = "ingress"
   from_port                = 2379
   to_port                  = 2380
@@ -156,7 +185,7 @@ resource "aws_security_group_rule" "sg_etcd" {
   }
 }
 
-resource "aws_security_group_rule" "sg_fleet" {
+resource "aws_security_group_rule" "sg-fleet" {
   type                     = "ingress"
   from_port                = 4001
   to_port                  = 4001

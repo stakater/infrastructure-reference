@@ -17,8 +17,24 @@
         "${config_bucket_arn}/gocd",
         "${config_bucket_arn}/gocd/*",
         "${cloudinit_bucket_arn}/gocd",
-        "${cloudinit_bucket_arn}/gocd/*"
+        "${cloudinit_bucket_arn}/gocd/*",
+        "arn:aws:s3:::${tf_state_bucket_name}",
+        "arn:aws:s3:::${tf_state_bucket_name}/*"
       ]
+    },
+    {
+        "Effect": "Deny",
+        "Action": [
+            "s3:Create*",
+            "s3:Put*",
+            "s3:Delete*"
+        ],
+        "Resource": [
+            "arn:aws:s3:::${tf_state_bucket_name}/global-admiral/*",
+            "arn:aws:s3:::${tf_state_bucket_name}/dev/*",
+            "arn:aws:s3:::${tf_state_bucket_name}/qa/*",
+            "arn:aws:s3:::${tf_state_bucket_name}/prod/terraform.tfstate"
+        ]
     },
     {
       "Effect": "Allow",

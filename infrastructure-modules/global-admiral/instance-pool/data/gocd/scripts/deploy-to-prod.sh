@@ -116,6 +116,9 @@ then
 fi;
 
 cd ${deployCodeLocation}
+sudo git pull origin master
+
+cd ${deployCodeLocation}/deploy-prod
 
 # Enable remote config
 sudo /opt/terraform/terraform remote config \
@@ -124,10 +127,8 @@ sudo /opt/terraform/terraform remote config \
   -backend-config="key=$DEPLOY_STATE_KEY" \
   -backend-config="region=$AWS_REGION";
 
-cd ${deployCodeLocation}/deploy-prod
-
 # Write vars to be used by the deploy code in a TF vars file
-tfvarsFile="${deployCodeLocation}/.terraform/deploy.tfvars"
+tfvarsFile="${deployCodeLocation}/deploy-prod/.terraform/deploy.tfvars"
 sudo sh -c "{
   echo \"aws_region = \\\"${AWS_REGION}\\\"
   tf_state_bucket_name = \\\"${TF_STATE_BUCKET_NAME}\\\"

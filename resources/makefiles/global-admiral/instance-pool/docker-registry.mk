@@ -4,7 +4,9 @@ docker_registry_global_admiral: plan_docker_registry_global_admiral
 	$(TF_APPLY) -target aws_s3_bucket_object.docker_registry_cloud_config \
 	            -target aws_s3_bucket_object.docker_registry_upload_script \
 							-target module.docker-registry.module.launch-configuration \
-							-target aws_security_group_rule.sg_docker_registry \
+							-target aws_security_group_rule.sg-docker-registry-ssh \
+							-target aws_security_group_rule.sg-docker-registry-outgoing \
+							-target aws_security_group_rule.sg-docker-registry-app \
 							-target module.docker-registry.module.auto-scaling-group \
 							-target module.docker-registry_scale_up_policy \
 							-target module.docker-registry_scale_down_policy \
@@ -21,7 +23,9 @@ plan_docker_registry_global_admiral: init_docker_registry_global_admiral
 						 -target module.docker-registry.module.auto-scaling-group \
 						 -target module.docker-registry_scale_up_policy \
 						 -target module.docker-registry_scale_down_policy \
-						 -target aws_security_group_rule.sg_docker_registry \
+						 -target aws_security_group_rule.sg-docker-registry-ssh \
+						 -target aws_security_group_rule.sg-docker-registry-outgoing \
+						 -target aws_security_group_rule.sg-docker-registry-app \
 						 -target module.docker-registry \
 						 -target aws_route53_record.docker-registry;
 
@@ -33,7 +37,9 @@ refresh_docker_registrys_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_gl
 								-target module.docker-registry.module.auto-scaling-group \
 								-target module.docker-registry_scale_up_policy \
 								-target module.docker-registry_scale_down_policy \
-								-target aws_security_group_rule.sg_docker_registry \
+								-target aws_security_group_rule.sg-docker-registry-ssh \
+								-target aws_security_group_rule.sg-docker-registry-outgoing \
+								-target aws_security_group_rule.sg-docker-registry-app \
 								-target module.docker-registry \
 								-target aws_route53_record.docker-registry;
 
@@ -41,6 +47,9 @@ destroy_docker_registry_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_glo
 	cd $(BUILD_GLOBAL_ADMIRAL); \
 	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-global-admiral-config -d docker-registry; \
 	$(TF_DESTROY) -target aws_route53_record.docker-registry \
+								-target aws_security_group_rule.sg-docker-registry-ssh \
+								-target aws_security_group_rule.sg-docker-registry-outgoing \
+								-target aws_security_group_rule.sg-docker-registry-app \
 	              -target module.docker-registry \
 								-target module.docker-registry_scale_up_policy \
 								-target module.docker-registry_scale_down_policy \

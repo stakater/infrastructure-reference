@@ -3,8 +3,6 @@ worker_qa: plan_worker_qa
 	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-qa-config -c worker-qa; \
 	$(TF_APPLY) -target aws_s3_bucket_object.worker-cloud-config \
 							-target module.worker.module.launch-configuration \
-							-target aws_security_group_rule.sg-worker \
-							-target aws_security_group_rule.sg-worker-fleet \
 							-target module.worker.module.auto-scaling-group \
 							-target module.worker-scale-up-policy \
 							-target module.worker-scale-down-policy \
@@ -12,6 +10,10 @@ worker_qa: plan_worker_qa
 							-target aws_route53_record.worker \
 							-target aws_route53_record.worker-internal \
 							-target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
+							-target aws_security_group_rule.sg-worker-ssh \
+							-target aws_security_group_rule.sg-worker-outgoing \
+							-target aws_security_group_rule.sg-worker-app \
+							-target aws_security_group_rule.sg-worker-fleet \
 							-target aws_security_group_rule.sg-worker-registry \
 							-target aws_security_group_rule.sg-worker-etcd;
 # Specifiy nested modules explicitly while using terraform apply, plan and destroy
@@ -21,8 +23,6 @@ plan_worker_qa: init_worker_qa
 	cd $(BUILD_QA); \
 	$(TF_PLAN) -target aws_s3_bucket_object.worker-cloud-config \
 						 -target module.worker.module.launch-configuration \
-						 -target aws_security_group_rule.sg-worker \
-						 -target aws_security_group_rule.sg-worker-fleet \
 						 -target module.worker.module.auto-scaling-group \
 						 -target module.worker-scale-up-policy \
 						 -target module.worker-scale-down-policy \
@@ -30,6 +30,10 @@ plan_worker_qa: init_worker_qa
 						 -target aws_route53_record.worker \
 						 -target aws_route53_record.worker-internal \
 						 -target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
+						 -target aws_security_group_rule.sg-worker-ssh \
+						 -target aws_security_group_rule.sg-worker-outgoing \
+						 -target aws_security_group_rule.sg-worker-app \
+						 -target aws_security_group_rule.sg-worker-fleet \
 						 -target aws_security_group_rule.sg-worker-registry \
 						 -target aws_security_group_rule.sg-worker-etcd;
 
@@ -37,8 +41,6 @@ refresh_worker_qa: | $(TF_PROVIDER_QA) pull_qa_state
 	cd $(BUILD_QA); \
 	$(TF_REFRESH) -target aws_s3_bucket_object.worker-cloud-config \
 								-target module.worker.module.launch-configuration \
-								-target aws_security_group_rule.sg-worker \
-								-target aws_security_group_rule.sg-worker-fleet \
 								-target module.worker.module.auto-scaling-group \
 								-target module.worker-scale-up-policy \
 								-target module.worker-scale-down-policy \
@@ -46,6 +48,10 @@ refresh_worker_qa: | $(TF_PROVIDER_QA) pull_qa_state
 								-target aws_route53_record.worker \
 								-target aws_route53_record.worker-internal \
 								-target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
+								-target aws_security_group_rule.sg-worker-ssh \
+								-target aws_security_group_rule.sg-worker-outgoing \
+								-target aws_security_group_rule.sg-worker-app \
+								-target aws_security_group_rule.sg-worker-fleet \
 								-target aws_security_group_rule.sg-worker-registry \
 								-target aws_security_group_rule.sg-worker-etcd;
 
@@ -54,11 +60,13 @@ destroy_worker_qa: | $(TF_PROVIDER_QA) pull_qa_state
 	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-qa-config -d worker-qa; \
 	$(TF_DESTROY) -target aws_security_group_rule.sg-worker-registry \
 								-target aws_security_group_rule.sg-worker-etcd \
+								-target aws_security_group_rule.sg-worker-ssh \
+								-target aws_security_group_rule.sg-worker-outgoing \
+								-target aws_security_group_rule.sg-worker-app \
+								-target aws_security_group_rule.sg-worker-fleet \
 								-target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
 								-target aws_route53_record.worker-internal \
 	              -target aws_route53_record.worker \
-								-target aws_security_group_rule.sg-worker-fleet \
-	              -target aws_security_group_rule.sg-worker \
 	              -target module.worker \
 								-target module.worker-scale-up-policy \
 								-target module.worker-scale-down-policy \

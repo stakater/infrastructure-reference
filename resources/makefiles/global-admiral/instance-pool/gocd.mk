@@ -6,6 +6,7 @@ gocd_global_admiral: plan_gocd_global_admiral
 							-target aws_s3_bucket_object.gocd_build_docker_image \
 							-target aws_s3_bucket_object.gocd_compile_code \
 							-target aws_s3_bucket_object.gocd_deploy_to_cluster \
+							-target aws_s3_bucket_object.gocd_deploy_to_prod \
 							-target aws_s3_bucket_object.gocd_docker_cleanup \
 							-target aws_s3_bucket_object.gocd_gocd_parameters \
 							-target aws_s3_bucket_object.gocd_prod_deploy_params \
@@ -17,7 +18,9 @@ gocd_global_admiral: plan_gocd_global_admiral
 							-target aws_s3_bucket_object.gocd_passwd \
 							-target aws_s3_bucket_object.gocd_sudoers \
 							-target module.gocd.module.launch-configuration \
-							-target aws_security_group_rule.sg_gocd \
+							-target aws_security_group_rule.sg-gocd-ssh \
+							-target aws_security_group_rule.sg-gocd-outgoing \
+							-target aws_security_group_rule.sg-gocd-app \
 							-target module.gocd.module.auto-scaling-group \
 							-target module.gocd_scale_up_policy \
 							-target module.gocd_scale_down_policy \
@@ -33,6 +36,7 @@ plan_gocd_global_admiral: init_gocd_global_admiral
 						 -target aws_s3_bucket_object.gocd_build_docker_image \
 					 	 -target aws_s3_bucket_object.gocd_compile_code \
 						 -target aws_s3_bucket_object.gocd_deploy_to_cluster \
+						 -target aws_s3_bucket_object.gocd_deploy_to_prod \
 						 -target aws_s3_bucket_object.gocd_docker_cleanup \
 						 -target aws_s3_bucket_object.gocd_gocd_parameters \
 						 -target aws_s3_bucket_object.gocd_prod_deploy_params \
@@ -47,7 +51,9 @@ plan_gocd_global_admiral: init_gocd_global_admiral
 						 -target module.gocd.module.auto-scaling-group \
 						 -target module.gocd_scale_up_policy \
 						 -target module.gocd_scale_down_policy \
-						 -target aws_security_group_rule.sg_gocd \
+						 -target aws_security_group_rule.sg-gocd-ssh \
+						 -target aws_security_group_rule.sg-gocd-outgoing \
+						 -target aws_security_group_rule.sg-gocd-app \
 						 -target module.gocd \
 						 -target aws_lb_cookie_stickiness_policy.gocd-elb-stickiness-policy;
 
@@ -58,6 +64,7 @@ refresh_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 								-target aws_s3_bucket_object.gocd_build_docker_image \
 								-target aws_s3_bucket_object.gocd_compile_code \
 								-target aws_s3_bucket_object.gocd_deploy_to_cluster \
+								-target aws_s3_bucket_object.gocd_deploy_to_prod \
 								-target aws_s3_bucket_object.gocd_docker_cleanup \
 								-target aws_s3_bucket_object.gocd_gocd_parameters \
 								-target aws_s3_bucket_object.gocd_prod_deploy_params \
@@ -72,7 +79,9 @@ refresh_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 								-target module.gocd.module.auto-scaling-group \
 								-target module.gocd_scale_up_policy \
 								-target module.gocd_scale_down_policy \
-								-target aws_security_group_rule.sg_gocd \
+								-target aws_security_group_rule.sg-gocd-ssh \
+								-target aws_security_group_rule.sg-gocd-outgoing \
+								-target aws_security_group_rule.sg-gocd-app \
 								-target module.gocd \
 								-target aws_lb_cookie_stickiness_policy.gocd-elb-stickiness-policy;
 
@@ -81,7 +90,9 @@ destroy_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-global-admiral-config -d gocd; \
 	$(TF_DESTROY) -target aws_lb_cookie_stickiness_policy.gocd-elb-stickiness-policy \
 	              -target module.gocd \
-	              -target aws_security_group_rule.sg_gocd \
+								-target aws_security_group_rule.sg-gocd-ssh \
+								-target aws_security_group_rule.sg-gocd-outgoing \
+								-target aws_security_group_rule.sg-gocd-app \
 								-target module.gocd_scale_up_policy \
 								-target module.gocd_scale_down_policy \
 								-target module.gocd.module.auto-scaling-group \
@@ -90,6 +101,7 @@ destroy_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 		            -target aws_s3_bucket_object.gocd_build_ami \
 								-target aws_s3_bucket_object.gocd_build_docker_image \
 								-target aws_s3_bucket_object.gocd_compile_code \
+								-target aws_s3_bucket_object.gocd_deploy_to_prod \
 								-target aws_s3_bucket_object.gocd_deploy_to_cluster \
 								-target aws_s3_bucket_object.gocd_docker_cleanup \
 								-target aws_s3_bucket_object.gocd_prod_deploy_params \
