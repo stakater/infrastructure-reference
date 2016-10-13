@@ -67,10 +67,27 @@
       <params>
         <param name="SOURCE_DIR" />
         <param name="APP_NAME">test_app</param>
-        <param name="APP_DOCKER_IMAGE"></param>
       </params>
       <materials>
         <pipeline pipelineName="app-create-ami-prod" stageName="Build-AMI" />
+      </materials>
+    </pipeline>
+    <pipeline name="app-switch-group" template="stakater_switch_deployment_group">
+      <params>
+        <param name="SOURCE_DIR" />
+        <param name="APP_NAME">test_app</param>
+      </params>
+      <materials>
+        <pipeline pipelineName="app-deploy-prod" stageName="Launch-AMI" />
+      </materials>
+    </pipeline>
+    <pipeline name="app-rollback-deployment" template="stakater_rollback_deployment">
+      <params>
+        <param name="SOURCE_DIR" />
+        <param name="APP_NAME">test_app</param>
+      </params>
+      <materials>
+        <pipeline pipelineName="app-deploy-prod" stageName="Launch-AMI" />
       </materials>
     </pipeline>
   </pipelines>
@@ -139,6 +156,38 @@
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>/gocd-data/scripts/launch-ami.sh #{APP_NAME}</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="stakater_switch_deployment_group">
+      <stage name="BG-Deployment-Switch-Group" fetchMaterials="false">
+        <approval type="manual" />
+        <jobs>
+          <job name="BG-Deployment-Switch-Group">
+            <tasks>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>/gocd-data/scripts/switch-deployment-group.sh #{APP_NAME}</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="stakater_rollback_deployment">
+      <stage name="BG-Rollback-Deployment" fetchMaterials="false">
+        <approval type="manual" />
+        <jobs>
+          <job name="BG-Rollback-Deployment">
+            <tasks>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>/gocd-data/scripts/rollback-deployment.sh #{APP_NAME}</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
