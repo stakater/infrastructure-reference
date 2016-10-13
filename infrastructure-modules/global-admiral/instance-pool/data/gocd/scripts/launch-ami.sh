@@ -1,5 +1,5 @@
 #!/bin/bash
-# THis shell script deploys and AMI 
+# This shell script deploys an AMI 
 #-----------------------------------------------------
 # Argument1: APP_NAME
 #-----------------------------------------------------
@@ -70,17 +70,5 @@ then
     exit 1;
 fi;
 
-## Automated Deployment
-# Download amd update modules
-cd ~/terraform-aws-asg/examples/standard/;
-sudo /opt/terraform/terraform get -update .;
-
-# Destroy terraform managed infrastructure
-#sudo /opt/terraform/terraform destroy -force -var-file=./terraform.tfvars -var ami=${AMI_ID} -var vpc_id=${VPC_ID} -var subnet_ids=${SUBNET_ID} -var region=${AWS_REGION};
-
-# Create execution plan
-sudo /opt/terraform/terraform plan -var-file=./terraform.tfvars -var ami=${AMI_ID} -var vpc_id=${VPC_ID} -var subnet_ids=${SUBNET_ID} -var region=${AWS_REGION};
-
-# Apply changes required
-sudo /opt/terraform/terraform apply -var-file=./terraform.tfvars -var ami=${AMI_ID} -var vpc_id=${VPC_ID} -var subnet_ids=${SUBNET_ID} -var region=${AWS_REGION};
-
+# Update blue green deployment group
+/gocd-data/scripts/update-blue-green-deployment-groups.sh ${APP_NAME} ${AMI_ID} ${VPC_ID} ${SUBNET_ID} ${AWS_REGION}

@@ -1,5 +1,5 @@
 #!/bin/bash
-# THis shell script builds Amazon Machine Images (AMI)
+# This shell script builds Amazon Machine Images (AMI)
 #-----------------------------------------------------
 # Argument1: APP_NAME
 # Argument2: APP_IMAGE_BUILD_VERSION
