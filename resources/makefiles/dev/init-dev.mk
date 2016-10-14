@@ -7,9 +7,6 @@ show_state_dev: init
 graph_dev: | $(BUILD)
 	cd $(BUILD); $(TF_GRAPH)
 
-refresh_dev: init_dev
-	cd $(BUILD); $(TF_REFRESH)
-
 init_dev: | $(TF_PROVIDER_DEV) $(MODULE_VARS_DEV)
 	cd $(BUILD_DEV); \
 	mkdir -p policy; \

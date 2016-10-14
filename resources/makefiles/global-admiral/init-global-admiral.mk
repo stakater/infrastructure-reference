@@ -7,9 +7,6 @@ show_state_global_admiral: init
 graph_global_admiral: | $(BUILD)
 	cd $(BUILD); $(TF_GRAPH)
 
-refresh_global_admiral: init_global_admiral
-	cd $(BUILD); $(TF_REFRESH)
-
 init_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) $(MODULE_VARS_GLOBAL_ADMIRAL)
 	cd $(BUILD_GLOBAL_ADMIRAL); \
 	mkdir -p policy; \

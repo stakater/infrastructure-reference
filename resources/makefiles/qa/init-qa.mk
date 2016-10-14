@@ -7,9 +7,6 @@ show_state_qa: init
 graph_qa: | $(BUILD)
 	cd $(BUILD); $(TF_GRAPH)
 
-refresh_qa: init_qa
-	cd $(BUILD); $(TF_REFRESH)
-
 init_qa: | $(TF_PROVIDER_QA) $(MODULE_VARS_QA)
 	cd $(BUILD_QA); \
 	mkdir -p policy; \

@@ -2,14 +2,14 @@
 <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="81">
   <server artifactsdir="artifacts" agentAutoRegisterKey="123456789ytrewq" commandRepositoryLocation="default" serverId="e89d0b81-9c38-4e25-a946-ac1dc6944233">
     <security>
-          <passwordFile path="/passwd" />
+      <passwordFile path="/passwd" />
     </security>
   </server>
   <pipelines group="App-Development">
     <pipeline name="app-build-dev" template="stakater_build">
       <params>
         <param name="SOURCE_DIR" />
- 	<param name="APP_NAME">test_app</param>
+ 	      <param name="APP_NAME">test_app</param>
         <param name="ENVIRONMENT">dev</param>
         <param name="APP_DOCKER_IMAGE"></param>
       </params>
@@ -20,8 +20,8 @@
     <pipeline name="app-deploy-dev" template="stakater_deploy_cluster">
       <params>
         <param name="SOURCE_DIR" />
-	<param name="APP_NAME">test_app</param>
-	<param name="CLUSTER_ENV">dev</param>
+        <param name="APP_NAME">test_app</param>
+        <param name="CLUSTER_ENV">dev</param>
         <param name="APP_DOCKER_IMAGE"></param>
       </params>
       <materials>
@@ -45,7 +45,7 @@
     <pipeline name="app-build-prod" template="stakater_build">
       <params>
         <param name="SOURCE_DIR" />
-	<param name="APP_NAME">test_app</param>
+	      <param name="APP_NAME">test_app</param>
         <param name="ENVIRONMENT">prod</param>
         <param name="APP_DOCKER_IMAGE"></param>
       </params>
@@ -56,8 +56,9 @@
     <pipeline name="app-create-ami-prod" template="stakater_build_ami">
       <params>
         <param name="SOURCE_DIR" />
-	<param name="APP_NAME">test_app</param>
+	      <param name="APP_NAME">test_app</param>
         <param name="APP_DOCKER_IMAGE"></param>
+        <param name="PROD_CLOUDINIT_S3_FULL_PATH">myS3bucket/app/cloud-config.tmpl.yaml</param>
       </params>
       <materials>
         <pipeline pipelineName="app-build-prod" stageName="Build" />
@@ -80,7 +81,7 @@
         <jobs>
           <job name="Build">
             <tasks>
-	      <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+             <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>/gocd-data/scripts/compile-code.sh #{APP_NAME} #{ENVIRONMENT}</arg>
                 <runif status="any" />
@@ -107,7 +108,7 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>/gocd-data/scripts/deploy-to-cluster.sh #{CLUSTER_ENV} #{APP_DOCKER_IMAGE}</arg>
+                <arg>/gocd-data/scripts/deploy-to-cluster.sh #{APP_NAME} #{CLUSTER_ENV} #{APP_DOCKER_IMAGE}</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -122,7 +123,7 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>/gocd-data/scripts/build-ami.sh #{APP_NAME} ${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER} $(uuid -v4) #{APP_DOCKER_IMAGE}</arg>
+                <arg>/gocd-data/scripts/build-ami.sh #{APP_NAME} ${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER} $(uuid -v4) #{APP_DOCKER_IMAGE} #{PROD_CLOUDINIT_S3_FULL_PATH}</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -138,7 +139,8 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>/gocd-data/scripts/launch-ami.sh #{APP_NAME}</arg>
+                <arg>AWS_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
+                   /gocd-data/scripts/deploy-to-prod.sh -r $AWS_REGION -k prod/#{APP_NAME}/terraform.tfstate -a #{APP_NAME}</arg>
                 <runif status="passed" />
               </exec>
             </tasks>

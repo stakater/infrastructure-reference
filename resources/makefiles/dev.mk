@@ -2,7 +2,8 @@ dev: storage_dev network_dev utilities_dev aurora_db_dev efs_dev instance_pool_d
 
 plan_dev: plan_storage_dev plan_network_dev plan_utilities_dev plan_aurora_db_dev plan_efs_dev plan_instance_pool_dev
 
-refresh_dev: refresh_storage_dev refresh_network_dev refresh_utilities_dev refresh_aurora_db_dev refresh_efs_dev refresh_instance_pool_dev
+refresh_dev: init_dev
+	cd $(BUILD); $(TF_REFRESH)
 
 destroy_dev: destroy_instance_pool_dev destroy_efs_dev destroy_aurora_db_dev destroy_utilities_dev destroy_network_dev destroy_storage_dev
 

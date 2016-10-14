@@ -5,6 +5,7 @@
 # Argument2: APP_IMAGE_BUILD_VERSION
 # Argument3: BUILD_UUID
 # Argument4: APP_DOCKER_IMAGE
+# Argument5: PROD_CLOUDINIT_S3_FULL_PATH - path to prodcution enviornment's cloudinit file in s3 (e.g. bucket-name/file/location)
 #-----------------------------------------------------
 
 PROPERTIES_FILE=/gocd-data/scripts/gocd.parameters.txt
@@ -16,32 +17,34 @@ APP_NAME=$1
 APP_IMAGE_BUILD_VERSION=$2
 BUILD_UUID=$3
 APP_DOCKER_IMAGE=$4
+PROD_CLOUDINIT_S3_FULL_PATH=$5
 
 echo "APP_DOCKER_OPTS: ${APP_DOCKER_OPTS}";
 echo "DOCKER_REGISTRY: ${DOCKER_REGISTRY}";
 
 # Check number of parameters equals 4
-if [ "$#" -ne 4 ]; then
+if [ "$#" -lt 4 ]; then
     echo "ERROR: [Build AMI] Illegal number of parameters"
     exit 1
 fi
 
 # AMI Baker
-if [ ! -d "/app/amibaker" ];
+AMI_BAKER_LOCATION="/app/stakater/amibaker"
+if [ ! -d "$AMI_BAKER_LOCATION" ];
 then
-  sudo mkdir -p /app/amibaker;
+  sudo mkdir -p $AMI_BAKER_LOCATION;
 fi;
-if [ ! "$(ls -A /app/amibaker)" ];
+if [ ! "$(ls -A $AMI_BAKER_LOCATION)" ];
 then
-  sudo git clone https://github.com/stakater/ami-baker.git /app/amibaker;
+  sudo git clone https://github.com/stakater/ami-baker.git $AMI_BAKER_LOCATION;
 fi;
 
-cd /app/amibaker;
+cd $AMI_BAKER_LOCATION;
 sudo git pull origin master;
 
-sudo docker run -d --name packer_${GO_PIPELINE_NAME} -v /app/amibaker:/usr/src/app stakater/packer
+sudo docker run -d --name packer_${GO_PIPELINE_NAME} -v $AMI_BAKER_LOCATION:/usr/src/app stakater/packer
 
-sudo cp -f /etc/registry-certificates/ca.crt /app/amibaker/baker-data/ca.crt;
+sudo cp -f /etc/registry-certificates/ca.crt $AMI_BAKER_LOCATION/baker-data/ca.crt;
 macAddress=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/);
 vpc_id=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$macAddress/vpc-id);
 subnet_id=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$macAddress/subnet-id);
@@ -63,8 +66,18 @@ echo APP_DOCKER_OPTS: ${APP_DOCKER_OPTS}
 echo APP_DOCKER_IMAGE: ${APP_DOCKER_IMAGE}
 echo "########################################################################"
 
+# Default file
+CLOUD_CONFIG_TMPL_PATH="cloud-config/cloud-config.tmpl.yaml"
+
+# Download cloud config to ami-baker's cloud-config folder if path is given, else use default config
+if [ ! -z ${PROD_CLOUDINIT_S3_FULL_PATH} ];
+then
+  CLOUD_CONFIG_TMPL_PATH="cloud-config/cloud-config-$APP_NAME.tmpl.yaml";
+  sudo aws s3 cp s3://${PROD_CLOUDINIT_S3_FULL_PATH} "$CLOUD_CONFIG_TMPL_PATH"
+fi;
+
 # Bake AMI
-sudo docker exec packer_${GO_PIPELINE_NAME} /bin/bash -c "./bake-ami.sh -r $aws_region -v $vpc_id -s $subnet_id -b $build_uuid -n ${APP_NAME}_${APP_IMAGE_BUILD_VERSION} -d ${APP_DOCKER_IMAGE} -o \"${APP_DOCKER_OPTS}\" -g $docker_registry_path"
+sudo docker exec packer_${GO_PIPELINE_NAME} /bin/bash -c "./bake-ami.sh -r $aws_region -v $vpc_id -s $subnet_id -b $build_uuid -n ${APP_NAME}_${APP_IMAGE_BUILD_VERSION} -c ${CLOUD_CONFIG_TMPL_PATH} -d ${APP_DOCKER_IMAGE} -o \"${APP_DOCKER_OPTS}\" -g $docker_registry_path"
 
 aws_describe_json=$(aws ec2 describe-images --region $aws_region --filters Name=tag:BuildUUID,Values=${build_uuid});
 AMI_ID=$(echo "$aws_describe_json" | jq --raw-output '.Images[0].ImageId');
