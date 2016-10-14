@@ -7,9 +7,6 @@ show_state_prod: init
 graph_prod: | $(BUILD)
 	cd $(BUILD); $(TF_GRAPH)
 
-refresh_prod: init_prod
-	cd $(BUILD); $(TF_REFRESH)
-
 init_prod: | $(TF_PROVIDER_PROD) $(MODULE_VARS_PROD)
 	cd $(BUILD_PROD); \
 	mkdir -p policy; \
