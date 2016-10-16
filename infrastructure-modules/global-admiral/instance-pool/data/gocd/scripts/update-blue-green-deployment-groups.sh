@@ -3,42 +3,87 @@
 #----------------------------------------------
 # Argument1: APP_NAME
 # Argument2: AMI_ID
-# Argument3: VPC_ID
-# Argument4: SUBNET_ID
-# Argument5: AWS_REGION
+# Argument3: AWS_REGION
+# Argument4: DEPLOY_INSTANCE_TYPE
 #----------------------------------------------
 
 # Get parameter values
 APP_NAME=$1
 AMI_ID=$2
-VPC_ID=$3
-SUBNET_ID=$4
-AWS_REGION=$5
+AWS_REGION=$3
+DEPLOY_INSTANCE_TYPE=$4
 
+##############################################################
+#################
+# Prod Params
+#################
+ARE_PROD_PARAMS_EMPTY=false;
+PROD_PARAMS_FILE="/gocd-data/scripts/prod.parameters.txt"
+# Check prod params file exist
+if [ ! -f ${PROD_PARAMS_FILE} ];
+then
+   echo "Error: [Deploy-to-AMI] Prod parameters file not found";
+   exit 1;
+fi;
+
+# Read parameter values from file
+TF_STATE_BUCKET_NAME=`/gocd-data/scripts/read-parameter.sh ${PROD_PARAMS_FILE} TF_STATE_BUCKET_NAME`
+TF_GLOBAL_ADMIRAL_STATE_KEY=`/gocd-data/scripts/read-parameter.sh ${PROD_PARAMS_FILE} TF_GLOBAL_ADMIRAL_STATE_KEY`
+TF_PROD_STATE_KEY=`/gocd-data/scripts/read-parameter.sh ${PROD_PARAMS_FILE} TF_PROD_STATE_KEY`
+
+# Check parameter values not empty
+if test -z ${TF_STATE_BUCKET_NAME};
+then
+   echo "Error: Value for TF_STATE_BUCKET_NAME not defined.";
+   ARE_PROD_PARAMS_EMPTY=true;
+fi;
+
+if test -z ${TF_GLOBAL_ADMIRAL_STATE_KEY};
+then
+   echo "Error: Value for TF_GLOBAL_ADMIRAL_STATE_KEY not defined.";
+   ARE_PROD_PARAMS_EMPTY=true;
+fi;
+
+if test -z ${TF_PROD_STATE_KEY};
+then
+   echo "Error: Value for TF_PROD_STATE_KEY not defined.";
+   ARE_PROD_PARAMS_EMPTY=true;
+fi;
+
+# Check ami params not empty
+if $ARE_PROD_PARAMS_EMPTY;
+then
+    echo "ERROR: Invalid PROD parameters.";
+    exit 1;
+fi;
+
+## Get deployment state values
 DEPLOYMENT_STATE_FILE_PATH="/app/${APP_NAME}/cd/blue-green-deployment"
 DEPLOYMENT_STATE_FILE_NAME="${APP_NAME}_deployment_state.txt"
 DEPLOYMENT_STATE_FILE="${DEPLOYMENT_STATE_FILE_PATH}/${DEPLOYMENT_STATE_FILE_NAME}"
-
-# Get deployment state values
+# Read parameters from file
 LIVE_GROUP=`/gocd-data/scripts/read-parameter.sh ${DEPLOYMENT_STATE_FILE} LIVE_GROUP`
 BLUE_GROUP_AMI_ID=`/gocd-data/scripts/read-parameter.sh ${DEPLOYMENT_STATE_FILE} BLUE_GROUP_AMI_ID`
 GREEN_GROUP_AMI_ID=`/gocd-data/scripts/read-parameter.sh ${DEPLOYMENT_STATE_FILE} GREEN_GROUP_AMI_ID`
+##############################################################
+
 
 CLUSTER_MIN_SIZE=1
 CLUSTER_MAX_SIZE=1
-MIN_ELB_CAPACITY=1
 
 # Output values
 echo "###################################################"
 echo "APP_NAME: ${APP_NAME}"
 echo "AMI_ID: ${AMI_ID}"
-echo "VPC_ID: ${VPC_ID}"
-echo "SUBNET_ID: ${SUBNET_ID}"
 echo "AWS_REGION: ${AWS_REGION}"
 echo "LIVE_GROUP: ${LIVE_GROUP}"
 echo "BLUE_GROUP_AMI_ID: ${BLUE_GROUP_AMI_ID}"
 echo "GREEN_GROUP_AMI_ID: ${GREEN_GROUP_AMI_ID}"
 echo "DEPLOYMENT_STATE_FILE: ${DEPLOYMENT_STATE_FILE_PATH}/${DEPLOYMENT_STATE_FILE_NAME}"
+echo "DEPLOY_INSTANCE_TYPE: ${DEPLOY_INSTANCE_TYPE}"
+echo "TF_STATE_BUCKET_NAME: ${TF_STATE_BUCKET_NAME}"
+echo "TF_GLOBAL_ADMIRAL_STATE_KEY: ${TF_GLOBAL_ADMIRAL_STATE_KEY}"
+echo "TF_PROD_STATE_KEY: ${TF_PROD_STATE_KEY}"
 echo "###################################################"
 
 if [ $LIVE_GROUP == "null" ]
@@ -48,12 +93,10 @@ then
    # First deployment. Create blue group
    BLUE_CLUSTER_MIN_SIZE=${CLUSTER_MIN_SIZE}
    BLUE_CLUSTER_MAX_SIZE=${CLUSTER_MAX_SIZE}
-   BLUE_MIN_ELB_CAPACITY=${MIN_ELB_CAPACITY}
    BLUE_GROUP_AMI_ID=${AMI_ID}
   
    GREEN_CLUSTER_MIN_SIZE=0
    GREEN_CLUSTER_MAX_SIZE=0
-   GREEN_MIN_ELB_CAPACITY=0
    GREEN_GROUP_AMI_ID=${AMI_ID}
 elif [ $LIVE_GROUP == "blue" ]
 then
@@ -62,12 +105,10 @@ then
    # Update GREEN group for new deployment 
    BLUE_CLUSTER_MIN_SIZE=${CLUSTER_MIN_SIZE}
    BLUE_CLUSTER_MAX_SIZE=${CLUSTER_MAX_SIZE}
-   BLUE_MIN_ELB_CAPACITY=${MIN_ELB_CAPACITY}
    BLUE_GROUP_AMI_ID=${BLUE_GROUP_AMI_ID}
   
    GREEN_CLUSTER_MIN_SIZE=${CLUSTER_MIN_SIZE}
    GREEN_CLUSTER_MAX_SIZE=${CLUSTER_MAX_SIZE}
-   GREEN_MIN_ELB_CAPACITY=${MIN_ELB_CAPACITY}
    GREEN_GROUP_AMI_ID=${AMI_ID}
 elif [ $LIVE_GROUP == "green" ]
 then
@@ -76,12 +117,10 @@ then
    # Update BLUE group for new deployment
    BLUE_CLUSTER_MIN_SIZE=${CLUSTER_MIN_SIZE}
    BLUE_CLUSTER_MAX_SIZE=${CLUSTER_MAX_SIZE}
-   BLUE_MIN_ELB_CAPACITY=${MIN_ELB_CAPACITY}
    BLUE_GROUP_AMI_ID=${AMI_ID}
 
    GREEN_CLUSTER_MIN_SIZE=${CLUSTER_MIN_SIZE}
    GREEN_CLUSTER_MAX_SIZE=${CLUSTER_MAX_SIZE}
-   GREEN_MIN_ELB_CAPACITY=${MIN_ELB_CAPACITY}
    GREEN_GROUP_AMI_ID=${GREEN_GROUP_AMI_ID}
 fi;
 
@@ -93,24 +132,14 @@ echo "GREEN_CLUSTER_MIN_SIZE: ${GREEN_CLUSTER_MIN_SIZE}"
 echo "GREEN_CLUSTER_MAX_SIZE: ${GREEN_CLUSTER_MAX_SIZE}"
 echo "BLUE_GROUP_AMI_ID: ${BLUE_GROUP_AMI_ID}"
 echo "GREEN_GROUP_AMI_ID: ${GREEN_GROUP_AMI_ID}"
-echo "BLUE_MIN_ELB_CAPACITY: ${BLUE_MIN_ELB_CAPACITY}"
-echo "GREEN_MIN_ELB_CAPACITY: ${GREEN_MIN_ELB_CAPACITY}"
 echo "#######################################################################"
 
 ## Automated Deployment
-# Download amd update modules
-cd ~/terraform-aws-asg/examples/standard/;
-sudo /opt/terraform/terraform get -update .;
+# Write terraform variables to .tfvars file
+/gocd-data/scripts/write-terraform-variables.sh ${APP_NAME} ${AWS_REGION} ${TF_STATE_BUCKET_NAME} ${TF_PROD_STATE_KEY} ${TF_GLOBAL_ADMIRAL_STATE_KEY} ${DEPLOY_INSTANCE_TYPE} ${BLUE_GROUP_AMI_ID} ${BLUE_CLUSTER_MIN_SIZE} ${BLUE_CLUSTER_MAX_SIZE} ${GREEN_GROUP_AMI_ID} ${GREEN_CLUSTER_MIN_SIZE} ${GREEN_CLUSTER_MAX_SIZE}
 
-# Destroy terraform managed infrastructure
-#sudo /opt/terraform/terraform destroy -force -var-file=./terraform.tfvars -var ami_blue_group=${BLUE_GROUP_AMI_ID} -var ami_green_group=${GREEN_GROUP_AMI_ID} -var vpc_id=${VPC_ID} -var subnet_ids=${SUBNET_ID} -var region=${AWS_REGION} -var green_cluster_min_size=\"${GREEN_CLUSTER_MIN_SIZE}\" -var green_cluster_max_size=\"${GREEN_CLUSTER_MAX_SIZE}\" -var blue_cluster_min_size=\"${BLUE_CLUSTER_MIN_SIZE}\" -var blue_cluster_max_size=\"${BLUE_CLUSTER_MAX_SIZE}\" -var blue_min_elb_capacity=\"${BLUE_MIN_ELB_CAPACITY}\" -var green_min_elb_capacity=\"${GREEN_MIN_ELB_CAPACITY}\";
-
-# Create execution plan
-sudo /opt/terraform/terraform plan -var-file=./terraform.tfvars -var ami_blue_group=${BLUE_GROUP_AMI_ID} -var ami_green_group=${GREEN_GROUP_AMI_ID} -var vpc_id=${VPC_ID} -var subnet_ids=${SUBNET_ID} -var region=${AWS_REGION} -var green_cluster_min_size=\"${GREEN_CLUSTER_MIN_SIZE}\" -var green_cluster_max_size=\"${GREEN_CLUSTER_MAX_SIZE}\" -var blue_cluster_min_size=\"${BLUE_CLUSTER_MIN_SIZE}\" -var blue_cluster_max_size=\"${BLUE_CLUSTER_MAX_SIZE}\" -var blue_min_elb_capacity=\"${BLUE_MIN_ELB_CAPACITY}\" -var green_min_elb_capacity=\"${GREEN_MIN_ELB_CAPACITY}\";
-
-# Apply changes required
-sudo /opt/terraform/terraform apply -var-file=./terraform.tfvars -var ami_blue_group=${BLUE_GROUP_AMI_ID} -var ami_green_group=${GREEN_GROUP_AMI_ID} -var vpc_id=${VPC_ID} -var subnet_ids=${SUBNET_ID} -var region=${AWS_REGION} -var green_cluster_min_size=\"${GREEN_CLUSTER_MIN_SIZE}\" -var green_cluster_max_size=\"${GREEN_CLUSTER_MAX_SIZE}\" -var blue_cluster_min_size=\"${BLUE_CLUSTER_MIN_SIZE}\" -var blue_cluster_max_size=\"${BLUE_CLUSTER_MAX_SIZE}\" -var blue_min_elb_capacity=\"${BLUE_MIN_ELB_CAPACITY}\" -var green_min_elb_capacity=\"${GREEN_MIN_ELB_CAPACITY}\";
-
+# Apply terraform changes
+/gocd-data/scripts/terraform-apply-changes.sh
 
 ## Update deployment state file
 if [ $LIVE_GROUP == "null" ]
