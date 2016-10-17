@@ -26,7 +26,6 @@ fileList+=("gocd/scripts/docker-cleanup.sh")
 fileList+=("gocd/scripts/gocd.parameters.txt")
 fileList+=("gocd/scripts/prod.parameters.txt")
 fileList+=("gocd/scripts/read-parameter.sh")
-fileList+=("gocd/scripts/launch-ami.sh")
 fileList+=("gocd/scripts/test-code.sh")
 fileList+=("gocd/scripts/compile-code.sh")
 fileList+=("gocd/scripts/write-ami-parameters.sh")
@@ -107,10 +106,6 @@ fi
 if [ -f ${gocdDownloadDir}/read-parameter.sh ] ;
 then
   cp ${gocdDownloadDir}/read-parameter.sh ${gocdScriptsDir}/read-parameter.sh
-fi
-if [ -f ${gocdDownloadDir}/launch-ami.sh ] ;
-then
-  cp ${gocdDownloadDir}/launch-ami.sh ${gocdScriptsDir}/launch-ami.sh
 fi
 if [ -f ${gocdDownloadDir}/test-code.sh ] ;
 then

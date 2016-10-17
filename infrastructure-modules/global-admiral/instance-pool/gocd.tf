@@ -127,11 +127,6 @@ resource "aws_s3_bucket_object" "gocd_prod_deploy_params" {
   key = "gocd/scripts/prod.parameters.txt"
   content = "${data.template_file.gocd-prod-deploy-params-tmpl.rendered}"
 }
-resource "aws_s3_bucket_object" "gocd_launch_ami" {
-  bucket = "${module.config-bucket.bucket_name}"
-  key = "gocd/scripts/launch-ami.sh"
-  source = "./data/gocd/scripts/launch-ami.sh"
-}
 resource "aws_s3_bucket_object" "gocd_read_parameter" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/read-parameter.sh"
