@@ -61,5 +61,5 @@ fi;
 ##############################################
 
 # Update blue green deployment group
-/gocd-data/scripts/update-blue-green-deployment-groups.sh ${APP_NAME} ${AMI_ID} ${AWS_REGION} ${DEPLOY_INSTANCE_TYPE}
+/gocd-data/scripts/update-blue-green-deployment-groups.sh ${APP_NAME} ${AMI_ID} ${AWS_REGION} ${DEPLOY_INSTANCE_TYPE} ${DEPLOY_STATE_KEY}
 

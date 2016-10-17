@@ -5,6 +5,7 @@
 # Argument2: AMI_ID
 # Argument3: AWS_REGION
 # Argument4: DEPLOY_INSTANCE_TYPE
+# Argument5: DEPLOY_STATE_KEY
 #----------------------------------------------
 
 # Get parameter values
@@ -12,6 +13,7 @@ APP_NAME=$1
 AMI_ID=$2
 AWS_REGION=$3
 DEPLOY_INSTANCE_TYPE=$4
+DEPLOY_STATE_KEY=$5
 
 ##############################################################
 #################
@@ -139,7 +141,7 @@ echo "#######################################################################"
 /gocd-data/scripts/write-terraform-variables.sh ${APP_NAME} ${AWS_REGION} ${TF_STATE_BUCKET_NAME} ${TF_PROD_STATE_KEY} ${TF_GLOBAL_ADMIRAL_STATE_KEY} ${DEPLOY_INSTANCE_TYPE} ${BLUE_GROUP_AMI_ID} ${BLUE_CLUSTER_MIN_SIZE} ${BLUE_CLUSTER_MAX_SIZE} ${GREEN_GROUP_AMI_ID} ${GREEN_CLUSTER_MIN_SIZE} ${GREEN_CLUSTER_MAX_SIZE}
 
 # Apply terraform changes
-/gocd-data/scripts/terraform-apply-changes.sh
+/gocd-data/scripts/terraform-apply-changes.sh ${TF_STATE_BUCKET_NAME} ${DEPLOY_STATE_KEY} ${AWS_REGION}
 
 ## Update deployment state file
 if [ $LIVE_GROUP == "null" ]
