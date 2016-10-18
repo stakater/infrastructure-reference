@@ -1,5 +1,5 @@
 module "network" {
-    source = "github.com/stakater/blueprint-network-aws.git//modules"
+    source = "github.com/stakater/blueprint-network-aws.git//modules?ref=bastian-ami"
 
     vpc_cidr = "10.2.0.0/16"
     name = "${var.stack_name}-qa"
@@ -15,6 +15,7 @@ module "network" {
     config_bucket_name = "${module.config-bucket.bucket_name}"
     config_bucket_arn = "${module.config-bucket.arn}"
     bastion_host_keypair = "bastion-host-qa"
+    bastion_host_ami_id  = "${var.bastion_host_ami_id}"
 
     # variables for peering this vpc with another vpc
     peer_owner_id = "${var.aws_account["id"]}"
