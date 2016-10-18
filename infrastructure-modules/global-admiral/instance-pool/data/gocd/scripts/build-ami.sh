@@ -18,6 +18,10 @@ APP_IMAGE_BUILD_VERSION=$2
 BUILD_UUID=$3
 APP_DOCKER_IMAGE=$4
 PROD_CLOUDINIT_S3_FULL_PATH=$5
+DATA_EBS_DEVICE_NAME=$6
+DATA_EBS_VOL_SIZE=$7
+LOGS_EBS_DEVICE_NAME=$8
+LOGS_EBS_VOL_SIZE=$9
 
 echo "APP_DOCKER_OPTS: ${APP_DOCKER_OPTS}";
 echo "DOCKER_REGISTRY: ${DOCKER_REGISTRY}";
@@ -77,7 +81,7 @@ then
 fi;
 
 # Bake AMI
-sudo docker exec packer_${GO_PIPELINE_NAME} /bin/bash -c "./bake-ami.sh -r $aws_region -v $vpc_id -s $subnet_id -b $build_uuid -n ${APP_NAME}_${APP_IMAGE_BUILD_VERSION} -c ${CLOUD_CONFIG_TMPL_PATH} -d ${APP_DOCKER_IMAGE} -o \"${APP_DOCKER_OPTS}\" -g $docker_registry_path"
+sudo docker exec packer_${GO_PIPELINE_NAME} /bin/bash -c "./bake-ami.sh -r $aws_region -v $vpc_id -s $subnet_id -b $build_uuid -n ${APP_NAME}_${APP_IMAGE_BUILD_VERSION} -c ${CLOUD_CONFIG_TMPL_PATH} -d ${APP_DOCKER_IMAGE} -o \"${APP_DOCKER_OPTS}\" -g $docker_registry_path -e ${DATA_EBS_DEVICE_NAME} -z ${DATA_EBS_VOL_SIZE} -l ${LOGS_EBS_DEVICE_NAME} -x ${LOGS_EBS_VOL_SIZE}"
 
 aws_describe_json=$(aws ec2 describe-images --region $aws_region --filters Name=tag:BuildUUID,Values=${build_uuid});
 AMI_ID=$(echo "$aws_describe_json" | jq --raw-output '.Images[0].ImageId');
