@@ -26,9 +26,15 @@ fileList+=("gocd/scripts/docker-cleanup.sh")
 fileList+=("gocd/scripts/gocd.parameters.txt")
 fileList+=("gocd/scripts/prod.parameters.txt")
 fileList+=("gocd/scripts/read-parameter.sh")
+fileList+=("gocd/scripts/rollback-deployment.sh")
+fileList+=("gocd/scripts/switch-deployment-group.sh")
+fileList+=("gocd/scripts/terraform-apply-changes.sh")
 fileList+=("gocd/scripts/test-code.sh")
+fileList+=("gocd/scripts/update-blue-green-deployment-groups.sh")
+fileList+=("gocd/scripts/update-deployment-state.sh")
 fileList+=("gocd/scripts/compile-code.sh")
 fileList+=("gocd/scripts/write-ami-parameters.sh")
+fileList+=("gocd/scripts/write-terraform-variables.sh")
 
 # Download all files in the list
 for f in "${fileList[@]}"
@@ -107,9 +113,29 @@ if [ -f ${gocdDownloadDir}/read-parameter.sh ] ;
 then
   cp ${gocdDownloadDir}/read-parameter.sh ${gocdScriptsDir}/read-parameter.sh
 fi
+if [ -f ${gocdDownloadDir}/rollback-deployment.sh ] ;
+then
+  cp ${gocdDownloadDir}/rollback-deployment.sh ${gocdScriptsDir}/rollback-deployment.sh
+fi
+if [ -f ${gocdDownloadDir}/switch-deployment-group.sh ] ;
+then
+  cp ${gocdDownloadDir}/switch-deployment-group.sh ${gocdScriptsDir}/switch-deployment-group.sh
+fi
+if [ -f ${gocdDownloadDir}/terraform-apply-changes.sh ] ;
+then
+  cp ${gocdDownloadDir}/terraform-apply-changes.sh ${gocdScriptsDir}/terraform-apply-changes.sh
+fi
 if [ -f ${gocdDownloadDir}/test-code.sh ] ;
 then
   cp ${gocdDownloadDir}/test-code.sh ${gocdScriptsDir}/test-code.sh
+fi
+if [ -f ${gocdDownloadDir}/update-blue-green-deployment-groups.sh ] ;
+then
+  cp ${gocdDownloadDir}/update-blue-green-deployment-groups.sh ${gocdScriptsDir}/update-blue-green-deployment-groups.sh
+fi
+if [ -f ${gocdDownloadDir}/update-deployment-state.s ] ;
+then
+  cp ${gocdDownloadDir}/update-deployment-state.s ${gocdScriptsDir}/update-deployment-state.s
 fi
 if [ -f ${gocdDownloadDir}/compile-code.sh ] ;
 then
@@ -118,6 +144,10 @@ fi
 if [ -f ${gocdDownloadDir}/write-ami-parameters.sh ] ;
 then
   cp ${gocdDownloadDir}/write-ami-parameters.sh ${gocdScriptsDir}/write-ami-parameters.sh
+fi
+if [ -f ${gocdDownloadDir}/write-terraform-variables.sh ] ;
+then
+  cp ${gocdDownloadDir}/write-terraform-variables.sh ${gocdScriptsDir}/write-terraform-variables.sh
 fi
 
 chmod +x ${gocdScriptsDir}/*
