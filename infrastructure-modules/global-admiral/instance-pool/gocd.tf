@@ -132,15 +132,45 @@ resource "aws_s3_bucket_object" "gocd_read_parameter" {
   key = "gocd/scripts/read-parameter.sh"
   source = "./data/gocd/scripts/read-parameter.sh"
 }
+resource "aws_s3_bucket_object" "gocd_rollback_deployment" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/rollback-deployment.sh"
+  source = "./data/gocd/scripts/rollback-deployment.sh"
+}
+resource "aws_s3_bucket_object" "gocd_switch_deployment_group" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/switch-deployment-group.sh"
+  source = "./data/gocd/scripts/switch-deployment-group.sh"
+}
+resource "aws_s3_bucket_object" "gocd_terraform_apply_changes" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/terraform-apply-changes.sh"
+  source = "./data/gocd/scripts/terraform-apply-changes.sh"
+}
 resource "aws_s3_bucket_object" "gocd_test" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/test-code.sh"
   source = "./data/gocd/scripts/test-code.sh"
 }
+resource "aws_s3_bucket_object" "gocd_update_blue_green_deployment_groups" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/update-blue-green-deployment-groups.sh"
+  source = "./data/gocd/scripts/update-blue-green-deployment-groups.sh"
+}
+resource "aws_s3_bucket_object" "gocd_update_deployment_state" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/update-deployment-state.sh"
+  source = "./data/gocd/scripts/update-deployment-state.sh"
+}
 resource "aws_s3_bucket_object" "gocd_write_ami_parameters" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/write-ami-parameters.sh"
   source = "./data/gocd/scripts/write-ami-parameters.sh"
+}
+resource "aws_s3_bucket_object" "gocd_write_terraform_variables" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/write-terraform-variables.sh"
+  source = "./data/gocd/scripts/write-terraform-variables.sh"
 }
 resource "aws_s3_bucket_object" "gocd_cruise_config" {
   bucket = "${module.config-bucket.bucket_name}"
