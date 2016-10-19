@@ -19,7 +19,7 @@ module "docker-registry" {
   key_name         = "docker-registry"
   root_vol_size    = 50
   data_ebs_device_name  = "/dev/sdh"  # mount to /opt/data (for registry data)
-  data_ebs_vol_size     = 150
+  data_ebs_vol_size     = 200
   logs_ebs_device_name  = "/dev/sdg"
   logs_ebs_vol_size     = 20
 
