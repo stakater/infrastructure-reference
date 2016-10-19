@@ -1,5 +1,5 @@
 module "network" {
-    source = "github.com/stakater/blueprint-network-aws.git//modules?ref=bastian-ami"
+    source = "github.com/stakater/blueprint-network-aws.git//modules"
 
     vpc_cidr = "10.1.0.0/16"
     name = "${var.stack_name}-dev"
