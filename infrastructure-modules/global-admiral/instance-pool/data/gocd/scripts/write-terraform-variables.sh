@@ -12,9 +12,9 @@ DEPLOY_INSTANCE_TYPE=$6
 BLUE_GROUP_AMI_ID=$7
 BLUE_CLUSTER_MIN_SIZE=$8
 BLUE_CLUSTER_MAX_SIZE=$9
-GREEN_GROUP_AMI_ID=$10
-GREEN_CLUSTER_MIN_SIZE=$11
-GREEN_CLUSTER_MAX_SIZE=$12
+GREEN_GROUP_AMI_ID=${10}
+GREEN_CLUSTER_MIN_SIZE=${11}
+GREEN_CLUSTER_MAX_SIZE=${12}
 
 
 # file path
@@ -28,8 +28,8 @@ sudo sh -c "{
   tf_state_bucket_name = \\\"${TF_STATE_BUCKET_NAME}\\\"
   prod_state_key = \\\"${TF_PROD_STATE_KEY}\\\"
   global_admiral_state_key = \\\"${TF_GLOBAL_ADMIRAL_STATE_KEY}\\\"
-  instance_type = \\\"${DEPLOY_INSTANCE_TYPE}\\\" 
-  ami_blue_group = \\\"${BLUE_GROUP_AMI_ID}\\\" 
+  instance_type = \\\"${DEPLOY_INSTANCE_TYPE}\\\"
+  ami_blue_group = \\\"${BLUE_GROUP_AMI_ID}\\\"
   blue_cluster_min_size = \\\"${BLUE_CLUSTER_MIN_SIZE}\\\"
   blue_cluster_max_size = \\\"${BLUE_CLUSTER_MAX_SIZE}\\\"
   ami_green_group = \\\"${GREEN_GROUP_AMI_ID}\\\"

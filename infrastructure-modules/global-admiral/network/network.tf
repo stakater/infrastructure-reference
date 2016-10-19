@@ -15,6 +15,7 @@ module "network" {
     config_bucket_name = "${module.config-bucket.bucket_name}"
     config_bucket_arn = "${module.config-bucket.arn}"
     bastion_host_keypair = "bastion-host-ga"
+    bastion_host_ami_id  = "${var.bastion_host_ami_id}"
 }
 
 # Output to be accessible through remote state

@@ -45,7 +45,7 @@ fi;
 sudo cp -f /app/${APP_NAME}/*.war ./
 
 # Remove copies of new war file not needed anymore
-sudo rm -r /app/${APP_NAME}/*
+sudo rm -r /app/${APP_NAME}/*.war
 
 # Publish
 # Build image

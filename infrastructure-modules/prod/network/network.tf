@@ -15,6 +15,7 @@ module "network" {
     config_bucket_name = "${module.config-bucket.bucket_name}"
     config_bucket_arn = "${module.config-bucket.arn}"
     bastion_host_keypair = "bastion-host-prod"
+    bastion_host_ami_id  = "${var.bastion_host_ami_id}"
 
     # variables for peering this vpc with another vpc
     peer_owner_id = "${var.aws_account["id"]}"
