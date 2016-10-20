@@ -133,9 +133,9 @@ if [ -f ${gocdDownloadDir}/update-blue-green-deployment-groups.sh ] ;
 then
   cp ${gocdDownloadDir}/update-blue-green-deployment-groups.sh ${gocdScriptsDir}/update-blue-green-deployment-groups.sh
 fi
-if [ -f ${gocdDownloadDir}/update-deployment-state.s ] ;
+if [ -f ${gocdDownloadDir}/update-deployment-state.sh ] ;
 then
-  cp ${gocdDownloadDir}/update-deployment-state.s ${gocdScriptsDir}/update-deployment-state.s
+  cp ${gocdDownloadDir}/update-deployment-state.sh ${gocdScriptsDir}/update-deployment-state.sh
 fi
 if [ -f ${gocdDownloadDir}/compile-code.sh ] ;
 then
