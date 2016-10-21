@@ -8,6 +8,8 @@ coreos:
   fleet:
     metadata: env=${stack_name},platform=ec2,provider=aws,role=etcd2
     public-ip: $private_ipv4
+  update:
+    reboot-strategy: off
   units:
     - name: etcd2.service
       command: start
