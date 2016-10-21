@@ -1,3 +1,3 @@
-DOCKER_REGISTRY=registry.qbtech-stack.local:80
-DEV_CLUSTER_ENDPOINT=worker-dev-fleet.qbtech-stack.local
-QA_CLUSTER_ENDPOINT=worker-qa-fleet.qbtech-stack.local
+DOCKER_REGISTRY=registry.stakater-reference.local:80
+DEV_CLUSTER_ENDPOINT=worker-dev-fleet.stakater-reference.local
+QA_CLUSTER_ENDPOINT=worker-qa-fleet.stakater-reference.local
