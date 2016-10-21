@@ -4,6 +4,7 @@
 # NOTE: This is not a standalone script and is to be used with
 #       combination of the bootstrap-user-data script.
 #######################################################################
+aws_region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
 
 regCertDir="/etc/registry-certificates"
 mkdir -m 700 -p ${regCertDir}
@@ -15,12 +16,12 @@ resource="/${configBucket}/${regCertFile}"
 create_string_to_sign
 signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64)
 debug_log
-curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
+curl -s -L -O -H "Host: ${configBucket}.s3-${aws_region}.amazonaws.com" \
   -H "Content-Type: ${contentType}" \
   -H "Authorization: AWS ${s3Key}:${signature}" \
   -H "x-amz-security-token:${s3Token}" \
   -H "Date: ${dateValue}" \
-  https://${configBucket}.s3.amazonaws.com/${regCertFile}
+  https://${configBucket}.s3-${aws_region}.amazonaws.com/${regCertFile}
 
 # if ca.pem file is downloaded and is a valid certificate copy to docker registry certificate location
 # else delete the downloaded files

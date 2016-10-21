@@ -15,6 +15,8 @@
 # 3. All machines should have instance role profile, with a policy that allows access to this bucket.
 
 # Get instance auth token from meta-data
+aws_region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
+
 get_value() {
   echo -n $(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/$roleProfile | jq -r ".$1")
 }
@@ -37,12 +39,12 @@ $${resource}"
 # Log curl call
 debug_log () {
     echo ""  >> /tmp/s3-bootstrap.log
-    echo "curl -s -O -H \"Host: $${configBucket}.s3.amazonaws.com\"
+    echo "curl -s -O -H \"Host: $${configBucket}.s3-$${aws_region}.amazonaws.com\"
   -H \"Content-Type: $${contentType}\"
   -H \"Authorization: AWS $${s3Key}:$${signature}\"
   -H \"x-amz-security-token:$${s3Token}\"
   -H \"Date: $${dateValue}\"
-	https://$${configBucket}.s3.amazonaws.com/$${filePath} " >> /tmp/s3-bootstrap.log
+	https://$${configBucket}.s3-$${aws_region}.amazonaws.com/$${filePath} " >> /tmp/s3-bootstrap.log
 }
 
 # Instance profile
@@ -84,12 +86,12 @@ create_string_to_sign
 signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac $${s3Secret} -binary | base64)
 filePath=$${cloudConfigYaml}
 debug_log
-curl -L -s -H "Host: $${cloudInitBucket}.s3.amazonaws.com" \
+curl -L -s -H "Host: $${cloudInitBucket}.s3-$${aws_region}.amazonaws.com" \
   -H "Content-Type: $${contentType}" \
   -H "Authorization: AWS $${s3Key}:$${signature}" \
   -H "x-amz-security-token:$${s3Token}" \
   -H "Date: $${dateValue}" \
-  https://$${cloudInitBucket}.s3.amazonaws.com/$${filePath} \
+  https://$${cloudInitBucket}.s3-$${aws_region}.amazonaws.com/$${filePath} \
   | sed "s#\\$private_ipv4#$private_ipv4#g; s#\\$public_ipv4#$public_ipv4#g" \
   > $${workDir}/cloud-config.yaml
 
@@ -103,11 +105,11 @@ retry=5
 ready=0
 until [[ $retry -eq 0 ]]  || [[ $ready -eq 1  ]]
 do
-  curl -s -L -O -H "Host: $${configBucket}.s3.amazonaws.com" \
+  curl -s -L -O -H "Host: $${configBucket}.s3-$${aws_region}.amazonaws.com" \
     -H "Content-Type: $${contentType}" \
     -H "Authorization: AWS $${s3Key}:$${signature}" \
     -H "x-amz-security-token:$${s3Token}" \
-    -H "Date: $${dateValue}" https://$${configBucket}.s3.amazonaws.com/$${filePath}
+    -H "Date: $${dateValue}" https://$${configBucket}.s3-$${aws_region}.amazonaws.com/$${filePath}
   if [ -f $${workDir}/initial-cluster ] && grep -q ETCD_INITIAL_CLUSTER $${workDir}/initial-cluster ;
   then
     ready=1

@@ -8,6 +8,8 @@
 # Dowload and place `cruise-config.xml` to `/gocd-data/conf` to feed
 # `cruise-config.xml` to GoCD at startup
 #######################################################################
+aws_region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
+
 gocdDownloadDir="/gocd-downlaod"
 mkdir -m 700 -p ${gocdDownloadDir}
 cd ${gocdDownloadDir}
@@ -43,12 +45,12 @@ do
   create_string_to_sign
   signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64)
   debug_log
-  curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
+  curl -s -L -O -H "Host: ${configBucket}.s3-${aws_region}.amazonaws.com" \
     -H "Content-Type: ${contentType}" \
     -H "Authorization: AWS ${s3Key}:${signature}" \
     -H "x-amz-security-token:${s3Token}" \
     -H "Date: ${dateValue}" \
-    https://${configBucket}.s3.amazonaws.com/${f}
+    https://${configBucket}.s3-${aws_region}.amazonaws.com/${f}
 done
 
 # Create gocd data directory
@@ -133,9 +135,9 @@ if [ -f ${gocdDownloadDir}/update-blue-green-deployment-groups.sh ] ;
 then
   cp ${gocdDownloadDir}/update-blue-green-deployment-groups.sh ${gocdScriptsDir}/update-blue-green-deployment-groups.sh
 fi
-if [ -f ${gocdDownloadDir}/update-deployment-state.s ] ;
+if [ -f ${gocdDownloadDir}/update-deployment-state.sh ] ;
 then
-  cp ${gocdDownloadDir}/update-deployment-state.s ${gocdScriptsDir}/update-deployment-state.s
+  cp ${gocdDownloadDir}/update-deployment-state.sh ${gocdScriptsDir}/update-deployment-state.sh
 fi
 if [ -f ${gocdDownloadDir}/compile-code.sh ] ;
 then
