@@ -1,17 +1,19 @@
 #!/bin/bash
 # Applies terraform changes
 #---------------------------------
-# Argument1: TF_STATE_BUCKET_NAME
-# Argument2: DEPLOY_STATE_KEY
-# Argument3: AWS_REGION
+# Argument1: APP_NAME
+# Argument2: TF_STATE_BUCKET_NAME
+# Argument3: DEPLOY_STATE_KEY
+# Argument4: AWS_REGION
 #--------------------------------
 
-TF_STATE_BUCKET_NAME=$1
-DEPLOY_STATE_KEY=$2
-AWS_REGION=$3
+APP_NAME=$1
+TF_STATE_BUCKET_NAME=$2
+DEPLOY_STATE_KEY=$3
+AWS_REGION=$4
 
 # Clone deployment code
-deployCodeLocation="/app/stakater/prod-deployment-reference"
+deployCodeLocation="/app/stakater/prod-deployment-reference-${APP_NAME}"
 tfvarsFile="${deployCodeLocation}/deploy-prod/.terraform/deploy.tfvars"
 
 if [ ! -d "${deployCodeLocation}" ];
