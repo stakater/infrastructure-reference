@@ -19,7 +19,7 @@ TEST_LOAD_BALANCER=${APP_NAME//_/\-}-prod-elb-test
 
 ##############################################################
 ## Get prod parameters 
-PROD_PARAMS_FILE="/app/stakater/prod-deployment-reference/deploy-prod/.terraform/deploy.tfvars"
+PROD_PARAMS_FILE="/app/stakater/prod-deployment-reference-${APP_NAME}/deploy-prod/.terraform/deploy.tfvars"
 # Check prod params file exist
 if [ ! -f ${PROD_PARAMS_FILE} ];
 then

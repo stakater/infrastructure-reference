@@ -21,7 +21,7 @@ GREEN_GROUP_LOAD_BALANCERS=${15}
 GREEN_GROUP_MIN_ELB_CAPACITY=${16}
 
 # file path
-deployCodeLocation="/app/stakater/prod-deployment-reference"
+deployCodeLocation="/app/stakater/prod-deployment-reference-${APP_NAME}"
 tfvarsFile="${deployCodeLocation}/deploy-prod/.terraform/deploy.tfvars"
 
 # Write vars to be used by the deploy code in a TF vars file
