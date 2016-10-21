@@ -1,4 +1,4 @@
-prod: storage_prod network_prod utilities_prod aurora_db_prod efs_prod prod_user_data
+prod: storage_prod network_prod utilities_prod efs_prod prod_user_data
 	cd $(BUILD_PROD); $(TF_REFRESH);
 	# Refresh terraform at the end, to make sure all output is present
 	# https://github.com/hashicorp/terraform/issues/2598
