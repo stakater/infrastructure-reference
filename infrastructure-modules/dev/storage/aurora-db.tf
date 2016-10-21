@@ -6,9 +6,9 @@ module "aurora-db" {
   vpc_cidr = "${module.network.vpc_cidr}"
   subnets = "${module.network.private_persistence_subnet_ids}"
 
-  aurora_db_name = "testdb"
-  aurora_db_username = "root"
-  aurora_db_password = "root12345"
+  aurora_db_name = "${var.dev_database_name}"
+  aurora_db_username = "${var.dev_database_username}"
+  aurora_db_password = "${var.dev_database_password}"
 
   # DB Backup
   backup_retention_period = 14
@@ -24,7 +24,7 @@ module "aurora-db" {
 ## Route53 Record
 ########################
 resource "aws_route53_record" "aurora-db-record" {
-    zone_id = "${data.terraform_remote_state.global-admiral.route53_private_zone_id}"
+    zone_id = "${module.route53-private.zone_id}"
     name = "aurora-db-dev"
     type = "CNAME"
     ttl = 60
