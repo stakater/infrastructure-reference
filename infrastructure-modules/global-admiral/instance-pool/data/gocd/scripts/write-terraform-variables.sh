@@ -22,7 +22,14 @@ GREEN_GROUP_MIN_ELB_CAPACITY=${16}
 
 # file path
 deployCodeLocation="/app/stakater/prod-deployment-reference-${APP_NAME}"
-tfvarsFile="${deployCodeLocation}/deploy-prod/.terraform/deploy.tfvars"
+terraformFolderPath="${deployCodeLocation}/deploy-prod/.terraform/"
+tfvarsFile="${terraformFolderPath}/deploy.tfvars"
+
+# Check if .terraform folder exists
+if [ ! -d "${terraformFolderPath}" ];
+then
+  sudo mkdir -p ${terraformFolderPath}
+fi;
 
 # Write vars to be used by the deploy code in a TF vars file
 sudo sh -c "{
@@ -39,10 +46,8 @@ sudo sh -c "{
   blue_group_min_elb_capacity = \\\"${BLUE_GROUP_MIN_ELB_CAPACITY}\\\"
   ami_green_group = \\\"${GREEN_GROUP_AMI_ID}\\\"
   green_cluster_min_size = \\\"${GREEN_CLUSTER_MIN_SIZE}\\\"
-  green_cluster_max_size = \\\"${GREEN_CLUSTER_MAX_SIZE}\\\"  
+  green_cluster_max_size = \\\"${GREEN_CLUSTER_MAX_SIZE}\\\"
   green_group_load_balancers = \\\"${GREEN_GROUP_LOAD_BALANCERS}\\\"
   green_group_min_elb_capacity = \\\"${GREEN_GROUP_MIN_ELB_CAPACITY}\\\"
 \"
 } > ${tfvarsFile}"
-
-
