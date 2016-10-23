@@ -13,6 +13,9 @@ echo "Getting AWS account number..."
 AWS_ACCOUNT=$(aws --profile ${AWS_PROFILE} iam get-user | jq ".User.Arn" | grep -Eo '[[:digit:]]{12}')
 echo $AWS_ACCOUNT
 
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+AWS_REGION=$($DIR/read_cfg.sh $HOME/.aws/config "profile $AWS_PROFILE" region)
+
 TMP_DIR=${BUILD}/keypairs
 
 create(){
@@ -24,7 +27,7 @@ create(){
     chmod 700 ${TMP_DIR}
     echo "Creating keypair ${key} and uploading to s3"
     aws --profile ${AWS_PROFILE} ec2 create-key-pair --key-name ${key} --query 'KeyMaterial' --output text > ${TMP_DIR}/${key}.pem
-    aws --profile ${AWS_PROFILE} s3 cp ${TMP_DIR}/${key}.pem s3://${CONFIG_BUCKET_NAME}/keypairs/${key}.pem
+    aws --region ${AWS_REGION} --profile ${AWS_PROFILE} s3 cp ${TMP_DIR}/${key}.pem s3://${CONFIG_BUCKET_NAME}/keypairs/${key}.pem
 
     chmod 600 ${TMP_DIR}/${key}.pem
     echo "ssh-add ${TMP_DIR}/${key}.pem"
@@ -44,7 +47,7 @@ destroy(){
       echo "Remove from ssh agent"
       ssh-add -L |grep "${TMP_DIR}/${key}.pem" > ${TMP_DIR}/${key}.pub
       [ -s ${TMP_DIR}/${key}.pub ] && ssh-add -d ${TMP_DIR}/${key}.pub
-      aws --profile ${AWS_PROFILE} s3 rm s3://${CONFIG_BUCKET_NAME}/keypairs/${key}.pem
+      aws --region ${AWS_REGION} --profile ${AWS_PROFILE} s3 rm s3://${CONFIG_BUCKET_NAME}/keypairs/${key}.pem
       echo "Delete aws keypair ${key}"
       aws --profile ${AWS_PROFILE} ec2 delete-key-pair --key-name ${key}
       echo "Remove from ${TMP_DIR}"

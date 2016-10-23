@@ -22,6 +22,20 @@ TF_STATE_PROD_KEY := prod/terraform.tfstate
 # download cloudconfig and upload keypairs
 PROD_CLOUDINIT_BUCKET_NAME := $(STACK_NAME)-prod-cloudinit
 PROD_CONFIG_BUCKET_NAME := $(STACK_NAME)-prod-config
+
+# Database properties
+DEV_DATABASE_USERNAME := root
+DEV_DATABASE_PASSWORD := root
+DEV_DATABASE_NAME := mydb
+
+QA_DATABASE_USERNAME := root
+QA_DATABASE_PASSWORD := root
+QA_DATABASE_NAME := mydb
+
+PROD_DATABASE_USERNAME := root
+PROD_DATABASE_PASSWORD := root
+PROD_DATABASE_NAME := mydb
+
 # For get-vars.sh
 COREOS_UPDATE_CHANNEL=stable
 VM_TYPE=hvm

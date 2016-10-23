@@ -1,18 +1,20 @@
 #!/bin/bash
 # Deploy to cluster
 #-----------------------------------
-# Argument1: CLUSTER_ENV (`dev` or `qa`)
-# Argument2: APP_DOCKER_IMAGE
+# Argument1: APP_NAME
+# Argument2: CLUSTER_ENV (`dev` or `qa`)
+# Argument3: APP_DOCKER_IMAGE
+# Argument4: APP_DOCKER_OPTS
 #-----------------------------------
 
 GOCD_PARAMS_FILE="/gocd-data/scripts/gocd.parameters.txt"
 # Get parameter values
-APP_DOCKER_OPTS=`/gocd-data/scripts/read-parameter.sh ${GOCD_PARAMS_FILE} APP_DOCKER_OPTS`
 DEV_CLUSTER_ENDPOINT=`/gocd-data/scripts/read-parameter.sh ${GOCD_PARAMS_FILE} DEV_CLUSTER_ENDPOINT`
 QA_CLUSTER_ENDPOINT=`/gocd-data/scripts/read-parameter.sh ${GOCD_PARAMS_FILE} QA_CLUSTER_ENDPOINT`
 APP_NAME=$1
 CLUSTER_ENV=$2
 APP_DOCKER_IMAGE=$3
+APP_DOCKER_OPTS=$4
 
 # Convert CLUSTER_ENV value to lowercase
 CLUSTER_ENV=`echo "$CLUSTER_ENV" | sed 's/./\L&/g'`

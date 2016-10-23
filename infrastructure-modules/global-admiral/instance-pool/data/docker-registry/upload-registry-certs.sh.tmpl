@@ -10,6 +10,8 @@ if [ ! -d $1 ]; then
   exit 0
 fi
 
+aws_region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
+
 # Get instance auth token from meta-data
 get_value() {
   echo -n $(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/$roleProfile/ \
@@ -45,12 +47,12 @@ download_file_to_check() {
   create_string_to_sign
   signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac $${s3Sec} -binary | base64)
 
-  curl -s -L -O -H "Host: $${configBucket}.s3.amazonaws.com" \
+  curl -s -L -O -H "Host: $${configBucket}.s3-$${aws_region}.amazonaws.com" \
     -H "Content-Type: $${contentType}" \
     -H "Authorization: AWS $${s3Key}:$${signature}" \
     -H "x-amz-security-token:$${s3Token}" \
     -H "Date: $${dateValue}" \
-    https://$${configBucket}.s3.amazonaws.com/$${fileToDownload}
+    https://$${configBucket}.s3-$${aws_region}.amazonaws.com/$${fileToDownload}
 
   if [ -f $${fileName} ];
   then
@@ -99,12 +101,12 @@ do
   until [[ $retry -eq 0 ]]  || [[ $ready -eq 1  ]]
   do
     curl -X PUT -T "$${file}" \
-    -H "Host: $${configBucket}.s3.amazonaws.com" \
+    -H "Host: $${configBucket}.s3-$${aws_region}.amazonaws.com" \
     -H "Date: $${dateValue}" \
     -H "Content-Type: $${contentType}" \
     -H "Authorization: AWS $${s3Key}:$${signature}" \
     -H "x-amz-security-token:$${s3Token}" \
-    https://$${configBucket}.s3.amazonaws.com/$${registry_certificates}
+    https://$${configBucket}.s3-$${aws_region}.amazonaws.com/$${registry_certificates}
 
     # Download file to check if it is Successfully uploaded or not
     DOWNLOADED=false

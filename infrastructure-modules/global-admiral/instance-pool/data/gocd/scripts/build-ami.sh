@@ -5,31 +5,89 @@
 # Argument2: APP_IMAGE_BUILD_VERSION
 # Argument3: BUILD_UUID
 # Argument4: APP_DOCKER_IMAGE
-# Argument5: PROD_CLOUDINIT_S3_FULL_PATH - path to prodcution enviornment's cloudinit file in s3 (e.g. bucket-name/file/location)
+# Argument5: APP_DOCKER_OPTS
+# Argument6: PROD_CLOUDINIT_S3_FULL_PATH - path to prodcution enviornment's cloudinit file in s3 (e.g. bucket-name/file/location)
+# Argument7: DATA_EBS_DEVICE_NAME: Data device name
+# Argument8: DATA_EBS_VOL_SIZE: data device size
+# Argument9: LOGS_EBS_DEVICE_NAME: logs device name
+# Argument10: LOGS_EBS_VOL_SIZE: logs device size
 #-----------------------------------------------------
 
 PROPERTIES_FILE=/gocd-data/scripts/gocd.parameters.txt
 
 # Get parameter values
-APP_DOCKER_OPTS=`/gocd-data/scripts/read-parameter.sh ${PROPERTIES_FILE} APP_DOCKER_OPTS`
 DOCKER_REGISTRY=`/gocd-data/scripts/read-parameter.sh ${PROPERTIES_FILE} DOCKER_REGISTRY`
-APP_NAME=$1
-APP_IMAGE_BUILD_VERSION=$2
-BUILD_UUID=$3
-APP_DOCKER_IMAGE=$4
-PROD_CLOUDINIT_S3_FULL_PATH=$5
-DATA_EBS_DEVICE_NAME=$6
-DATA_EBS_VOL_SIZE=$7
-LOGS_EBS_DEVICE_NAME=$8
-LOGS_EBS_VOL_SIZE=$9
+APP_NAME=""
+APP_IMAGE_BUILD_VERSION=""
+BUILD_UUID=""
+APP_DOCKER_IMAGE=""
+APP_DOCKER_OPTS=""
+PROD_CLOUDINIT_S3_FULL_PATH=""
+DATA_EBS_DEVICE_NAME=""
+DATA_EBS_VOL_SIZE=""
+LOGS_EBS_DEVICE_NAME=""
+LOGS_EBS_VOL_SIZE=""
 
-echo "APP_DOCKER_OPTS: ${APP_DOCKER_OPTS}";
-echo "DOCKER_REGISTRY: ${DOCKER_REGISTRY}";
-
-# Check number of parameters equals 4
-if [ "$#" -lt 4 ]; then
-    echo "ERROR: [Build AMI] Illegal number of parameters"
-    exit 1
+# Flags to make sure all options are given
+aOptionFlag=false;
+bOptionFlag=false;
+uOptionFlag=false;
+dOptionFlag=false;
+oOptionFlag=false;
+volOptionCnt=0;
+# Get options from the command line
+while getopts ":a:b:u:d:o:c:e:z:l:x:" OPTION
+do
+    case $OPTION in
+        a)
+          aOptionFlag=true
+          APP_NAME=$OPTARG
+          ;;
+        b)
+          bOptionFlag=true
+          APP_IMAGE_BUILD_VERSION=$OPTARG
+          ;;
+        u)
+          uOptionFlag=true
+          BUILD_UUID=$OPTARG
+          ;;
+        d)
+          dOptionFlag=true
+          APP_DOCKER_IMAGE=$OPTARG
+          ;;
+        o)
+          oOptionFlag=true
+          APP_DOCKER_OPTS=$OPTARG
+          ;;
+        c)
+          PROD_CLOUDINIT_S3_FULL_PATH=$OPTARG #optional
+          ;;
+        e)
+          volOptionCnt=$((volOptionCnt+1));
+          DATA_EBS_DEVICE_NAME=$OPTARG
+          ;;
+        z)
+          volOptionCnt=$((volOptionCnt+1));
+          DATA_EBS_VOL_SIZE=$OPTARG
+          ;;
+        l)
+          volOptionCnt=$((volOptionCnt+1));
+          LOGS_EBS_DEVICE_NAME=$OPTARG
+          ;;
+        x)
+          volOptionCnt=$((volOptionCnt+1));
+          LOGS_EBS_VOL_SIZE=$OPTARG
+          ;;
+        *)
+          echo "Usage: $(basename $0) -a <APP NAME> -b <APP IMAGE BUILD VERSION> -u <Build UUID> -d <APP DOCKER IMAGE>  -o <APP DOCKER OPTIONS> -c <Full path (incl bucket name) of cloud config file> (optional) -e <EBS data volume device name> -z <EBS data volume device size> -l <EBS logs volume device name> -x <EBS logs volume size>"
+          exit 0
+          ;;
+    esac
+done
+if [[ ! $aOptionFlag || ! $bOptionFlag || ! $uOptionFlag || ! $dOptionFlag || ! $oOptionFlag ]] || [[ "$volOptionCnt" -lt  "4" ]] ;
+then
+  echo "Usage: $(basename $0) -a <APP NAME> -b <APP IMAGE BUILD VERSION> -u <Build UUID> -d <APP DOCKER IMAGE> -o <APP DOCKER OPTIONS> -c <Full path (incl bucket name) of cloud config file> (optional) -e <EBS data volume device name> -z <EBS data volume device size> -l <EBS logs volume device name> -x <EBS logs volume size>"
+  exit 0;
 fi
 
 # AMI Baker
@@ -68,16 +126,20 @@ echo APP_NAME: ${APP_NAME}
 echo APP_IMAGE_BUILD_VERSION: ${APP_IMAGE_BUILD_VERSION}
 echo APP_DOCKER_OPTS: ${APP_DOCKER_OPTS}
 echo APP_DOCKER_IMAGE: ${APP_DOCKER_IMAGE}
+echo DATA_EBS_DEVICE_NAME: ${DATA_EBS_DEVICE_NAME}
+echo DATA_EBS_VOL_SIZE: ${DATA_EBS_VOL_SIZE}
+echo LOGS_EBS_DEVICE_NAME: ${LOGS_EBS_DEVICE_NAME}
+echo LOGS_EBS_VOL_SIZE: ${LOGS_EBS_VOL_SIZE}
 echo "########################################################################"
 
 # Default file
 CLOUD_CONFIG_TMPL_PATH="cloud-config/cloud-config.tmpl.yaml"
 
 # Download cloud config to ami-baker's cloud-config folder if path is given, else use default config
-if [ ! -z ${PROD_CLOUDINIT_S3_FULL_PATH} ];
+if [ "X${PROD_CLOUDINIT_S3_FULL_PATH}" != "X" ];
 then
   CLOUD_CONFIG_TMPL_PATH="cloud-config/cloud-config-$APP_NAME.tmpl.yaml";
-  sudo aws s3 cp s3://${PROD_CLOUDINIT_S3_FULL_PATH} "$CLOUD_CONFIG_TMPL_PATH"
+  sudo aws --region ${aws_region} s3 cp s3://${PROD_CLOUDINIT_S3_FULL_PATH} "$CLOUD_CONFIG_TMPL_PATH"
 fi;
 
 # Bake AMI
