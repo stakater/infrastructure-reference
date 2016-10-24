@@ -7,7 +7,7 @@ module "mysql" {
 
   # VPC parameters
   vpc_id  = "${module.network.vpc_id}"
-  subnets = "${module.network.private_app_subnet_ids}"
+  subnets = "${module.network.private_persistence_subnets}"
   region  = "${var.aws_account["default_region"]}"
 
   # LC parameters
@@ -103,13 +103,11 @@ resource "aws_security_group" "mysql-sg-elb" {
   }
 }
 
-## Internal load balancer in private app subnets instead of public subnets
-# So that fleet can be accessed through peered vpc i.e. global-admiral
-# (As peering is at private-app level and not at public level)
+## Internal load balancer
 resource "aws_elb" "mysql-elb-internal" {
   name                      = "${var.stack_name}-dev-mysql-int"
   security_groups           = ["${aws_security_group.mysql-sg-elb.id}"]
-  subnets                   = ["${split(",",module.network.private_app_subnet_ids)}"]
+  subnets                   = ["${split(",",module.network.private_persistence_subnets)}"]
   internal                  = true
   cross_zone_load_balancing = true
   connection_draining       = true
