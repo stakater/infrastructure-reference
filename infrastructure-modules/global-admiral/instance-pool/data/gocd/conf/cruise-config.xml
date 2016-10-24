@@ -5,13 +5,13 @@
       <passwordFile path="/passwd" />
     </security>
   </server>
-  <pipelines group="App-Development">
+  <pipelines group="APP-Dev">
     <pipeline name="app-build-dev" template="stakater_build">
       <params>
         <param name="SOURCE_DIR" />
- 	      <param name="APP_NAME">test_app</param>
+        <param name="APP_NAME">app</param>
         <param name="ENVIRONMENT">dev</param>
-        <param name="APP_DOCKER_IMAGE"></param>
+        <param name="APP_DOCKER_IMAGE">registry.stakater-reference.local:80/app_dev</param>
       </params>
       <materials>
         <git url="" branch="develop" />
@@ -20,34 +20,48 @@
     <pipeline name="app-deploy-dev" template="stakater_deploy_cluster">
       <params>
         <param name="SOURCE_DIR" />
-        <param name="APP_NAME">test_app</param>
+        <param name="APP_NAME">app</param>
         <param name="CLUSTER_ENV">dev</param>
-        <param name="APP_DOCKER_IMAGE"></param>
+        <param name="APP_DOCKER_IMAGE">registry.stakater-reference.local:80/app_dev</param>
+        <param name="APP_DOCKER_OPTS">-p 8080:8080</param>
       </params>
       <materials>
         <pipeline pipelineName="app-build-dev" stageName="Build" />
       </materials>
     </pipeline>
-    <pipeline name="app-deploy-qa" isLocked="false" template="stakater_deploy_cluster">
+  </pipelines>
+  <pipelines group="APP-Test">
+    <pipeline name="app-build-qa" template="stakater_build">
       <params>
         <param name="SOURCE_DIR" />
-	<param name="APP_NAME">test_app</param>
-        <param name="CLUSTER_ENV">qa</param>
-        <param name="APP_DOCKER_IMAGE"></param>
+        <param name="APP_NAME">app</param>
+        <param name="ENVIRONMENT">test</param>
+        <param name="APP_DOCKER_IMAGE">registry.stakater-reference.local:80/app_qa</param>
       </params>
-      <timer>0 0 00 ? * MON-FRI</timer>
       <materials>
-        <git url="" autoUpdate="false" />
+        <git url="" branch="master" />
+      </materials>
+    </pipeline>
+    <pipeline name="app-deploy-qa" template="stakater_deploy_cluster">
+      <params>
+        <param name="SOURCE_DIR" />
+        <param name="APP_NAME">app</param>
+        <param name="CLUSTER_ENV">qa</param>
+        <param name="APP_DOCKER_IMAGE">registry.stakater-reference.local:80/app_qa</param>
+        <param name="APP_DOCKER_OPTS">-p 8080:8080</param>
+      </params>
+      <materials>
+        <pipeline pipelineName="app-build-qa" stageName="Build" />
       </materials>
     </pipeline>
   </pipelines>
-  <pipelines group="App-Production">
+  <pipelines group="APP-Production">
     <pipeline name="app-build-prod" template="stakater_build">
       <params>
         <param name="SOURCE_DIR" />
-	      <param name="APP_NAME">test_app</param>
-        <param name="ENVIRONMENT">prod</param>
-        <param name="APP_DOCKER_IMAGE"></param>
+        <param name="APP_NAME">app</param>
+        <param name="ENVIRONMENT">test</param>
+        <param name="APP_DOCKER_IMAGE">registry.stakater-reference.local:80/app_prod</param>
       </params>
       <materials>
         <git url="" branch="master" />
@@ -56,9 +70,14 @@
     <pipeline name="app-create-ami-prod" template="stakater_build_ami">
       <params>
         <param name="SOURCE_DIR" />
-	      <param name="APP_NAME">test_app</param>
-        <param name="APP_DOCKER_IMAGE"></param>
-        <param name="PROD_CLOUDINIT_S3_FULL_PATH">myS3bucket/app/cloud-config.tmpl.yaml</param>
+        <param name="APP_NAME">app</param>
+        <param name="APP_DOCKER_IMAGE">registry.stakater-reference.local:80/app_prod</param>
+        <param name="APP_DOCKER_OPTS">-p 8080:8080</param>
+        <param name="PROD_CLOUDINIT_S3_FULL_PATH" />
+        <param name="DATA_EBS_DEVICE_NAME">/dev/sdf</param>
+        <param name="DATA_EBS_VOL_SIZE">50</param>
+        <param name="LOGS_EBS_DEVICE_NAME">/dev/sdg</param>
+        <param name="LOGS_EBS_VOL_SIZE">20</param>
       </params>
       <materials>
         <pipeline pipelineName="app-build-prod" stageName="Build" />
@@ -67,7 +86,10 @@
     <pipeline name="app-deploy-prod" template="stakater_launch_ami">
       <params>
         <param name="SOURCE_DIR" />
-        <param name="APP_NAME">test_app</param>
+        <param name="APP_NAME">app</param>
+        <param name="APP_DOCKER_IMAGE">registry.stakater-reference.local:80/app_prod</param>
+        <param name="ENABLE_SSL">false</param>
+        <param name="INSTANCE_TYPE">t2.micro</param>
       </params>
       <materials>
         <pipeline pipelineName="app-create-ami-prod" stageName="Build-AMI" />
@@ -76,7 +98,7 @@
     <pipeline name="app-switch-group" template="stakater_switch_deployment_group">
       <params>
         <param name="SOURCE_DIR" />
-        <param name="APP_NAME">test_app</param>
+        <param name="APP_NAME">app</param>
       </params>
       <materials>
         <pipeline pipelineName="app-deploy-prod" stageName="Launch-AMI" />
@@ -85,7 +107,7 @@
     <pipeline name="app-rollback-deployment" template="stakater_rollback_deployment">
       <params>
         <param name="SOURCE_DIR" />
-        <param name="APP_NAME">test_app</param>
+        <param name="APP_NAME">app</param>
       </params>
       <materials>
         <pipeline pipelineName="app-deploy-prod" stageName="Launch-AMI" />
@@ -98,7 +120,7 @@
         <jobs>
           <job name="Build">
             <tasks>
-             <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>/gocd-data/scripts/compile-code.sh #{APP_NAME} #{ENVIRONMENT}</arg>
                 <runif status="any" />
@@ -125,7 +147,7 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>/gocd-data/scripts/deploy-to-cluster.sh #{APP_NAME} #{CLUSTER_ENV} #{APP_DOCKER_IMAGE}</arg>
+                <arg>/gocd-data/scripts/deploy-to-cluster.sh #{APP_NAME} #{CLUSTER_ENV} #{APP_DOCKER_IMAGE} "#{APP_DOCKER_OPTS}"</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -140,7 +162,7 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>/gocd-data/scripts/build-ami.sh #{APP_NAME} ${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER} $(uuid -v4) #{APP_DOCKER_IMAGE} #{PROD_CLOUDINIT_S3_FULL_PATH}</arg>
+                <arg>/gocd-data/scripts/build-ami.sh -a #{APP_NAME} -b ${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER} -u $(uuid -v4) -d #{APP_DOCKER_IMAGE} -o "#{APP_DOCKER_OPTS}" -c "#{PROD_CLOUDINIT_S3_FULL_PATH}" -e #{DATA_EBS_DEVICE_NAME} -z #{DATA_EBS_VOL_SIZE} -l #{LOGS_EBS_DEVICE_NAME} -x #{LOGS_EBS_VOL_SIZE}</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -157,7 +179,7 @@
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>AWS_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
-                   /gocd-data/scripts/deploy-to-prod.sh -r $AWS_REGION -k prod/#{APP_NAME}/terraform.tfstate -a #{APP_NAME}</arg>
+                   /gocd-data/scripts/deploy-to-prod.sh -r $AWS_REGION -k prod/#{APP_NAME}/terraform.tfstate -a #{APP_NAME} -s #{ENABLE_SSL} -i "#{INSTANCE_TYPE}"</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -174,7 +196,7 @@
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>AWS_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
-                   /gocd-data/scripts/switch-deployment-group.sh #{APP_NAME} $AWS_REGION prod/#{APP_NAME}/terraform.tfstate </arg>
+                   /gocd-data/scripts/switch-deployment-group.sh #{APP_NAME} $AWS_REGION prod/#{APP_NAME}/terraform.tfstate</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -191,7 +213,7 @@
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>AWS_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
-                   /gocd-data/scripts/rollback-deployment.sh #{APP_NAME} $AWS_REGION prod/#{APP_NAME}/terraform.tfstate </arg>
+                   /gocd-data/scripts/rollback-deployment.sh #{APP_NAME} $AWS_REGION prod/#{APP_NAME}/terraform.tfstate</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -201,48 +223,42 @@
     </pipeline>
   </templates>
   <environments>
-    <environment name="Build-Development">
+    <environment name="Build">
       <agents>
-        <physical uuid="" />
-      </agents>
-      <pipelines>
-        <pipeline name="app-build-dev" />
-      </pipelines>
-    </environment>
-    <environment name="Deploy-Development">
-      <agents>
-        <physical uuid="" />
-      </agents>
-      <pipelines>
-        <pipeline name="app-deploy-dev" />
-      </pipelines>
-    </environment>
-    <environment name="Test">
-      <agents>
-        <physical uuid="" />
-      </agents>
-      <pipelines>
-        <pipeline name="app-deploy-qa" />
-      </pipelines>
-    </environment>
-    <environment name="Build-Production">
-      <agents>
-        <physical uuid="" />
+        <physical uuid="3bc29fff-e81d-42de-9d00-a83d3f26e537" />
+        <physical uuid="e4c8fe98-5e1b-4094-a28c-70b3a6aefdd4" />
       </agents>
       <pipelines>
         <pipeline name="app-build-prod" />
+        <pipeline name="app-build-dev" />
+        <pipeline name="app-build-qa" />
       </pipelines>
     </environment>
-    <environment name="Deploy-Production">
+    <environment name="Build-AMI">
       <agents>
-        <physical uuid="" />
+      </agents>
+      <pipelines>
+        <pipeline name="app-create-ami-prod" />
+      </pipelines>
+    </environment>
+    <environment name="Deploy-to-Production">
+      <agents>
       </agents>
       <pipelines>
         <pipeline name="app-deploy-prod" />
+        <pipeline name="app-switch-group" />
+        <pipeline name="app-rollback-deployment" />
+      </pipelines>
+    </environment>
+    <environment name="Deploy-to-Cluster">
+      <agents>
+      </agents>
+      <pipelines>
+        <pipeline name="app-deploy-dev" />
+        <pipeline name="app-deploy-qa" />
       </pipelines>
     </environment>
   </environments>
   <agents>
-  </agents>
+</agents>
 </cruise>
-
