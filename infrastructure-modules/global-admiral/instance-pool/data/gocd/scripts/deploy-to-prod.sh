@@ -2,13 +2,14 @@
 AWS_REGION=""
 DEPLOY_STATE_KEY=""
 APP_NAME=""
-DEPLOY_INSTANCE_TYPE="t2.medium" # default value
+DEPLOY_INSTANCE_TYPE="t2.micro" # default value
+ENABLE_SSL=false;
 
 kOptionFlag=false;
 rOptionFlag=false;
 aOptionFlag=false;
 # Get options from the command line
-while getopts ":k:r:a:i:" OPTION
+while getopts ":k:r:a:i:s:" OPTION
 do
     case $OPTION in
         k)
@@ -26,8 +27,11 @@ do
         i)
           DEPLOY_INSTANCE_TYPE=$OPTARG
           ;;
+        s)
+          ENABLE_SSL=$OPTARG
+          ;;
         *)
-          echo "Usage: $(basename $0) -k <key for the state file> -r <aws-region> -a <app-name> -i <deploy instance type>"
+          echo "Usage: $(basename $0) -k <key for the state file> -r <aws-region> -a <app-name> -i <deploy instance type> -s <Enable SSL ? > (optional)"
           exit 0
           ;;
     esac
@@ -35,7 +39,7 @@ done
 
 if ! $kOptionFlag || ! $rOptionFlag || ! $aOptionFlag;
 then
-  echo "Usage: $(basename $0) -k <key for the state file> -r <aws-region> -a <app-name> -i <deploy instance type>"
+  echo "Usage: $(basename $0) -k <key for the state file> -r <aws-region> -a <app-name> -i <deploy instance type> -s <Enable SSL ? > (optional)"
   exit 0;
 fi
 
@@ -61,5 +65,5 @@ fi;
 ##############################################
 
 # Update blue green deployment group
-/gocd-data/scripts/update-blue-green-deployment-groups.sh ${APP_NAME} ${AMI_ID} ${AWS_REGION} ${DEPLOY_INSTANCE_TYPE} ${DEPLOY_STATE_KEY}
+/gocd-data/scripts/update-blue-green-deployment-groups.sh ${APP_NAME} ${AMI_ID} ${AWS_REGION} ${DEPLOY_INSTANCE_TYPE} ${DEPLOY_STATE_KEY} ${ENABLE_SSL}
 

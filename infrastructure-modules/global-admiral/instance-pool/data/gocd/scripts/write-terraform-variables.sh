@@ -19,6 +19,7 @@ GREEN_CLUSTER_MIN_SIZE=${13}
 GREEN_CLUSTER_MAX_SIZE=${14}
 GREEN_GROUP_LOAD_BALANCERS=${15}
 GREEN_GROUP_MIN_ELB_CAPACITY=${16}
+ENABLE_SSL=${17}
 
 # file path
 deployCodeLocation="/app/stakater/prod-deployment-reference-${APP_NAME}"
@@ -49,5 +50,6 @@ sudo sh -c "{
   green_cluster_max_size = \\\"${GREEN_CLUSTER_MAX_SIZE}\\\"
   green_group_load_balancers = \\\"${GREEN_GROUP_LOAD_BALANCERS}\\\"
   green_group_min_elb_capacity = \\\"${GREEN_GROUP_MIN_ELB_CAPACITY}\\\"
+  enable_ssl = \\\"${ENABLE_SSL}\\\"
 \"
 } > ${tfvarsFile}"
