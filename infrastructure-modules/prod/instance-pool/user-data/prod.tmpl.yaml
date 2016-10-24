@@ -43,9 +43,39 @@ coreos:
         ExecStop=/usr/bin/docker stop %n
         [Install]
         WantedBy=multi-user.target
+    - name: nginx.service
+      command: start
+      content: |
+        [Unit]
+        Description=Nginx Service
+        Requires=docker.service
+        After=docker.service
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/docker run --rm --name %n -p 80:80 -v /nginx/conf:/etc/nginx/conf.d/ nginx
+        ExecStop=/usr/bin/docker stop %n
+        [Install]
+        WantedBy=multi-user.target
 
 write_files:
   - path: /etc/conf.d/nfs
     permissions: '0644'
     content: |
       OPTS_RPC_MOUNTD=""
+  - path: /nginx/conf/default.conf
+    permissions: '0644'
+    content: |
+      server {
+        listen 80;
+
+        location /health_check {
+              return 200;
+        }
+        location / {
+          #x_forwarded_proto property set by ELB
+          if ($http_x_forwarded_proto != 'https') {
+           rewrite ^ https://$host$request_uri? permanent;
+          }
+        }
+      }

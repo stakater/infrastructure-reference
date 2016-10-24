@@ -190,7 +190,7 @@ resource "aws_lb_cookie_stickiness_policy" "worker-elb-stickiness-policy" {
 # Route53 record
 # Add to global-admiral's private dns
 resource "aws_route53_record" "worker" {
-  zone_id = "${data.terraform_remote_state.global-admiral.route53_private_zone_id}"
+  zone_id = "${module.route53-private.zone_id}"
   name = "worker-dev"
   type = "A"
 
