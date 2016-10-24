@@ -21,18 +21,20 @@ fi
 
 # Remove special characters from app name
 SIMPLE_APP_NAME=${APP_NAME//[_-]/}
+# Convert ENVIRONMENT value to lowercase
+ENVIRONMENT=`echo "$ENVIRONMENT" | sed 's/./\L&/g'`
 
 # Package
 # Run docker-compose up command.
 if [ $ENVIRONMENT == "prod" ]
 then
-   sudo /opt/bin/docker-compose -f docker-compose-prod.yml -p ${SIMPLE_APP_NAME} up app
+   sudo /opt/bin/docker-compose -f docker-compose-prod.yml -p "${SIMPLE_APP_NAME}${ENVIRONMENT}" up app
 elif [ $ENVIRONMENT == "dev" ]
 then
-   sudo /opt/bin/docker-compose -f docker-compose-dev.yml -p ${SIMPLE_APP_NAME} up app
+   sudo /opt/bin/docker-compose -f docker-compose-dev.yml -p "${SIMPLE_APP_NAME}${ENVIRONMENT}" up app
 elif [ $ENVIRONMENT == "test" ]
 then
-   sudo /opt/bin/docker-compose -f docker-compose-test.yml -p ${SIMPLE_APP_NAME} up app
+   sudo /opt/bin/docker-compose -f docker-compose-test.yml -p "${SIMPLE_APP_NAME}${ENVIRONMENT}" up app
 fi;
 
 # Remove old war files from project root directory
@@ -60,10 +62,10 @@ sudo docker tag -f ${APP_DOCKER_IMAGE} ${newTag}
 sudo docker push ${newTag}
 
 # Delete unwanted images/containers
-sudo docker rmi -f ${SIMPLE_APP_NAME}_compile
-sudo docker rmi -f ${SIMPLE_APP_NAME}_test
-sudo docker rmi -f ${SIMPLE_APP_NAME}_app
-sudo docker rm ${SIMPLE_APP_NAME}_app_1
+sudo docker rmi -f ${SIMPLE_APP_NAME}${ENVIRONMENT}_compile
+sudo docker rmi -f ${SIMPLE_APP_NAME}${ENVIRONMENT}_test
+sudo docker rmi -f ${SIMPLE_APP_NAME}${ENVIRONMENT}_app
+sudo docker rm -vf ${SIMPLE_APP_NAME}${ENVIRONMENT}_app_1
 
 # Delete empty docker images
 /gocd-data/scripts/docker-cleanup.sh
