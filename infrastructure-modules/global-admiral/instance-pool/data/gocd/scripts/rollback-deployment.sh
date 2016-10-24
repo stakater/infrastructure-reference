@@ -159,6 +159,12 @@ echo "#######################################################################"
 
 # Apply terraform changes
 /gocd-data/scripts/terraform-apply-changes.sh ${APP_NAME} ${TF_STATE_BUCKET_NAME} ${DEPLOY_STATE_KEY} ${AWS_REGION}
+# Check status and fail pipeline if exit code 1 (error while applying changes)
+APPLY_CHANGES_STATUS=$?
+if [ ${APPLY_CHANGES_STATUS} = 1 ];
+then
+    exit 1;
+fi;
 
 ## Update deployment state file
 if [ $LIVE_GROUP == "null" ]

@@ -101,7 +101,7 @@ then
 
    GREEN_CLUSTER_MIN_SIZE=${CLUSTER_MIN_SIZE}
    GREEN_CLUSTER_MAX_SIZE=${CLUSTER_MAX_SIZE}
-   GREEN_GROUP_AMI_ID=${GREEN_GROUP_AMI_ID}
+   GREEN_GROUP_AMI_ID=${BLUE_GROUP_AMI_ID}
    GREEN_GROUP_LOAD_BALANCERS=${ACTIVE_LOAD_BALANCER}
    GREEN_GROUP_MIN_ELB_CAPACITY=${MIN_ELB_CAPACITY}  
 elif [ $LIVE_GROUP == "green" ]
@@ -141,11 +141,17 @@ echo "#######################################################################"
 
 # Apply terraform changes
 /gocd-data/scripts/terraform-apply-changes.sh ${APP_NAME} ${TF_STATE_BUCKET_NAME} ${DEPLOY_STATE_KEY} ${AWS_REGION}
+# Check status and fail pipeline if exit code 1 (error while applying changes)
+APPLY_CHANGES_STATUS=$?
+if [ ${APPLY_CHANGES_STATUS} = 1 ];
+then
+    exit 1;
+fi;
 
 ## Update deployment state file
 if [ $LIVE_GROUP == "null" ]
 then
-   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} blue ${BLUE_GROUP_AMI_ID} ${GREEN_GROUP_AMI_ID} true false
+   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} blue ${BLUE_GROUP_AMI_ID} null true false
 elif [ $LIVE_GROUP == "blue" ]
 then
    /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} green ${BLUE_GROUP_AMI_ID} ${GREEN_GROUP_AMI_ID} true false

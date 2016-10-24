@@ -44,5 +44,16 @@ sudo /opt/terraform/terraform plan -var-file="${tfvarsFile}" -target null_resour
 sudo /opt/terraform/terraform apply -var-file="${tfvarsFile}" -target null_resource.create-key-pair
 
 # Create rest of the resources
-sudo /opt/terraform/terraform plan -var-file="${tfvarsFile}"
-sudo /opt/terraform/terraform apply -var-file="${tfvarsFile}"
+## Plan terraform changes and terminate if there are errors
+if ! sudo /opt/terraform/terraform plan -var-file="${tfvarsFile}"
+then
+   echo "ERROR: [terraform-apply-changes] Terraform plan failed"
+   exit 1
+fi;
+
+## Apply terraform changes and terminate if there are errors
+if ! sudo /opt/terraform/terraform apply -var-file="${tfvarsFile}"
+then
+   echo "ERROR: [terraform-apply-changes] Applying terraform changes failed"
+   exit 1
+fi;
