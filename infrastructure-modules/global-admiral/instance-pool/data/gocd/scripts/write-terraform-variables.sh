@@ -32,6 +32,17 @@ then
   sudo mkdir -p ${terraformFolderPath}
 fi;
 
+# If enable_ssl is set, set the value in tfvars to 1 (as used by terraform)
+# And fetch ssl certificate id from cert-arn file
+ENABLE_SSL_CONVERTED_VALUE=0;
+SSL_CERTIFICATE_ID=""
+if [[ "${ENABLE_SSL}" == "true" || "${ENABLE_SSL}" == "1" ]];
+then
+  ENABLE_SSL_CONVERTED_VALUE=1;
+  CRT_PARAM_FILE="/app/certs/cert-arn.txt"
+  SSL_CERTIFICATE_ID=`/gocd-data/scripts/read-parameter.sh ${CRT_PARAM_FILE} ssl_certificate_id`
+fi;
+
 # Write vars to be used by the deploy code in a TF vars file
 sudo sh -c "{
   echo \"app_name = \\\"${APP_NAME}\\\"
@@ -50,6 +61,7 @@ sudo sh -c "{
   green_cluster_max_size = \\\"${GREEN_CLUSTER_MAX_SIZE}\\\"
   green_group_load_balancers = \\\"${GREEN_GROUP_LOAD_BALANCERS}\\\"
   green_group_min_elb_capacity = \\\"${GREEN_GROUP_MIN_ELB_CAPACITY}\\\"
-  enable_ssl = \\\"${ENABLE_SSL}\\\"
+  enable_ssl = \\\"${ENABLE_SSL_CONVERTED_VALUE}\\\"
+  ssl_certificate_id = \\\"${SSL_CERTIFICATE_ID}\\\"
 \"
 } > ${tfvarsFile}"
