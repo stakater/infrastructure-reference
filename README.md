@@ -93,8 +93,7 @@ You can customize stakater settings by changing the variables in the `Makefile`.
 Following is the list of variables in the `Makefile` and their description: 
 
 | Variables                   | Description                                                                                                                              |
-|-----------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
-|                             |                                                                                                                                          |
+|-----------------------------|------------------------------------------------------------------------------------------------------------------------------------------|                                                                                                                                      |
 | AWS_PROFILE                 | Name of the AWS profile stakater is going to use  ([Setup AWS credentials](#setup-aws-credentials))                                      |
 | STACK_NAME                  | Name of the stack you are about to build with stakater. (This name will be used in all resources created)                                |
 | TF_STATE_BUCKET_NAME        | Name of the (already existing) S3 bucket in which the terraform state files will be stored                                               |
@@ -122,18 +121,10 @@ Below these variables in the `Makefile`, you will find a list of variables which
 **Available availibility zones**: 
 Availibility zones for a region, that are availble to your AWS account
 
-
-###To Create:
-Usage: `make (<resource> | destroy_<resource> | plan_<resource> | refresh_<resource> | show | graph )``
-
-Available resources: network
-
-For example: `make plan_network` to show what resources are planned for network
-
-###NOTE: The bucket name specified for `TF_STATE_BUCKET_NAME` in the Makefile should exist and should be accessible.
-
-
-###To Destroy
-Usage: `make destroy_<resource>`
-
-For example: `make destroy_network`
+#### Advanced Configuration:
+Advanced options such as 
+* Adding/Removing ELBs for a module
+* Adding/Updating/Removing Security group rules for a module
+* Chaning the size and name of attached EBS volumes
+* Adding/Updating/Removing Route53 entries for a module
+* Adding/Updating/Removing Scale policies for autoscaling groups 
