@@ -119,7 +119,7 @@ Following is the list of variables in the `Makefile` and their description:
 #### List of availbility zones in the `Makefile`: 
 Below these variables in the `Makefile`, you will find a list of variables which includes available availability zones(*) per region.
 
-* Available availibility zones: 
+**Available availibility zones**: 
 Availibility zones for a region, that are availble to your AWS account
 
 
