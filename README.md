@@ -6,6 +6,7 @@
 - [Install tools](#install-tools)
 - [Quick start](#quick-start)
 - [Customization](#customization)
+- [Building Infrastructure](#building-infrastructure)
 
 ## Overview
 
@@ -131,6 +132,7 @@ Advanced options such as:
 
 can be configured in the terraform files for modules in environments' folder inside `infrastructure-modules` folder. 
 
+## Building Infrastructure
 ###To Create:
 
 Usage: make (<resource> | destroy_<resource> | plan_<resource> | refresh_<resource> | show | graph )`
