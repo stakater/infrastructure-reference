@@ -97,7 +97,6 @@ Following is the list of variables in the `Makefile` and their description:
 |                             |                                                                                                                                          |
 | AWS_PROFILE                 | Name of the AWS profile stakater is going to use  ([Setup AWS credentials](#setup-aws-credentials))                                      |
 | STACK_NAME                  | Name of the stack you are about to build with stakater. (This name will be used in all resources created)                                |
-|                             
 | TF_STATE_BUCKET_NAME        | Name of the (already existing) S3 bucket in which the terraform state files will be stored                                               |
 | TF_STATE_GLOBAL_ADMIRAL_KEY | Key of the global admiral state file in the bucket (i.e. full path of the state file)                                                    |
 | TF_STATE_DEV_KEY            | Key of the Development environment state file in the bucket (i.e. full path of the state file)                                           |
@@ -111,7 +110,10 @@ Following is the list of variables in the `Makefile` and their description:
 | QA_DATABASE_USERNAME        | Database username for QA database (Used for both Mysql instance-pool OR Aurora DB)                                                       |
 | QA_DATABASE_PASSWORD        | Database password for the provided username AND root password, for QA database (Used for both Mysql instance-pool OR Aurora DB)          |
 | QA_DATABASE_NAME            | Database username for QA database (Used for both Mysql instance-pool OR Aurora DB)                                                       |
-
+| PROD_DATABASE_USERNAME | Database username for production database (Aurora DB)                                                            |
+| PROD_DATABASE_PASSWORD | Database password for the provided username AND root password, for production database (Aurora DB)               |
+| PROD_DATABASE_NAME     | Database name for production database (Aurora DB)                                                                |
+| COREOS_UPDATE_CHANNEL  | Update channel for fetching Core OS AMI ID (stable, beta, alpha) (We recommend to keep it at `stable` (default)) |
 
 ###To Create:
 Usage: `make (<resource> | destroy_<resource> | plan_<resource> | refresh_<resource> | show | graph )``
