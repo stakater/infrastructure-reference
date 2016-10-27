@@ -1,4 +1,11 @@
 # Stakater Infrastructure Reference
+## Table of Contents##
+
+- [Overview](#overview)
+- [Setup AWS credentials](#setup-aws-credentials)
+- [Install tools](#install-tools)
+- [Quick start](#quick-start)
+- [Customization](#customization)
 
 ## Overview
 
@@ -79,6 +86,8 @@ $ aws configure --profile stakater-reference
 Use the [downloaded aws user credentials](#setup-aws-credentials) when prompted.
 
 The above command will create a __stakater-reference__ profile authentication section in ~/.aws/config and ~/.aws/credentials files. The build process bellow will automatically configure Terraform AWS provider credentials using this profile.
+
+## Customization
 
 ###To Create:
 Usage: `make (<resource> | destroy_<resource> | plan_<resource> | refresh_<resource> | show | graph )``
