@@ -135,9 +135,28 @@ can be configured in the terraform files for modules in environments' folder ins
 ## Building Infrastructure
 ###To Create:
 
-Usage: make (<resource> | destroy_<resource> | plan_<resource> | refresh_<resource> | show | graph )`
 
-Available resources: network
+To Build your infrastructure consisting of Global Admiral and Dev,QA,Prod Environments run the following command:
+
+```
+make all
+```
+
+This will in turn call `make global_admiral dev qa prod` in the given order.
+
+You can also make each environment or resource separately by calling make in the following format: 
+
+For environments: 
+
+* make global_admiral
+* make dev
+* make qa
+* make prod
+
+For Resources: 
+```
+Usage: make (<resource> | destroy_<resource> | plan_<resource> | refresh_<resource> )`
+```
 
 For example: make plan_network to show what resources are planned for network
 NOTE: The bucket name specified for TF_STATE_BUCKET_NAME in the Makefile should exist and should be accessible.
