@@ -122,9 +122,25 @@ Below these variables in the `Makefile`, you will find a list of variables which
 Availibility zones for a region, that are availble to your AWS account
 
 #### Advanced Configuration:
-Advanced options such as 
+Advanced options such as:
 * Adding/Removing ELBs for a module
 * Adding/Updating/Removing Security group rules for a module
 * Chaning the size and name of attached EBS volumes
 * Adding/Updating/Removing Route53 entries for a module
 * Adding/Updating/Removing Scale policies for autoscaling groups 
+
+can be configured in the terraform files for modules in environments' folder inside `infrastructure-modules` folder. 
+
+To Create:
+
+Usage: make (<resource> | destroy_<resource> | plan_<resource> | refresh_<resource> | show | graph )`
+
+Available resources: network
+
+For example: make plan_network to show what resources are planned for network
+NOTE: The bucket name specified for TF_STATE_BUCKET_NAME in the Makefile should exist and should be accessible.
+To Destroy
+
+Usage: make destroy_<resource>
+
+For example: make destroy_network
