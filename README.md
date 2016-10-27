@@ -88,6 +88,30 @@ Use the [downloaded aws user credentials](#setup-aws-credentials) when prompted.
 The above command will create a __stakater-reference__ profile authentication section in ~/.aws/config and ~/.aws/credentials files. The build process bellow will automatically configure Terraform AWS provider credentials using this profile.
 
 ## Customization
+You can customize stakater settings by changing the variables in the `Makefile`.
+
+Following is the list of variables in the `Makefile` and their description: 
+
+| Variables                   | Description                                                                                                                              |
+|-----------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
+|                             |                                                                                                                                          |
+| AWS_PROFILE                 | Name of the AWS profile stakater is going to use  ([Setup AWS credentials](#setup-aws-credentials))                                      |
+| STACK_NAME                  | Name of the stack you are about to build with stakater. (This name will be used in all resources created)                                |
+|                             
+| TF_STATE_BUCKET_NAME        | Name of the (already existing) S3 bucket in which the terraform state files will be stored                                               |
+| TF_STATE_GLOBAL_ADMIRAL_KEY | Key of the global admiral state file in the bucket (i.e. full path of the state file)                                                    |
+| TF_STATE_DEV_KEY            | Key of the Development environment state file in the bucket (i.e. full path of the state file)                                           |
+| TF_STATE_QA_KEY             | Key of the QA environment state file in the bucket (i.e. full path of the state file)                                                    |
+| TF_STATE_PROD_KEY           | Key of the Production environment state file in the bucket (i.e. full path of the state file)                                            |
+| PROD_CLOUDINIT_BUCKET_NAME  | Name of the Cloudinit S3 Bucket for Production environment                                                                               |
+| PROD_CONFIG_BUCKET_NAME     | Name of the Config S3 Bucket for Production environment                                                                                  |
+| DEV_DATABASE_USERNAME       | Database username for development database (Used for both Mysql instance-pool OR Aurora DB)                                              |
+| DEV_DATABASE_PASSWORD       | Database password for the provided username AND root password, for development database (Used for both Mysql instance-pool OR Aurora DB) |
+| DEV_DATABASE_NAME           | Database name for QA database (Used for both Mysql instance-pool OR Aurora DB)                                                           |
+| QA_DATABASE_USERNAME        | Database username for QA database (Used for both Mysql instance-pool OR Aurora DB)                                                       |
+| QA_DATABASE_PASSWORD        | Database password for the provided username AND root password, for QA database (Used for both Mysql instance-pool OR Aurora DB)          |
+| QA_DATABASE_NAME            | Database username for QA database (Used for both Mysql instance-pool OR Aurora DB)                                                       |
+
 
 ###To Create:
 Usage: `make (<resource> | destroy_<resource> | plan_<resource> | refresh_<resource> | show | graph )``
