@@ -131,7 +131,7 @@ Advanced options such as:
 
 can be configured in the terraform files for modules in environments' folder inside `infrastructure-modules` folder. 
 
-To Create:
+###To Create:
 
 Usage: make (<resource> | destroy_<resource> | plan_<resource> | refresh_<resource> | show | graph )`
 
@@ -139,7 +139,7 @@ Available resources: network
 
 For example: make plan_network to show what resources are planned for network
 NOTE: The bucket name specified for TF_STATE_BUCKET_NAME in the Makefile should exist and should be accessible.
-To Destroy
+###To Destroy
 
 Usage: make destroy_<resource>
 
