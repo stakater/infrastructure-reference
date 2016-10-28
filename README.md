@@ -132,6 +132,11 @@ Availibility zones for a region, that are availble to your AWS account
 #### Certificates
 If you want to use SSL certificates on your load balancers, import those certificates in AWS Certification Manager, and pass the ARN of the certificate from GoCD. (More in GoCD configuration)
 
+#### Terraform State Bucket
+You will need to create a S3 bucket (in the same region assigned to the AWS profile your using), for storing terraform remote states.
+
+The name of this bucket should be provided against the `TF_STATE_BUCKET_NAME` variable in the `Makefile`
+
 #### Advanced Configuration:
 Advanced options such as:
 * Adding/Removing ELBs for a module
