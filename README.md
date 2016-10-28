@@ -122,6 +122,13 @@ Below these variables in the `Makefile`, you will find a list of variables which
 **Available availibility zones**: 
 Availibility zones for a region, that are availble to your AWS account
 
+#### GoCD Configuration
+* Set up GoCD Configuration file (`cruise-config.xml`)
+* Set up the `gocd.parameters.txt` file.
+* One more step in GoCD configuration is assigning agents, which takes place after your infrastructure has been created and GoCD is running
+
+(For more information on how to configure GoCD, follow the link)
+
 #### Advanced Configuration:
 Advanced options such as:
 * Adding/Removing ELBs for a module
@@ -134,7 +141,6 @@ can be configured in the terraform files for modules in environments' folder ins
 
 ## Building Infrastructure
 ###To Create:
-
 
 To Build your infrastructure consisting of Global Admiral and Dev,QA,Prod Environments run the following command:
 
@@ -165,3 +171,5 @@ NOTE: The bucket name specified for TF_STATE_BUCKET_NAME in the Makefile should 
 Usage: make destroy_<resource>
 
 For example: make destroy_network
+
+
