@@ -7,6 +7,7 @@
 - [Quick start](#quick-start)
 - [Customization](#customization)
 - [Building Infrastructure](#building-infrastructure)
+- [One time Setup](#one-time-setup) 
 
 ## Overview
 
@@ -125,9 +126,11 @@ Availibility zones for a region, that are availble to your AWS account
 #### GoCD Configuration
 * Set up GoCD Configuration file (`cruise-config.xml`)
 * Set up the `gocd.parameters.txt` file.
-* One more step in GoCD configuration is assigning agents, which takes place after your infrastructure has been created and GoCD is running
 
 (For more information on how to configure GoCD, follow the link)
+
+#### Certificates
+If you want to use SSL certificates on your load balancers, import those certificates in AWS Certification Manager, and pass the ARN of the certificate from GoCD. (More in GoCD configuration)
 
 #### Advanced Configuration:
 Advanced options such as:
@@ -172,4 +175,7 @@ Usage: make destroy_<resource>
 
 For example: make destroy_network
 
+## One time Setup 
+Once your infrastructure has been set up, you'll need to perform the following steps as a part of one time setup of the infrastructure:
 
+* Assign agents to GoCD (link)
