@@ -8,6 +8,7 @@
 - [Customization](#customization)
 - [Building Infrastructure](#building-infrastructure)
 - [One time Setup](#one-time-setup) 
+- [Troubleshooting](#troubleshooting) 
 
 ## Overview
 
@@ -183,4 +184,7 @@ For example: make destroy_network
 ## One time Setup 
 Once your infrastructure has been set up, you'll need to perform the following steps as a part of one time setup of the infrastructure:
 
+* Prepare your application for Stakater (link)
 * Assign agents to GoCD (link)
+
+## Troubleshooting
