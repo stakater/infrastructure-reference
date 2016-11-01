@@ -223,25 +223,25 @@ Once your infrastructure has been set up, you'll need to perform the following s
     
     e.g. `make network_dev`, `make network_qa` or `make network_prod`
 
-* Network timeout error 
+* ####Network Timeout Error 
     
-    #####Error:
-    `timeout while waiting for state to become 'successful'` OR `Network time out waiting for I/O...` 
+    **Error**: 
+      `timeout while waiting for state to become 'successful'` OR `Network time out waiting for I/O...` 
     
     This issue occurs due to slow network response from AWS or slow internet connection from the requesting side. 
     
     Retry using a better internet connection. 
     
-* Error while Creating Keypair
+* ####Error while Creating Keypair
     
-    #####Error: 
+    **Error**: 
     `Cannot create keypair: Permission denied`
     
     Issue occurs while creating keypair using the aws-keypair.sh script, this is an intermittent in issue, and can be avoided by retrying
     
-* Error while Uploading Keypair
+* ####Error while Uploading Keypair
     
-    #####Error:
+    **Error**: 
     `Could not upload keypair: Access Denied`
     
     Issue occurs while uploading the keypair after it has been created using AWS CLI (aws-keypair.sh), this is an intermittent in issue, and can be avoided by retrying the make. 
