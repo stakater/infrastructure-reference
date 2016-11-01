@@ -188,3 +188,37 @@ Once your infrastructure has been set up, you'll need to perform the following s
 * Assign agents to GoCD (link)
 
 ## Troubleshooting
+
+
+#### Known Issues while making Infrastructure
+* `aws_launch_configuration.lc_ebs: Error creating launch configuration: ValidationError: Invalid IamInstanceProfile`
+
+    This is an intermittent and can be avoided by performing the specific step again
+
+    #####Reference:
+      * https://github.com/hashicorp/terraform/issues/1885
+      * https://github.com/hashicorp/terraform/issues/9474
+      
+* `aws_launch_configuration.lc: Error creating launch configuration: ValidationError: You are not authorized to perform this operation.`
+
+    This is an intermittent and can be avoided by performing the specific step again
+    
+    #####Reference:
+      * https://github.com/hashicorp/terraform/issues/5862
+      * https://github.com/hashicorp/terraform/issues/7198
+
+
+* `Resource 'data.terraform_remote_state.global-admiral' does not have attribute 'variable_name' for variable 'data.terraform_remote_state.global-admiral.variable_name'`
+
+    For example: `data.terraform_remote_state.global-admiral.private_app_route_table_ids`
+    
+    In case make fails due to unknown output referenced in global-admiral state, call `make refresh_global_admiral` and then make.
+    
+    #####Reference: 
+      * https://github.com/hashicorp/terraform/issues/2598
+
+    #####NOTE:
+      Once you refresh global admiral state, global admiral will remove vpc-peering connections created by other VPCs (in their tf states), as global admiral is not aware of them.
+    Please be sure to re-make the network module of other environments in order to re-create the vpc-connection IF it is removed as a result of refreshing. (Work in progress to solve this issue)
+    
+    e.g. `make network_dev`, `make network_qa` or `make network_prod`
