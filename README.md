@@ -222,3 +222,26 @@ Once your infrastructure has been set up, you'll need to perform the following s
     Please be sure to re-make the network module of other environments in order to re-create the vpc-connection IF it is removed as a result of refreshing. (Work in progress to solve this issue)
     
     e.g. `make network_dev`, `make network_qa` or `make network_prod`
+
+* Network timeout error 
+    
+    #####Error:
+    `timeout while waiting for state to become 'successful'` OR `Network time out waiting for I/O...` 
+    
+    This issue occurs due to slow network response from AWS or slow internet connection from the requesting side. 
+    
+    Retry using a better internet connection. 
+    
+* Error while Creating Keypair
+    
+    #####Error: 
+    `Cannot create keypair: Permission denied`
+    
+    Issue occurs while creating keypair using the aws-keypair.sh script, this is an intermittent in issue, and can be avoided by retrying
+    
+* Error while Uploading Keypair
+    
+    #####Error:
+    `Could not upload keypair: Access Denied`
+    
+    Issue occurs while uploading the keypair after it has been created using AWS CLI (aws-keypair.sh), this is an intermittent in issue, and can be avoided by retrying the make. 
