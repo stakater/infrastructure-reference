@@ -191,7 +191,10 @@ Once your infrastructure has been set up, you'll need to perform the following s
 
 
 #### Known Issues while making Infrastructure
-* `aws_launch_configuration.lc_ebs: Error creating launch configuration: ValidationError: Invalid IamInstanceProfile`
+* ####Error Creating Launch Configuration
+
+    **Error**:  
+    `aws_launch_configuration.lc_ebs: Error creating launch configuration: ValidationError: Invalid IamInstanceProfile`
 
     This is an intermittent and can be avoided by performing the specific step again
 
@@ -199,7 +202,10 @@ Once your infrastructure has been set up, you'll need to perform the following s
       * https://github.com/hashicorp/terraform/issues/1885
       * https://github.com/hashicorp/terraform/issues/9474
       
-* `aws_launch_configuration.lc: Error creating launch configuration: ValidationError: You are not authorized to perform this operation.`
+* ####Error Creating Launch Configuration 
+
+    **Error**:  
+    `aws_launch_configuration.lc: Error creating launch configuration: ValidationError: You are not authorized to perform this operation.`
 
     This is an intermittent and can be avoided by performing the specific step again
     
@@ -208,7 +214,10 @@ Once your infrastructure has been set up, you'll need to perform the following s
       * https://github.com/hashicorp/terraform/issues/7198
 
 
-* `Resource 'data.terraform_remote_state.global-admiral' does not have attribute 'variable_name' for variable 'data.terraform_remote_state.global-admiral.variable_name'`
+* ####Attribute missing from Remote State
+
+    **Error**:  
+    `Resource 'data.terraform_remote_state.global-admiral' does not have attribute 'variable_name' for variable 'data.terraform_remote_state.global-admiral.variable_name'`
 
     For example: `data.terraform_remote_state.global-admiral.private_app_route_table_ids`
     
