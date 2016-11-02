@@ -20,7 +20,7 @@ The entire infrastructure is managed by [Terraform](https://www.terraform.io/int
 Go to [AWS Console](https://console.aws.amazon.com/).
 
 1. Signup AWS account if you don't already have one. The default EC2 instances created by this tool is covered by AWS Free Tier (https://aws.amazon.com/free/) service.
-2. Create a group `stakater` with `AdministratorAccess` policy or using the [stakater-policy](#https://github.com/stakater/infrastructure-reference/blob/master/stakater-policy.json) given in the repo.
+2. Create a group `stakater` with `AdministratorAccess` policy or using the [stakater-policy](https://github.com/stakater/infrastructure-reference/blob/master/stakater-policy.json) given in the repo.
 3. Create a user `stakater` and __Download__ the user credentials.
 4. Add user `stakater` to group `stakater`.
 
