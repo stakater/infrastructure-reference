@@ -16,14 +16,7 @@ AWS_REGION=$4
 deployCodeLocation="/app/stakater/prod-deployment-reference-${APP_NAME}"
 tfvarsFile="${deployCodeLocation}/deploy-prod/.terraform/deploy.tfvars"
 
-if [ ! -d "${deployCodeLocation}" ];
-then
-  sudo mkdir -p ${deployCodeLocation}
-fi;
-if [ ! "$(ls -A ${deployCodeLocation})" ];
-then
-  sudo git clone https://github.com/stakater/prod-deployment-reference.git ${deployCodeLocation};
-fi;
+/gocd-data/scripts/clone-production-deployment-code.sh ${APP_NAME}
 
 cd ${deployCodeLocation}
 sudo git pull origin master

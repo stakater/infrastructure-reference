@@ -26,6 +26,9 @@ deployCodeLocation="/app/stakater/prod-deployment-reference-${APP_NAME}"
 terraformFolderPath="${deployCodeLocation}/deploy-prod/.terraform/"
 tfvarsFile="${terraformFolderPath}/deploy.tfvars"
 
+# Check if production deployment code exists
+/gocd-data/scripts/clone-production-deployment-code.sh ${APP_NAME}
+
 # Check if .terraform folder exists
 if [ ! -d "${terraformFolderPath}" ];
 then
