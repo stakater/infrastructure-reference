@@ -89,6 +89,7 @@
         <param name="APP_NAME">app</param>
         <param name="APP_DOCKER_IMAGE">registry.stakater-reference.local:80/app_prod</param>
         <param name="ENABLE_SSL">false</param>
+        <param name="INTERNAL_SUPPORT">false</param>
         <param name="INSTANCE_TYPE">t2.micro</param>
       </params>
       <materials>
@@ -179,7 +180,7 @@
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>AWS_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
-                   /gocd-data/scripts/deploy-to-prod.sh -r $AWS_REGION -k prod/#{APP_NAME}/terraform.tfstate -a #{APP_NAME} -s #{ENABLE_SSL} -i "#{INSTANCE_TYPE}"</arg>
+                   /gocd-data/scripts/deploy-to-prod.sh -r $AWS_REGION -k prod/#{APP_NAME}/terraform.tfstate -a #{APP_NAME} -s #{ENABLE_SSL} -i "#{INSTANCE_TYPE}" -t "#{INTERNAL_SUPPORT}"</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
