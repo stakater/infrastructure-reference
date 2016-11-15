@@ -12,7 +12,7 @@ module "worker" {
 
   # LC parameters
   ami              = "${var.ami}"
-  instance_type    = "t2.medium"
+  instance_type    = "t2.micro"
   iam_assume_role_policy = "${file("./policy/assume-role-policy.json")}"
   iam_role_policy  = "${data.template_file.worker-policy.rendered}"
   user_data        = "${data.template_file.worker-bootstrap-user-data.rendered}"
