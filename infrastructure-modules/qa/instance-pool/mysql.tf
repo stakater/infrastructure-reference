@@ -7,7 +7,7 @@ module "mysql" {
 
   # VPC parameters
   vpc_id  = "${module.network.vpc_id}"
-  subnets = "${module.network.private_persistence_subnets}"
+  subnets = "${module.network.private_app_subnet_ids}"
   region  = "${var.aws_account["default_region"]}"
 
   # LC parameters
@@ -103,11 +103,11 @@ resource "aws_security_group" "mysql-sg-elb" {
   }
 }
 
-## Internal load balancer 
+## Internal load balancer
 resource "aws_elb" "mysql-elb-internal" {
   name                      = "${var.stack_name}-qa-mysql-int"
   security_groups           = ["${aws_security_group.mysql-sg-elb.id}"]
-  subnets                   = ["${split(",",module.network.private_persistence_subnets)}"]
+  subnets                   = ["${split(",",module.network.private_app_subnet_ids)}"]
   internal                  = true
   cross_zone_load_balancing = true
   connection_draining       = true
