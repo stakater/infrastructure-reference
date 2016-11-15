@@ -32,12 +32,14 @@ TF_GLOBAL_ADMIRAL_STATE_KEY=`/gocd-data/scripts/read-parameter.sh ${PROD_PARAMS_
 TF_PROD_STATE_KEY=`/gocd-data/scripts/read-parameter.sh ${PROD_PARAMS_FILE} prod_state_key`
 DEPLOY_INSTANCE_TYPE=`/gocd-data/scripts/read-parameter.sh ${PROD_PARAMS_FILE} instance_type`
 ENABLE_SSL=`/gocd-data/scripts/read-parameter.sh ${PROD_PARAMS_FILE} enable_ssl`
+INTERNAL_SUPPORT=`/gocd-data/scripts/read-parameter.sh ${PROD_PARAMS_FILE} internal_support`
 # Remove unwanted characters
 TF_STATE_BUCKET_NAME=${TF_STATE_BUCKET_NAME//\"}
 TF_GLOBAL_ADMIRAL_STATE_KEY=${TF_GLOBAL_ADMIRAL_STATE_KEY//\"}
 TF_PROD_STATE_KEY=${TF_PROD_STATE_KEY//\"}
 DEPLOY_INSTANCE_TYPE=${DEPLOY_INSTANCE_TYPE//\"}
 ENABLE_SSL=${ENABLE_SSL//\"}
+INTERNAL_SUPPORT=${INTERNAL_SUPPORT//\"}
 
 ## Get deployment state values
 DEPLOYMENT_STATE_FILE_PATH="/app/${APP_NAME}/cd/blue-green-deployment"
@@ -64,6 +66,7 @@ echo "TF_GLOBAL_ADMIRAL_STATE_KEY: ${TF_GLOBAL_ADMIRAL_STATE_KEY}"
 echo "TF_PROD_STATE_KEY: ${TF_PROD_STATE_KEY}"
 echo "DEPLOY_STATE_KEY: ${DEPLOY_STATE_KEY}"
 echo "ENABLE_SSL: ${ENABLE_SSL}"
+echo "INTERNAL_SUPPORT: ${INTERNAL_SUPPORT}"
 echo "###################################################"
 
 
@@ -158,7 +161,7 @@ echo "GREEN_GROUP_MIN_ELB_CAPACITY: ${GREEN_GROUP_MIN_ELB_CAPACITY}"
 echo "#######################################################################"
 
 # Write terraform variables to .tfvars file
-/gocd-data/scripts/write-terraform-variables.sh ${APP_NAME} ${AWS_REGION} ${TF_STATE_BUCKET_NAME} ${TF_PROD_STATE_KEY} ${TF_GLOBAL_ADMIRAL_STATE_KEY} ${DEPLOY_INSTANCE_TYPE} ${BLUE_GROUP_AMI_ID} ${BLUE_CLUSTER_MIN_SIZE} ${BLUE_CLUSTER_MAX_SIZE} ${BLUE_GROUP_LOAD_BALANCERS} ${BLUE_GROUP_MIN_ELB_CAPACITY} ${GREEN_GROUP_AMI_ID} ${GREEN_CLUSTER_MIN_SIZE} ${GREEN_CLUSTER_MAX_SIZE} ${GREEN_GROUP_LOAD_BALANCERS} ${GREEN_GROUP_MIN_ELB_CAPACITY} ${ENABLE_SSL}
+/gocd-data/scripts/write-terraform-variables.sh ${APP_NAME} ${AWS_REGION} ${TF_STATE_BUCKET_NAME} ${TF_PROD_STATE_KEY} ${TF_GLOBAL_ADMIRAL_STATE_KEY} ${DEPLOY_INSTANCE_TYPE} ${BLUE_GROUP_AMI_ID} ${BLUE_CLUSTER_MIN_SIZE} ${BLUE_CLUSTER_MAX_SIZE} ${BLUE_GROUP_LOAD_BALANCERS} ${BLUE_GROUP_MIN_ELB_CAPACITY} ${GREEN_GROUP_AMI_ID} ${GREEN_CLUSTER_MIN_SIZE} ${GREEN_CLUSTER_MAX_SIZE} ${GREEN_GROUP_LOAD_BALANCERS} ${GREEN_GROUP_MIN_ELB_CAPACITY} ${ENABLE_SSL} ${INTERNAL_SUPPORT}
 
 # Apply terraform changes
 /gocd-data/scripts/terraform-apply-changes.sh ${APP_NAME} ${TF_STATE_BUCKET_NAME} ${DEPLOY_STATE_KEY} ${AWS_REGION}
