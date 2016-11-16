@@ -1,6 +1,6 @@
 qa: storage_qa network_qa utilities_qa  efs_qa instance_pool_qa
 
-plan_qa: plan_storage_qa plan_network_qa plan_utilities_qa plan_aurora_db_qa plan_efs_qa plan_instance_pool_qa
+plan_qa: plan_storage_qa plan_network_qa plan_utilities_qa plan_efs_qa plan_instance_pool_qa
 
 refresh_qa: init_qa
 	cd $(BUILD_QA); $(TF_REFRESH)

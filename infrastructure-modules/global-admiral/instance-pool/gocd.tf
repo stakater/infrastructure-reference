@@ -92,6 +92,11 @@ resource "aws_s3_bucket_object" "gocd_build_ami" {
   key = "gocd/scripts/build-ami.sh"
   source = "./data/gocd/scripts/build-ami.sh"
 }
+resource "aws_s3_bucket_object" "clone_production_deployment_code" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/clone-production-deployment-code.sh"
+  source = "./data/gocd/scripts/clone-production-deployment-code.sh"
+}
 resource "aws_s3_bucket_object" "gocd_build_docker_image" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/build-docker-image.sh"

@@ -83,6 +83,8 @@ coreos:
         TimeoutStartSec=0
         ExecStartPre=/usr/bin/docker pull gocd/gocd-server:16.5.0-3305
         ExecStartPre=-/usr/bin/docker rm %n
+        ExecStartPre=-/usr/bin/mkdir -p /gocd-data/server-data
+        ExecStartPre=-/usr/bin/chown 999:rkt-admin /gocd-data/server-data
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                                   -p 8153:8153 \
                                   -e AGENT_KEY=123456789abcdef \
@@ -91,7 +93,8 @@ coreos:
                                   -e AGENT_KEY=123456789lkjhgf \
                                   -e AGENT_KEY=123456789ytrewq \
                                   -v /gocd-data/conf:/etc/go \
-                                  -v /gocd-data/passwd:/passwd \
+                                  -v /gocd-data/server-data:/var/lib/go-server \
+                                  -v /gocd-data/gocd-passwd:/gocd-passwd \
                                   gocd/gocd-server:16.5.0-3305"
         ExecStop=/usr/bin/docker stop %n
         RestartSec=10
