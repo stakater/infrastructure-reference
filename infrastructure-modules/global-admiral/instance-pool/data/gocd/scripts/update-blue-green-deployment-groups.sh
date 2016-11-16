@@ -174,11 +174,11 @@ fi;
 ## Update deployment state file
 if [ $LIVE_GROUP == "null" ]
 then
-   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} ${LIVE_GROUP} ${AMI_ID} null true true
+   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} ${LIVE_GROUP} ${AMI_ID} null true true false
 elif [ $LIVE_GROUP == "blue" ]
 then
-   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} ${LIVE_GROUP} ${BLUE_GROUP_AMI_ID} ${AMI_ID} false true
+   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} ${LIVE_GROUP} ${BLUE_GROUP_AMI_ID} ${AMI_ID} true true false
 elif [ $LIVE_GROUP == "green" ]
 then
-   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} ${LIVE_GROUP} ${AMI_ID} ${GREEN_GROUP_AMI_ID} false true
+   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} ${LIVE_GROUP} ${AMI_ID} ${GREEN_GROUP_AMI_ID} true true false
 fi;

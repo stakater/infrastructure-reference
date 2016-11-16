@@ -107,7 +107,7 @@ then
 
    GREEN_CLUSTER_MIN_SIZE=${CLUSTER_MIN_SIZE}
    GREEN_CLUSTER_MAX_SIZE=${CLUSTER_MAX_SIZE}
-   GREEN_GROUP_AMI_ID=${BLUE_GROUP_AMI_ID}
+   GREEN_GROUP_AMI_ID=${GREEN_GROUP_AMI_ID}
    GREEN_GROUP_LOAD_BALANCERS=${ACTIVE_LOAD_BALANCER}
    GREEN_GROUP_MIN_ELB_CAPACITY=${MIN_ELB_CAPACITY}
 elif [ $LIVE_GROUP == "green" ]
@@ -157,12 +157,12 @@ fi;
 ## Update deployment state file
 if [ $LIVE_GROUP == "null" ]
 then
-   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} blue ${BLUE_GROUP_AMI_ID} null true false
+   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} blue ${BLUE_GROUP_AMI_ID} null true false true
 elif [ $LIVE_GROUP == "blue" ]
 then
-   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} green ${BLUE_GROUP_AMI_ID} ${GREEN_GROUP_AMI_ID} true false
+   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} green ${BLUE_GROUP_AMI_ID} ${GREEN_GROUP_AMI_ID} true false true
 elif [ $LIVE_GROUP == "green" ]
 then
-   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} blue ${BLUE_GROUP_AMI_ID} ${GREEN_GROUP_AMI_ID} true false
+   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} blue ${BLUE_GROUP_AMI_ID} ${GREEN_GROUP_AMI_ID} true false true
 fi;
 
