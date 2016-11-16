@@ -3,7 +3,6 @@ prod: storage_prod network_prod utilities_prod efs_prod prod_user_data
 	# Refresh terraform at the end, to make sure all output is present
 	# https://github.com/hashicorp/terraform/issues/2598
 
-
 plan_prod: plan_storage_prod plan_network_prod plan_utilities_prod plan_aurora_db_prod plan_efs_prod plan_prod_user_data
 
 refresh_prod: init_prod

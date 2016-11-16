@@ -99,8 +99,6 @@ TF_DESTROY := terraform destroy -force
 
 export
 
-all: network
-
 help:
 	@echo "Usage: make (<resource> | destroy_<resource> | plan_<resource> | refresh_<resource> | show | graph )"
 	@echo "Available resources: network"
@@ -111,24 +109,9 @@ destroy:
 	@echo "For example: make destroy_network"
 	@echo "Node: destroy may fail because of outstanding dependences"
 
-destroy_all: \
-	destroy_network
-
-clean_all: destroy_all
-	rm -f $(BUILD)/*.tf
-	#rm -f $(BUILD)/terraform.tfstate
-
-# TODO: Push/Pull terraform states from a tf state repo
-pull_tf_state:
-	@mkdir -p $(BUILD)
-	@echo pull terraform state from ....
-
-push_tf_state:
-	@echo push terraform state to ....
-
 # Load all resouces makefile
 include resources/makefiles/*.mk
 include resources/makefiles/*/*.mk
 include resources/makefiles/*/*/*.mk
 
-.PHONY: all destroy destroy_all clean_all help pull_tf_state push_tf_state
+.PHONY: destroy help
