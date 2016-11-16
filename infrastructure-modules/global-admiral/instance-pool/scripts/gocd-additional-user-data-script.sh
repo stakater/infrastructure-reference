@@ -21,6 +21,7 @@ fileList+=("gocd/conf/sudoers")
 fileList+=("gocd/conf/cruise-config.xml")
 fileList+=("gocd/conf/passwd")
 fileList+=("gocd/scripts/build-ami.sh")
+fileList+=("gocd/scripts/clone-production-deployment-code.sh")
 fileList+=("gocd/scripts/build-docker-image.sh")
 fileList+=("gocd/scripts/deploy-to-cluster.sh")
 fileList+=("gocd/scripts/deploy-to-prod.sh")
@@ -77,7 +78,8 @@ fi
 # if sudoers file is downloaded and valid, copy to `gocd-data` directory
 if [ -f ${gocdDownloadDir}/passwd ]  ;
 then
-  cp ${gocdDownloadDir}/passwd ${gocdDataDir}/passwd
+  mkdir -p ${gocdDataDir}/gocd-passwd
+  cp ${gocdDownloadDir}/passwd ${gocdDataDir}/gocd-passwd/passwd
 fi
 
 # if script files from script folder have been dwnloaded, copy to `gocd-data` directory
@@ -86,6 +88,10 @@ mkdir -p ${gocdScriptsDir}
 if [ -f ${gocdDownloadDir}/build-ami.sh ] ;
 then
   cp ${gocdDownloadDir}/build-ami.sh ${gocdScriptsDir}/build-ami.sh
+fi
+if [ -f ${gocdDownloadDir}/clone-production-deployment-code.sh ] ;
+then
+  cp ${gocdDownloadDir}/clone-production-deployment-code.sh ${gocdScriptsDir}/clone-production-deployment-code.sh
 fi
 if [ -f ${gocdDownloadDir}/build-docker-image.sh ] ;
 then
