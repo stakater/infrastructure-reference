@@ -12,7 +12,7 @@ module "worker" {
 
   # LC parameters
   ami              = "${var.ami}"
-  instance_type    = "t2.micro"
+  instance_type    = "t2.nano"
   iam_assume_role_policy = "${file("./policy/assume-role-policy.json")}"
   iam_role_policy  = "${data.template_file.worker-policy.rendered}"
   user_data        = "${data.template_file.worker-bootstrap-user-data.rendered}"
@@ -25,8 +25,8 @@ module "worker" {
 
   # ASG parameters
   max_size         = "2"
-  min_size         = "2"
-  min_elb_capacity = "2"
+  min_size         = "1"
+  min_elb_capacity = "1"
   load_balancers   = "${aws_elb.worker-elb.id},${aws_elb.worker-elb-internal.id}" # Assign both ELBs to instance-pool module
 }
 

@@ -28,7 +28,7 @@ terraformFolderPath="${deployCodeLocation}/deploy-prod/.terraform/"
 tfvarsFile="${terraformFolderPath}/deploy.tfvars"
 
 # Check if production deployment code exists
-/gocd-data/scripts/clone-production-deployment-code.sh ${APP_NAME}
+/gocd-data/scripts/clone-deployment-application-code.sh ${APP_NAME}
 
 # Check if .terraform folder exists
 if [ ! -d "${terraformFolderPath}" ];

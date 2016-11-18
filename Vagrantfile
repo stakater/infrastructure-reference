@@ -50,8 +50,8 @@ pip install --upgrade awscli s3cmd
 echo installing terraform ...
 mkdir -p /opt/terraform
 pushd /opt/terraform
-wget -nc -q https://releases.hashicorp.com/terraform/0.7.3/terraform_0.7.3_linux_amd64.zip
-unzip -q terraform_0.7.3_linux_amd64.zip
+wget -nc -q https://releases.hashicorp.com/terraform/0.7.11/terraform_0.7.11_linux_amd64.zip
+unzip -q terraform_0.7.11_linux_amd64.zip
 popd
 mkdir -p /etc/profile.d
 echo PATH=$PATH:/opt/terraform > /etc/profile.d/terraform.sh

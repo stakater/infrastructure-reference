@@ -1,3 +1,0 @@
-DOCKER_REGISTRY=registry.stakater-reference.local:80
-DEV_CLUSTER_ENDPOINT=worker-dev-fleet.stakater-reference.local
-QA_CLUSTER_ENDPOINT=worker-qa-fleet.stakater-reference.local

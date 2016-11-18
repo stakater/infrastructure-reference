@@ -18,6 +18,7 @@
         "iam:GetPolicy",
         "iam:GetRole",
         "iam:GetRolePolicy",
+        "iam:GetUser",
         "iam:ListAttachedRolePolicies",
         "iam:ListEntitiesForPolicy",
         "iam:ListInstanceProfiles",
@@ -27,6 +28,7 @@
         "iam:ListPolicyVersions",
         "iam:ListRolePolicies",
         "iam:ListRoles",
+        "iam:PassRole",
         "iam:PutRolePolicy",
         "iam:RemoveRoleFromInstanceProfile"
       ],
