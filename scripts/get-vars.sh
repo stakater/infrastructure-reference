@@ -50,31 +50,20 @@ done
 #########################
 # Preprossessing for terraform variable
 # for current region's availability zones
-###########################
-# Map of AWS availability zones
-declare -A AWS_AZS=(["us-east-1"]=${AZ_US_EAST_1}
-				 ["us-west-1"]=${AZ_US_WEST_1}
-				 ["us-west-2"]=${AZ_US_WEST_2}
-				 ["eu-west-1"]=${AZ_EU_WEST_1}
-				 ["eu-central-1"]=${AZ_EU_CETNRAL_1}
-				 ["ap-southeast-1"]=${AZ_AP_SOUTHEAST_1}
-				 ["ap-southeast-2"]=${AZ_AP_SOUTHEAST_2}
-				 ["ap-south-1"]=${AZ_AP_SOUTH_1}
-         ["ap-northeast-1"]=${AZ_AP_NORTHEAST_1}
-				 ["ap-northeast-2"]=${AZ_AP_NORTHEAST_2}
-				 ["sa-east-1"]=${AZ_SA_EAST_1})
-IFS=',' read -r -a AVAIL_ZONES <<< "${AWS_AZS["${AWS_REGION}"]}"
-
+#########################
+#Fetch Availability Zones availble for current profile (i.e. account and region)
+az_result=$(aws ec2 describe-availability-zones --output text --profile ${AWS_PROFILE} --query "AvailabilityZones[].ZoneName");
 # Converting array in the format: "us-east-1a","us-east-1c","us-east-1d"
-array_length="${#AVAIL_ZONES[@]}"
+az_array=(${az_result//'\n'/})
+array_length="${#az_array[@]}"
 tf_avail_zones=""
-for i in "${!AVAIL_ZONES[@]}"; do
-  tf_avail_zones="${tf_avail_zones} \"${AVAIL_ZONES[$i]}\""
+for i in "${!az_array[@]}"; do
+ tf_avail_zones="${tf_avail_zones} \"${az_array[$i]}\""
 
-  if [[ $i -lt $((array_length - 1)) ]]
-  then
-    tf_avail_zones="${tf_avail_zones},"
-  fi
+ if [[ $i -lt $((array_length - 1)) ]]
+ then
+   tf_avail_zones="${tf_avail_zones},"
+ fi
 done
 ####################
 ####################
