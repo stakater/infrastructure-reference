@@ -2,7 +2,7 @@
 AWS_REGION=""
 DEPLOY_STATE_KEY=""
 APP_NAME=""
-DEPLOY_INSTANCE_TYPE="t2.micro" # default value
+DEPLOY_INSTANCE_TYPE="t2.nano" # default value
 ENABLE_SSL=false;
 INTERNAL_SUPPORT=false;
 
