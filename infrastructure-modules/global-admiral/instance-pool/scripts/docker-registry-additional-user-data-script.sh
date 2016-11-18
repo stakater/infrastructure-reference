@@ -19,12 +19,25 @@ resource="/${configBucket}/${uploadScriptFile}"
 create_string_to_sign
 signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64)
 debug_log
-curl -s -L -O -H "Host: ${configBucket}.s3-${aws_region}.amazonaws.com" \
-  -H "Content-Type: ${contentType}" \
-  -H "Authorization: AWS ${s3Key}:${signature}" \
-  -H "x-amz-security-token:${s3Token}" \
-  -H "Date: ${dateValue}" \
-  https://${configBucket}.s3-${aws_region}.amazonaws.com/${uploadScriptFile}
 
+retry=5
+ready=0
+#Retry 5 times untill file is downloaded
+until [[ $retry -eq 0 ]]  || [[ $ready -eq 1  ]]
+do
+  curl -s -L -O -H "Host: ${configBucket}.s3-${aws_region}.amazonaws.com" \
+    -H "Content-Type: ${contentType}" \
+    -H "Authorization: AWS ${s3Key}:${signature}" \
+    -H "x-amz-security-token:${s3Token}" \
+    -H "Date: ${dateValue}" \
+    https://${configBucket}.s3-${aws_region}.amazonaws.com/${uploadScriptFile}
+
+  if [ -f ${scriptsDir}/upload-registry-certs.sh ] ;
+  then
+    ready=1
+  else
+    let "retry--"
+  fi
+done
 # make script file executable
 chmod a+x upload-registry-certs.sh

@@ -46,13 +46,30 @@ do
   create_string_to_sign
   signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64)
   debug_log
-  curl -s -L -O -H "Host: ${configBucket}.s3-${aws_region}.amazonaws.com" \
-    -H "Content-Type: ${contentType}" \
-    -H "Authorization: AWS ${s3Key}:${signature}" \
-    -H "x-amz-security-token:${s3Token}" \
-    -H "Date: ${dateValue}" \
-    https://${configBucket}.s3-${aws_region}.amazonaws.com/${f}
+  retry=5
+  ready=0
+  #Retry 5 times untill file is downloaded
+  until [[ $retry -eq 0 ]]  || [[ $ready -eq 1  ]]
+  do
+    curl -s -L -O -H "Host: ${configBucket}.s3-${aws_region}.amazonaws.com" \
+      -H "Content-Type: ${contentType}" \
+      -H "Authorization: AWS ${s3Key}:${signature}" \
+      -H "x-amz-security-token:${s3Token}" \
+      -H "Date: ${dateValue}" \
+      https://${configBucket}.s3-${aws_region}.amazonaws.com/${f}
+
+    # Extract filename from file path
+    filename="${f##*/}"
+    if [ -f ${gocdDownloadDir}/${filename} ] ;
+    then
+      ready=1
+    else
+      let "retry--"
+    fi
+  done
 done
+
+
 
 # Create gocd data directory
 gocdDataDir="/gocd-data"

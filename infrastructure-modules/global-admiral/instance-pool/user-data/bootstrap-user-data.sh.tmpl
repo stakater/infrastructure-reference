@@ -86,14 +86,26 @@ create_string_to_sign
 signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac $${s3Secret} -binary | base64)
 filePath=$${cloudConfigYaml}
 debug_log
-curl -L -s -H "Host: $${cloudInitBucket}.s3-$${aws_region}.amazonaws.com" \
-  -H "Content-Type: $${contentType}" \
-  -H "Authorization: AWS $${s3Key}:$${signature}" \
-  -H "x-amz-security-token:$${s3Token}" \
-  -H "Date: $${dateValue}" \
-  https://$${cloudInitBucket}.s3-$${aws_region}.amazonaws.com/$${filePath} \
-  | sed "s#\\$private_ipv4#$private_ipv4#g; s#\\$public_ipv4#$public_ipv4#g" \
-  > $${workDir}/cloud-config.yaml
+retry=5
+ready=0
+until [[ $retry -eq 0 ]]  || [[ $ready -eq 1  ]]
+do
+  curl -L -s -H "Host: $${cloudInitBucket}.s3-$${aws_region}.amazonaws.com" \
+    -H "Content-Type: $${contentType}" \
+    -H "Authorization: AWS $${s3Key}:$${signature}" \
+    -H "x-amz-security-token:$${s3Token}" \
+    -H "Date: $${dateValue}" \
+    https://$${cloudInitBucket}.s3-$${aws_region}.amazonaws.com/$${filePath} \
+    | sed "s#\\$private_ipv4#$private_ipv4#g; s#\\$public_ipv4#$public_ipv4#g" \
+    > $${workDir}/cloud-config.yaml
+
+  if [ -f $${workDir}/cloud-config.yaml ] && grep -q coreos $${workDir}/cloud-config.yaml ;
+  then
+    ready=1
+  else
+    let "retry--"
+  fi
+done
 
 # Download initial-cluster
 resource="/$${configBucket}/$${initialCluster}"
