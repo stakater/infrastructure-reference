@@ -12,7 +12,7 @@ module "gocd" {
 
   # LC parameters
   ami              = "${var.ami}"
-  instance_type    = "t2.large"
+  instance_type    = "t2.medium"
   iam_assume_role_policy = "${file("./policy/assume-role-policy.json")}"
   iam_role_policy  = "${data.template_file.gocd-policy.rendered}"
   user_data        = "${data.template_file.gocd-bootstrap-user-data.rendered}"
@@ -65,6 +65,14 @@ data "template_file" "gocd-user-data" {
   }
 }
 
+data "template_file" "gocd-params-tmpl" {
+  template = "${file("./data/gocd/scripts/gocd.parameters.txt.tmpl")}"
+
+  vars {
+    stack_name = "${var.stack_name}"
+  }
+}
+
 data "template_file" "gocd-prod-deploy-params-tmpl" {
   template = "${file("./data/gocd/scripts/prod.parameters.txt.tmpl")}"
 
@@ -92,10 +100,10 @@ resource "aws_s3_bucket_object" "gocd_build_ami" {
   key = "gocd/scripts/build-ami.sh"
   source = "./data/gocd/scripts/build-ami.sh"
 }
-resource "aws_s3_bucket_object" "clone_production_deployment_code" {
+resource "aws_s3_bucket_object" "clone_deployment_application_code" {
   bucket = "${module.config-bucket.bucket_name}"
-  key = "gocd/scripts/clone-production-deployment-code.sh"
-  source = "./data/gocd/scripts/clone-production-deployment-code.sh"
+  key = "gocd/scripts/clone-deployment-application-code.sh"
+  source = "./data/gocd/scripts/clone-deployment-application-code.sh"
 }
 resource "aws_s3_bucket_object" "gocd_build_docker_image" {
   bucket = "${module.config-bucket.bucket_name}"
@@ -125,7 +133,7 @@ resource "aws_s3_bucket_object" "gocd_docker_cleanup" {
 resource "aws_s3_bucket_object" "gocd_gocd_parameters" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/gocd.parameters.txt"
-  source = "./data/gocd/scripts/gocd.parameters.txt"
+  content = "${data.template_file.gocd-params-tmpl.rendered}"
 }
 resource "aws_s3_bucket_object" "gocd_prod_deploy_params" {
   bucket = "${module.config-bucket.bucket_name}"
