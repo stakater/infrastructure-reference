@@ -21,7 +21,7 @@ fileList+=("gocd/conf/sudoers")
 fileList+=("gocd/conf/cruise-config.xml")
 fileList+=("gocd/conf/passwd")
 fileList+=("gocd/scripts/build-ami.sh")
-fileList+=("gocd/scripts/clone-production-deployment-code.sh")
+fileList+=("gocd/scripts/clone-deployment-application-code.sh")
 fileList+=("gocd/scripts/build-docker-image.sh")
 fileList+=("gocd/scripts/deploy-to-cluster.sh")
 fileList+=("gocd/scripts/deploy-to-prod.sh")
@@ -89,9 +89,9 @@ if [ -f ${gocdDownloadDir}/build-ami.sh ] ;
 then
   cp ${gocdDownloadDir}/build-ami.sh ${gocdScriptsDir}/build-ami.sh
 fi
-if [ -f ${gocdDownloadDir}/clone-production-deployment-code.sh ] ;
+if [ -f ${gocdDownloadDir}/clone-deployment-application-code.sh ] ;
 then
-  cp ${gocdDownloadDir}/clone-production-deployment-code.sh ${gocdScriptsDir}/clone-production-deployment-code.sh
+  cp ${gocdDownloadDir}/clone-deployment-application-code.sh ${gocdScriptsDir}/clone-deployment-application-code.sh
 fi
 if [ -f ${gocdDownloadDir}/build-docker-image.sh ] ;
 then

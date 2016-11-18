@@ -81,7 +81,7 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull gocd/gocd-server:16.5.0-3305
+        ExecStartPre=/usr/bin/docker pull gocd/gocd-server:16.11.0
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStartPre=-/usr/bin/mkdir -p /gocd-data/server-data
         ExecStartPre=-/usr/bin/chown 999:rkt-admin /gocd-data/server-data
@@ -95,7 +95,7 @@ coreos:
                                   -v /gocd-data/conf:/etc/go \
                                   -v /gocd-data/server-data:/var/lib/go-server \
                                   -v /gocd-data/gocd-passwd:/gocd-passwd \
-                                  gocd/gocd-server:16.5.0-3305"
+                                  gocd/gocd-server:16.11.0"
         ExecStop=/usr/bin/docker stop %n
         RestartSec=10
         Restart=always
@@ -111,7 +111,7 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.5.0-3305
+        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.11.0
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789abcdef \
@@ -127,7 +127,7 @@ coreos:
                 -v /etc/registry-certificates:/etc/registry-certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
-                stakater/gocd-agent:16.5.0-3305"
+                stakater/gocd-agent:16.11.0"
         ExecStop=-/usr/bin/docker stop %n
         RestartSec=10
         Restart=always
@@ -144,7 +144,7 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.5.0-3305
+        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.11.0
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789zxcvb \
@@ -160,7 +160,7 @@ coreos:
                 -v /etc/registry-certificates:/etc/registry-certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
-                stakater/gocd-agent:16.5.0-3305"
+                stakater/gocd-agent:16.11.0"
         ExecStop=-/usr/bin/docker stop %n
         RestartSec=10
         Restart=always
@@ -177,7 +177,7 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.5.0-3305
+        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.11.0
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789mnbvcx \
@@ -193,7 +193,7 @@ coreos:
                 -v /etc/registry-certificates:/etc/registry-certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
-                stakater/gocd-agent:16.5.0-3305"
+                stakater/gocd-agent:16.11.0"
         ExecStop=-/usr/bin/docker stop %n
         RestartSec=10
         Restart=always
@@ -210,7 +210,7 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.5.0-3305
+        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.11.0
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789lkjhgf \
@@ -226,7 +226,7 @@ coreos:
                 -v /etc/registry-certificates:/etc/registry-certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
-                stakater/gocd-agent:16.5.0-3305"
+                stakater/gocd-agent:16.11.0"
         ExecStop=-/usr/bin/docker stop %n
         RestartSec=10
         Restart=always
@@ -243,7 +243,7 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.5.0-3305
+        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.11.0
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789ytrewq \
@@ -259,7 +259,7 @@ coreos:
                 -v /etc/registry-certificates:/etc/registry-certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
-                stakater/gocd-agent:16.5.0-3305"
+                stakater/gocd-agent:16.11.0"
         ExecStop=-/usr/bin/docker stop %n
         RestartSec=10
         Restart=always

@@ -3,7 +3,7 @@ gocd_global_admiral: plan_gocd_global_admiral
 	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-global-admiral-config -c gocd; \
 	$(TF_APPLY) -target aws_s3_bucket_object.gocd_cloud_config \
 	            -target aws_s3_bucket_object.gocd_build_ami \
-	            -target aws_s3_bucket_object.clone_production_deployment_code \
+	            -target aws_s3_bucket_object.clone_deployment_application_code \
                 -target aws_s3_bucket_object.gocd_build_docker_image \
                 -target aws_s3_bucket_object.gocd_compile_code \
                 -target aws_s3_bucket_object.gocd_deploy_to_cluster \
@@ -39,7 +39,7 @@ plan_gocd_global_admiral: init_gocd_global_admiral
 	cd $(BUILD_GLOBAL_ADMIRAL); \
 	$(TF_PLAN) -target aws_s3_bucket_object.gocd_cloud_config \
                -target aws_s3_bucket_object.gocd_build_ami \
-               -target aws_s3_bucket_object.clone_production_deployment_code \
+               -target aws_s3_bucket_object.clone_deployment_application_code \
                -target aws_s3_bucket_object.gocd_build_docker_image \
                -target aws_s3_bucket_object.gocd_compile_code \
                -target aws_s3_bucket_object.gocd_deploy_to_cluster \
@@ -73,7 +73,7 @@ refresh_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 	cd $(BUILD_GLOBAL_ADMIRAL); \
 	$(TF_REFRESH) -target aws_s3_bucket_object.gocd_cloud_config \
 	            	-target aws_s3_bucket_object.gocd_build_ami \
-	            	-target aws_s3_bucket_object.clone_production_deployment_code \
+	            	-target aws_s3_bucket_object.clone_deployment_application_code \
                     -target aws_s3_bucket_object.gocd_build_docker_image \
                     -target aws_s3_bucket_object.gocd_compile_code \
                     -target aws_s3_bucket_object.gocd_deploy_to_cluster \
@@ -103,7 +103,7 @@ refresh_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
                     -target module.gocd \
                     -target aws_lb_cookie_stickiness_policy.gocd-elb-stickiness-policy;
 
-destroy_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral_state
+destroy_gocd_global_admiral: init_gocd_global_admiral
 	cd $(BUILD_GLOBAL_ADMIRAL); \
 	$(SCRIPTS)/aws-keypair.sh -b $(STACK_NAME)-global-admiral-config -d gocd; \
 	$(TF_DESTROY) -target aws_lb_cookie_stickiness_policy.gocd-elb-stickiness-policy \
@@ -116,9 +116,8 @@ destroy_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
                   -target module.gocd.module.auto-scaling-group \
                   -target module.gocd.module.launch-configuration \
                   -target aws_s3_bucket_object.gocd_cloud_config \
-		          -target aws_s3_bucket_object.gocd_build_ami \
-		          -target aws_s3_bucket_object.clone_production_deployment_code \
-
+		          		-target aws_s3_bucket_object.gocd_build_ami \
+		          		-target aws_s3_bucket_object.clone_deployment_application_code \
                   -target aws_s3_bucket_object.gocd_build_docker_image \
                   -target aws_s3_bucket_object.gocd_compile_code \
                   -target aws_s3_bucket_object.gocd_deploy_to_prod \
