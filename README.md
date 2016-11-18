@@ -117,13 +117,6 @@ Following is the list of variables in the `Makefile` and their description:
 | PROD_DATABASE_NAME     | Database name for production database (Aurora DB)                                                                |
 | COREOS_UPDATE_CHANNEL  | Update channel for fetching Core OS AMI ID (stable, beta, alpha) (We recommend to keep it at `stable` (default)) |
 
-
-#### List of availbility zones in the `Makefile`: 
-Below these variables in the `Makefile`, you will find a list of variables which includes available availability zones(*) per region.
-
-**Available availibility zones**: 
-Availibility zones for a region, that are availble to your AWS account
-
 #### GoCD Configuration
 * Set up GoCD Configuration file (`cruise-config.xml`)
 * Set up the `gocd.parameters.txt` file.
