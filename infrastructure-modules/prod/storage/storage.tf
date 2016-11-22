@@ -60,6 +60,6 @@ output "maintenance-page-bucket-name" {
   value = "${module.maintenance-page-bucket.bucket_name}"
 }
 
-output "maintenance-page-website-endpoint" {
-  value = "${module.maintenance-page-bucket.website_endpoint}"
+output "maintenance-page-bucket-website-endpoint" {
+  value = "${module.maintenance-page-bucket.endpoint}"
 }
