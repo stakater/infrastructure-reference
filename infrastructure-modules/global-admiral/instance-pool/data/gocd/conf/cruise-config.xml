@@ -115,6 +115,26 @@
       </materials>
     </pipeline>
   </pipelines>
+  <pipelines group="Manage_Dev_Servers">
+    <pipeline name="Stop-Dev" template="stop_infra">
+      <params>
+        <param name="SOURCE_DIR" />
+        <param name="ENVIRONMENT">dev</param>
+      </params>
+      <materials>
+        <git url="https://github.com/stakater/dummy-repo.git" shallowClone="true" autoUpdate="false" />
+      </materials>
+    </pipeline>
+    <pipeline name="Start-Dev" template="start_infra">
+      <params>
+        <param name="SOURCE_DIR" />
+        <param name="ENVIRONMENT">dev</param>
+      </params>
+      <materials>
+        <git url="https://github.com/stakater/dummy-repo.git" shallowClone="true" autoUpdate="false" />
+      </materials>
+    </pipeline>
+  </pipelines>
   <templates>
     <pipeline name="stakater_build">
       <stage name="Build">
@@ -222,6 +242,37 @@
         </jobs>
       </stage>
     </pipeline>
+    <pipeline name="stop_infra">
+      <stage name="Stop-Infra" fetchMaterials="false">
+        <approval type="manual" />
+        <jobs>
+          <job name="Stop-Infra">
+            <tasks>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>/gocd-data/scripts/stop-infra.sh #{ENVIRONMENT}</arg>
+                <runif status="any" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="start_infra">
+      <stage name="Start-Infra" fetchMaterials="false">
+        <jobs>
+          <job name="Start-Infra">
+            <tasks>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>/gocd-data/scripts/start-infra.sh #{ENVIRONMENT}</arg>
+                <runif status="any" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
   </templates>
   <environments>
     <environment name="Build">
@@ -257,6 +308,14 @@
       <pipelines>
         <pipeline name="app-deploy-dev" />
         <pipeline name="app-deploy-qa" />
+      </pipelines>
+    </environment>
+    <environment name="Management">
+      <agents>
+      </agents>
+      <pipelines>
+        <pipeline name="Start-Dev" />
+        <pipeline name="Stop-Dev" />
       </pipelines>
     </environment>
   </environments>

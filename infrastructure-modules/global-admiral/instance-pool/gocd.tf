@@ -185,6 +185,36 @@ resource "aws_s3_bucket_object" "gocd_write_terraform_variables" {
   key = "gocd/scripts/write-terraform-variables.sh"
   source = "./data/gocd/scripts/write-terraform-variables.sh"
 }
+resource "aws_s3_bucket_object" "gocd_resume_ASG_processes" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/resume-ASG-processes.sh"
+  source = "./data/gocd/scripts/resume-ASG-processes.sh"
+}
+resource "aws_s3_bucket_object" "gocd_start_infra" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/start-infra.sh"
+  source = "./data/gocd/scripts/start-infra.sh"
+}
+resource "aws_s3_bucket_object" "gocd_start_instances" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/start-instances.sh"
+  source = "./data/gocd/scripts/start-instances.sh"
+}
+resource "aws_s3_bucket_object" "gocd_stop_infra" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/stop-infra.sh"
+  source = "./data/gocd/scripts/stop-infra.sh"
+}
+resource "aws_s3_bucket_object" "gocd_stop_instances" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/stop-instances.sh"
+  source = "./data/gocd/scripts/stop-instances.sh"
+}
+resource "aws_s3_bucket_object" "gocd_suspend_ASG_processes" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/suspend-ASG-processes.sh"
+  source = "./data/gocd/scripts/suspend-ASG-processes.sh"
+}
 resource "aws_s3_bucket_object" "gocd_cruise_config" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/conf/cruise-config.xml"
