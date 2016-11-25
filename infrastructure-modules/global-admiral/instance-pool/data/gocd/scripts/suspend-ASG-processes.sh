@@ -1,4 +1,11 @@
 #!/bin/bash
+# This script suspends Launch and Health Check processes for specified ',' separated environments in the specified region
+#----------------------------------------------
+# Argument1: ENVIRONMENTS
+# Argument2: REGION
+#----------------------------------------------
+
+#Input Parameters
 ENVIRONMENTS=$1
 REGION=$2
 # Check number of parameters equals 2

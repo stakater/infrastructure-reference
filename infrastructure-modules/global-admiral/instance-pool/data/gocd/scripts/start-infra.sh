@@ -1,4 +1,10 @@
 #!/bin/bash
+# This script starts stack for specified ',' separated environments in the current region
+#----------------------------------------------
+# Argument1: ENVIRONMENTS
+#----------------------------------------------
+
+#Input Parameters
 ENVIRONMENTS=$1
 # Check number of parameters equals 1
 if [ "$#" -ne 1 ]; then
