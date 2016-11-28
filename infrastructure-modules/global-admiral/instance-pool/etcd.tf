@@ -216,15 +216,14 @@ module "etcd_scale_up_policy" {
   notifications = "autoscaling:EC2_INSTANCE_LAUNCH_ERROR,autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
 
   # Monitor parameters
-  adjustment_type          = "PercentChangeInCapacity"
-  scaling_adjustment       = 30
+  adjustment_type          = "ChangeInCapacity"
+  scaling_adjustment       = 1
   cooldown                 = 300
-  min_adjustment_magnitude = 2
   comparison_operator      = "GreaterThanOrEqualToThreshold"
   evaluation_periods       = 2
   metric_name              = "CPUUtilization"
-  period                   = 120
-  threshold                = 10
+  period                   = 60
+  threshold                = 80
 }
 
 module "etcd_scale_down_policy" {
@@ -242,13 +241,13 @@ module "etcd_scale_down_policy" {
 
   # Monitor parameters
   adjustment_type     = "ChangeInCapacity"
-  scaling_adjustment  = 2
+  scaling_adjustment  = -1
   cooldown            = 300
   comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = 2
+  evaluation_periods  = 30
   metric_name         = "CPUUtilization"
-  period              = 120
-  threshold           = 10
+  period              = 60
+  threshold           = 50
 }
 
 # Outputs to be accessible through remote state
