@@ -20,6 +20,12 @@ gocd_global_admiral: plan_gocd_global_admiral
                 -target aws_s3_bucket_object.gocd_update_deployment_state \
                 -target aws_s3_bucket_object.gocd_write_ami_parameters \
                 -target aws_s3_bucket_object.gocd_write_terraform_variables \
+                -target aws_s3_bucket_object.gocd_resume_ASG_processes \
+                -target aws_s3_bucket_object.gocd_start_infra \
+                -target aws_s3_bucket_object.gocd_start_instances \
+                -target aws_s3_bucket_object.gocd_stop_infra \
+                -target aws_s3_bucket_object.gocd_stop_instances \
+                -target aws_s3_bucket_object.gocd_suspend_ASG_processes \
                 -target aws_s3_bucket_object.gocd_cruise_config \
                 -target aws_s3_bucket_object.gocd_passwd \
                 -target aws_s3_bucket_object.gocd_sudoers \
@@ -56,6 +62,12 @@ plan_gocd_global_admiral: init_gocd_global_admiral
                -target aws_s3_bucket_object.gocd_update_deployment_state \
                -target aws_s3_bucket_object.gocd_write_ami_parameters \
                -target aws_s3_bucket_object.gocd_write_terraform_variables \
+               -target aws_s3_bucket_object.gocd_resume_ASG_processes \
+               -target aws_s3_bucket_object.gocd_start_infra \
+               -target aws_s3_bucket_object.gocd_start_instances \
+               -target aws_s3_bucket_object.gocd_stop_infra \
+               -target aws_s3_bucket_object.gocd_stop_instances \
+               -target aws_s3_bucket_object.gocd_suspend_ASG_processes \
                -target aws_s3_bucket_object.gocd_cruise_config \
                -target aws_s3_bucket_object.gocd_passwd \
                -target aws_s3_bucket_object.gocd_sudoers \
@@ -90,6 +102,12 @@ refresh_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
                     -target aws_s3_bucket_object.gocd_update_deployment_state \
                     -target aws_s3_bucket_object.gocd_write_ami_parameters \
                     -target aws_s3_bucket_object.gocd_write_terraform_variables \
+                    -target aws_s3_bucket_object.gocd_resume_ASG_processes \
+                    -target aws_s3_bucket_object.gocd_start_infra \
+                    -target aws_s3_bucket_object.gocd_start_instances \
+                    -target aws_s3_bucket_object.gocd_stop_infra \
+                    -target aws_s3_bucket_object.gocd_stop_instances \
+                    -target aws_s3_bucket_object.gocd_suspend_ASG_processes \
                     -target aws_s3_bucket_object.gocd_cruise_config \
                     -target aws_s3_bucket_object.gocd_passwd \
                     -target aws_s3_bucket_object.gocd_sudoers \
@@ -134,6 +152,12 @@ destroy_gocd_global_admiral: init_gocd_global_admiral
                   -target aws_s3_bucket_object.gocd_update_blue_green_deployment_groups \
                   -target aws_s3_bucket_object.gocd_update_deployment_state \
                   -target aws_s3_bucket_object.gocd_write_terraform_variables \
+                  -target aws_s3_bucket_object.gocd_resume_ASG_processes \
+                  -target aws_s3_bucket_object.gocd_start_infra \
+                  -target aws_s3_bucket_object.gocd_start_instances \
+                  -target aws_s3_bucket_object.gocd_stop_infra \
+                  -target aws_s3_bucket_object.gocd_stop_instances \
+                  -target aws_s3_bucket_object.gocd_suspend_ASG_processes \
                   -target aws_s3_bucket_object.gocd_cruise_config \
                   -target aws_s3_bucket_object.gocd_passwd \
                   -target aws_s3_bucket_object.gocd_sudoers;

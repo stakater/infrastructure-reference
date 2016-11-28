@@ -38,6 +38,12 @@ fileList+=("gocd/scripts/update-deployment-state.sh")
 fileList+=("gocd/scripts/compile-code.sh")
 fileList+=("gocd/scripts/write-ami-parameters.sh")
 fileList+=("gocd/scripts/write-terraform-variables.sh")
+fileList+=("gocd/scripts/resume-ASG-processes.sh")
+fileList+=("gocd/scripts/start-infra.sh")
+fileList+=("gocd/scripts/start-instances.sh")
+fileList+=("gocd/scripts/stop-infra.sh")
+fileList+=("gocd/scripts/stop-instances.sh")
+fileList+=("gocd/scripts/suspend-ASG-processes.sh")
 
 # Download all files in the list
 for f in "${fileList[@]}"
@@ -173,6 +179,30 @@ fi
 if [ -f ${gocdDownloadDir}/write-terraform-variables.sh ] ;
 then
   cp ${gocdDownloadDir}/write-terraform-variables.sh ${gocdScriptsDir}/write-terraform-variables.sh
+fi
+if [ -f ${gocdDownloadDir}/resume-ASG-processes.sh ] ;
+then
+  cp ${gocdDownloadDir}/resume-ASG-processes.sh ${gocdScriptsDir}/resume-ASG-processes.sh
+fi
+if [ -f ${gocdDownloadDir}/start-infra.sh ] ;
+then
+  cp ${gocdDownloadDir}/start-infra.sh ${gocdScriptsDir}/start-infra.sh
+fi
+if [ -f ${gocdDownloadDir}/start-instances.sh ] ;
+then
+  cp ${gocdDownloadDir}/start-instances.sh ${gocdScriptsDir}/start-instances.sh
+fi
+if [ -f ${gocdDownloadDir}/stop-infra.sh ] ;
+then
+  cp ${gocdDownloadDir}/stop-infra.sh ${gocdScriptsDir}/stop-infra.sh
+fi
+if [ -f ${gocdDownloadDir}/stop-instances.sh ] ;
+then
+  cp ${gocdDownloadDir}/stop-instances.sh ${gocdScriptsDir}/stop-instances.sh
+fi
+if [ -f ${gocdDownloadDir}/suspend-ASG-processes.sh ] ;
+then
+  cp ${gocdDownloadDir}/suspend-ASG-processes.sh ${gocdScriptsDir}/suspend-ASG-processes.sh
 fi
 
 chmod +x ${gocdScriptsDir}/*
