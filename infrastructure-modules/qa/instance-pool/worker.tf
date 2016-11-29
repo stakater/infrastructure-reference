@@ -26,6 +26,7 @@ module "worker" {
   # ASG parameters
   max_size         = "2"
   min_size         = "1"
+  desired_size     = "1"
   min_elb_capacity = "1"
   load_balancers   = "${aws_elb.worker-elb.id},${aws_elb.worker-elb-internal.id}" # Assign both ELBs to instance-pool module
 }

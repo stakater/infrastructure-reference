@@ -26,6 +26,7 @@ module "docker-registry" {
   # ASG parameters
   max_size         = "1"
   min_size         = "1"
+  desired_size     = "1"
   min_elb_capacity = "1"
   load_balancers   = "${aws_elb.docker-registry-elb.id}"
 }
