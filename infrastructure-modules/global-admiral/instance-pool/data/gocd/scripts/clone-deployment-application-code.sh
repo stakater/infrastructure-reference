@@ -34,12 +34,14 @@
 # Clones production deployment code
 #----------------------------------
 # Argument1: APP_NAME
+# Argument1: ENVIRONMENT
 #----------------------------------
 
 APP_NAME=$1
+ENVIRONMENT=$2
 
 # Clone deployment code
-deployCodeLocation="/app/stakater/prod-deployment-reference-${APP_NAME}"
+deployCodeLocation="/app/stakater/prod-deployment-reference-${APP_NAME}-${ENVIRONMENT}"
 
 if [ ! -d "${deployCodeLocation}" ];
 then

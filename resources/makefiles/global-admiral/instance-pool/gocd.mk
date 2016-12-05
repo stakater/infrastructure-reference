@@ -10,7 +10,7 @@ gocd_global_admiral: plan_gocd_global_admiral
                 -target aws_s3_bucket_object.gocd_deploy_to_prod \
                 -target aws_s3_bucket_object.gocd_docker_cleanup \
                 -target aws_s3_bucket_object.gocd_gocd_parameters \
-                -target aws_s3_bucket_object.gocd_prod_deploy_params \
+                -target aws_s3_bucket_object.gocd_bg_deploy_params \
                 -target aws_s3_bucket_object.gocd_read_parameter \
                 -target aws_s3_bucket_object.gocd_rollback_deployment \
                 -target aws_s3_bucket_object.gocd_switch_deployment_group \
@@ -52,7 +52,7 @@ plan_gocd_global_admiral: init_gocd_global_admiral
                -target aws_s3_bucket_object.gocd_deploy_to_prod \
                -target aws_s3_bucket_object.gocd_docker_cleanup \
                -target aws_s3_bucket_object.gocd_gocd_parameters \
-               -target aws_s3_bucket_object.gocd_prod_deploy_params \
+               -target aws_s3_bucket_object.gocd_bg_deploy_params \
                -target aws_s3_bucket_object.gocd_read_parameter \
                -target aws_s3_bucket_object.gocd_rollback_deployment \
                -target aws_s3_bucket_object.gocd_switch_deployment_group \
@@ -92,7 +92,7 @@ refresh_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
                     -target aws_s3_bucket_object.gocd_deploy_to_prod \
                     -target aws_s3_bucket_object.gocd_docker_cleanup \
                     -target aws_s3_bucket_object.gocd_gocd_parameters \
-                    -target aws_s3_bucket_object.gocd_prod_deploy_params \
+                    -target aws_s3_bucket_object.gocd_bg_deploy_params \
                     -target aws_s3_bucket_object.gocd_read_parameter \
                     -target aws_s3_bucket_object.gocd_rollback_deployment \
                     -target aws_s3_bucket_object.gocd_switch_deployment_group \
@@ -141,7 +141,7 @@ destroy_gocd_global_admiral: init_gocd_global_admiral
                   -target aws_s3_bucket_object.gocd_deploy_to_prod \
                   -target aws_s3_bucket_object.gocd_deploy_to_cluster \
                   -target aws_s3_bucket_object.gocd_docker_cleanup \
-                  -target aws_s3_bucket_object.gocd_prod_deploy_params \
+                  -target aws_s3_bucket_object.gocd_bg_deploy_params \
                   -target aws_s3_bucket_object.gocd_gocd_parameters \
                   -target aws_s3_bucket_object.gocd_read_parameter \
                   -target aws_s3_bucket_object.gocd_write_ami_parameters \

@@ -74,13 +74,13 @@ data "template_file" "gocd-params-tmpl" {
   }
 }
 
-data "template_file" "gocd-prod-deploy-params-tmpl" {
-  template = "${file("./data/gocd/scripts/prod.parameters.txt.tmpl")}"
+data "template_file" "gocd-BG-deploy-params-tmpl" {
+  template = "${file("./data/gocd/scripts/BG.parameters.txt.tmpl")}"
 
   vars {
     tf_state_bucket_name = "${var.tf_state_bucket_name}"
     global_admiral_state_key = "${var.tf_state_global_admiral_key}"
-    prod_state_key = "${var.tf_state_prod_key}"
+    bg_state_key = "${var.tf_state_bg_key}"
   }
 }
 
@@ -136,9 +136,9 @@ resource "aws_s3_bucket_object" "gocd_gocd_parameters" {
   key = "gocd/scripts/gocd.parameters.txt"
   content = "${data.template_file.gocd-params-tmpl.rendered}"
 }
-resource "aws_s3_bucket_object" "gocd_prod_deploy_params" {
+resource "aws_s3_bucket_object" "gocd_bg_deploy_params" {
   bucket = "${module.config-bucket.bucket_name}"
-  key = "gocd/scripts/prod.parameters.txt"
+  key = "gocd/scripts/bg.parameters.txt"
   content = "${data.template_file.gocd-prod-deploy-params-tmpl.rendered}"
 }
 resource "aws_s3_bucket_object" "gocd_read_parameter" {

@@ -34,38 +34,42 @@
 # Create/Update groups in blue green deployment
 #----------------------------------------------
 # Argument1: APP_NAME
-# Argument2: AMI_ID
-# Argument3: AWS_REGION
-# Argument4: DEPLOY_INSTANCE_TYPE
-# Argument5: DEPLOY_STATE_KEY
+# Argument2: ENVIRONMENT
+# Argument3: AMI_ID
+# Argument4: AWS_REGION
+# Argument5: DEPLOY_INSTANCE_TYPE
+# Argument6: DEPLOY_STATE_KEY
+# Argument6: ENABLE_SSL
+# Argument6: INTERNAL_SUPPORT
 #----------------------------------------------
 
 # Get parameter values
 APP_NAME=$1
-AMI_ID=$2
-AWS_REGION=$3
-DEPLOY_INSTANCE_TYPE=$4
-DEPLOY_STATE_KEY=$5
-ENABLE_SSL=$6
-INTERNAL_SUPPORT=$7
+ENVIRONMENT=$2
+AMI_ID=$3
+AWS_REGION=$4
+DEPLOY_INSTANCE_TYPE=$5
+DEPLOY_STATE_KEY=$6
+ENABLE_SSL=$7
+INTERNAL_SUPPORT=$8
 
 CLUSTER_MIN_SIZE=1
 CLUSTER_MAX_SIZE=5
 CLUSTER_DESIRED_SIZE=$CLUSTER_MIN_SIZE
 MIN_ELB_CAPACITY=1
-ACTIVE_LOAD_BALANCER=${APP_NAME//_/\-}-prod-elb-active
-TEST_LOAD_BALANCER=${APP_NAME//_/\-}-prod-elb-test
+ACTIVE_LOAD_BALANCER=${APP_NAME//_/\-}-${ENVIRONMENT//_/\-}-elb-active
+TEST_LOAD_BALANCER=${APP_NAME//_/\-}-${ENVIRONMENT//_/\-}-elb-test
 
 ##############################################################
 #################
 # Prod Params
 #################
 ARE_PROD_PARAMS_EMPTY=false;
-PROD_PARAMS_FILE="/gocd-data/scripts/prod.parameters.txt"
+PROD_PARAMS_FILE="/gocd-data/scripts/${ENVIRONMENT}.parameters.txt"
 # Check prod params file exist
 if [ ! -f ${PROD_PARAMS_FILE} ];
 then
-   echo "Error: [Deploy-to-AMI] Prod parameters file not found";
+   echo "Error: [Deploy-to-AMI] ${ENVIRONMENT} parameters file not found";
    exit 1;
 fi;
 
@@ -201,10 +205,10 @@ echo "#######################################################################"
 
 ## Automated Deployment
 # Write terraform variables to .tfvars file
-/gocd-data/scripts/write-terraform-variables.sh ${APP_NAME} ${AWS_REGION} ${TF_STATE_BUCKET_NAME} ${TF_PROD_STATE_KEY} ${TF_GLOBAL_ADMIRAL_STATE_KEY} ${DEPLOY_INSTANCE_TYPE} ${BLUE_GROUP_AMI_ID} ${BLUE_CLUSTER_MIN_SIZE} ${BLUE_CLUSTER_MAX_SIZE} ${BLUE_CLUSTER_DESIRED_SIZE} ${BLUE_GROUP_LOAD_BALANCERS} ${BLUE_GROUP_MIN_ELB_CAPACITY} ${GREEN_GROUP_AMI_ID} ${GREEN_CLUSTER_MIN_SIZE} ${GREEN_CLUSTER_MAX_SIZE} ${GREEN_CLUSTER_DESIRED_SIZE} ${GREEN_GROUP_LOAD_BALANCERS} ${GREEN_GROUP_MIN_ELB_CAPACITY} ${ENABLE_SSL} ${INTERNAL_SUPPORT}
+/gocd-data/scripts/write-terraform-variables.sh ${APP_NAME} ${ENVIRONMENT} ${AWS_REGION} ${TF_STATE_BUCKET_NAME} ${TF_PROD_STATE_KEY} ${TF_GLOBAL_ADMIRAL_STATE_KEY} ${DEPLOY_INSTANCE_TYPE} ${BLUE_GROUP_AMI_ID} ${BLUE_CLUSTER_MIN_SIZE} ${BLUE_CLUSTER_MAX_SIZE} ${BLUE_CLUSTER_DESIRED_SIZE} ${BLUE_GROUP_LOAD_BALANCERS} ${BLUE_GROUP_MIN_ELB_CAPACITY} ${GREEN_GROUP_AMI_ID} ${GREEN_CLUSTER_MIN_SIZE} ${GREEN_CLUSTER_MAX_SIZE} ${GREEN_CLUSTER_DESIRED_SIZE} ${GREEN_GROUP_LOAD_BALANCERS} ${GREEN_GROUP_MIN_ELB_CAPACITY} ${ENABLE_SSL} ${INTERNAL_SUPPORT}
 
 # Apply terraform changes
-/gocd-data/scripts/terraform-apply-changes.sh ${APP_NAME} ${TF_STATE_BUCKET_NAME} ${DEPLOY_STATE_KEY} ${AWS_REGION}
+/gocd-data/scripts/terraform-apply-changes.sh ${APP_NAME} ${ENVIRONMENT} ${TF_STATE_BUCKET_NAME} ${DEPLOY_STATE_KEY} ${AWS_REGION}
 # Check status and fail pipeline if exit code 1 (error while applying changes)
 APPLY_CHANGES_STATUS=$?
 if [ ${APPLY_CHANGES_STATUS} = 1 ];
@@ -215,11 +219,11 @@ fi;
 ## Update deployment state file
 if [ $LIVE_GROUP == "null" ]
 then
-   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} ${LIVE_GROUP} ${AMI_ID} null true true false
+   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} ${ENVIRONMENT} ${LIVE_GROUP} ${AMI_ID} null true true false
 elif [ $LIVE_GROUP == "blue" ]
 then
-   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} ${LIVE_GROUP} ${BLUE_GROUP_AMI_ID} ${AMI_ID} true true false
+   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} ${ENVIRONMENT} ${LIVE_GROUP} ${BLUE_GROUP_AMI_ID} ${AMI_ID} true true false
 elif [ $LIVE_GROUP == "green" ]
 then
-   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} ${LIVE_GROUP} ${AMI_ID} ${GREEN_GROUP_AMI_ID} true true false
+   /gocd-data/scripts/update-deployment-state.sh ${APP_NAME} ${ENVIRONMENT} ${LIVE_GROUP} ${AMI_ID} ${GREEN_GROUP_AMI_ID} true true false
 fi;
