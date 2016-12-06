@@ -24,6 +24,7 @@
         <param name="CLUSTER_ENV">dev</param>
         <param name="APP_DOCKER_IMAGE">registry.stakater-reference.local:80/app_dev</param>
         <param name="APP_DOCKER_OPTS">-p 8080:8080</param>
+        <param name="EXTRA_UNIT_OPTS"/>
       </params>
       <materials>
         <pipeline pipelineName="app-build-dev" stageName="Build" />
@@ -49,6 +50,7 @@
         <param name="CLUSTER_ENV">qa</param>
         <param name="APP_DOCKER_IMAGE">registry.stakater-reference.local:80/app_qa</param>
         <param name="APP_DOCKER_OPTS">-p 8080:8080</param>
+        <param name="EXTRA_UNIT_OPTS"/>
       </params>
       <materials>
         <pipeline pipelineName="app-build-qa" stageName="Build" />
@@ -168,7 +170,7 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>/gocd-data/scripts/deploy-to-cluster.sh #{APP_NAME} #{CLUSTER_ENV} #{APP_DOCKER_IMAGE} "#{APP_DOCKER_OPTS}"</arg>
+                <arg>/gocd-data/scripts/deploy-to-cluster.sh #{APP_NAME} #{CLUSTER_ENV} #{APP_DOCKER_IMAGE} "#{APP_DOCKER_OPTS} "#{EXTRA_UNIT_OPTS}"</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
