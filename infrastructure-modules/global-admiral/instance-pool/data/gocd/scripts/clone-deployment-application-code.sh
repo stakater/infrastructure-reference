@@ -33,28 +33,23 @@
 
 # Clones production deployment code
 #----------------------------------
-# Argument1: APP_NAME
-# Argument1: ENVIRONMENT
+# Argument1: DEPLOY_CODE_LOCATION
 #----------------------------------
 
-APP_NAME=$1
-ENVIRONMENT=$2
+DEPLOY_CODE_LOCATION=$1
 
-# Clone deployment code
-deployCodeLocation="/app/stakater/prod-deployment-reference-${APP_NAME}-${ENVIRONMENT}"
-
-if [ ! -d "${deployCodeLocation}" ];
+if [ ! -d "${DEPLOY_CODE_LOCATION}" ];
 then
   echo "Ceating Directory."
-  sudo mkdir -p ${deployCodeLocation}
+  sudo mkdir -p ${DEPLOY_CODE_LOCATION}
 else
   echo "Directory Already Exists."
 fi;
 
-if [ -d ${deployCodeLocation}/.git ]; then
-  echo "${deployCodeLocation} is a git repository.";
+if [ -d ${DEPLOY_CODE_LOCATION}/.git ]; then
+  echo "${DEPLOY_CODE_LOCATION} is a git repository.";
 else
-  echo "${deployCodeLocation} is not a git repository. Cloning ...."
-  sudo git clone https://github.com/stakater/prod-deployment-reference.git ${deployCodeLocation};
+  echo "${DEPLOY_CODE_LOCATION} is not a git repository. Cloning ...."
+  sudo git clone https://github.com/stakater/prod-deployment-reference.git ${DEPLOY_CODE_LOCATION};
 fi;
 

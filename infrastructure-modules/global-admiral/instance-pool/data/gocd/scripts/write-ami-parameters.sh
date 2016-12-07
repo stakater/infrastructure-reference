@@ -49,8 +49,8 @@ VPC_ID=$4
 SUBNET_I=$5
 AWS_REGION=$6
 
-OUTPUT_FILE_PATH="/app/${ENVIRONMENT}_${APP_NAME}/cd/vars"
-OUTPUT_FILE_NAME="${ENVIRONMENT}_${APP_NAME}_ami_params.txt"
+OUTPUT_FILE_PATH="/app/${APP_NAME}/${ENVIRONMENT}/cd/vars"
+OUTPUT_FILE_NAME="${APP_NAME}_${ENVIRONMENT}_ami_params.txt"
 
 # Check number of parameters equal 5
 if [ "$#" -ne 6 ]; then

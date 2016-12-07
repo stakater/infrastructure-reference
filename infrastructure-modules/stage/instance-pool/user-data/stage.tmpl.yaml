@@ -1,0 +1,81 @@
+#cloud-config
+## This cloud-config contains placeholders to be replaced by ami-baker
+## https://github.com/stakater/ami-baker
+coreos:
+  etcd2:
+    proxy: on
+    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+  update:
+    reboot-strategy: off
+  units:
+    - name: data.mount
+      content: |
+        [Mount]
+        What=EFS_DNS:/
+        Where=/data
+        Type=nfs
+    - name: runcmd.service
+      command: start
+      content: |
+        [Unit]
+        Description=command
+        [Service]
+        Type=oneshot
+        Environment="EFS_DNS=${efs_dns}"
+        ExecStart=/bin/sh -c "AZ_ZONE=$(curl -s -L http://169.254.169.254/latest/meta-data/placement/availability-zone); \
+                              sed -i \"s/EFS_DNS/$AZ_ZONE.$EFS_DNS/\" /etc/systemd/system/data.mount; \
+                              systemctl daemon-reload; \
+                              systemctl restart data.mount"
+# 1- Append current availability-zone to EFS_DNS Substring
+# 2- Replace EFS_DNS with the resulting value in systemd file
+# 3- Restart the systemd unit
+    - name: application.service
+      command: start
+      content: |
+        [Unit]
+        Description= Application Unit with placeholders to be replaced by ami-baker module
+        After=docker.service
+        Requires=docker.service
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/docker run --rm --name %n <#DOCKER_OPTS#> <#DOCKER_IMAGE#>
+        ExecStop=/usr/bin/docker stop %n
+        [Install]
+        WantedBy=multi-user.target
+    - name: nginx.service
+      command: start
+      content: |
+        [Unit]
+        Description=Nginx Service
+        Requires=docker.service
+        After=docker.service
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/docker run --rm --name %n -p 80:80 -v /nginx/conf:/etc/nginx/conf.d/ nginx
+        ExecStop=/usr/bin/docker stop %n
+        [Install]
+        WantedBy=multi-user.target
+
+write_files:
+  - path: /etc/conf.d/nfs
+    permissions: '0644'
+    content: |
+      OPTS_RPC_MOUNTD=""
+  - path: /nginx/conf/default.conf
+    permissions: '0644'
+    content: |
+      server {
+        listen 80;
+
+        location /health_check {
+              return 200;
+        }
+        location / {
+          #x_forwarded_proto property set by ELB
+          if ($http_x_forwarded_proto != 'https') {
+           rewrite ^ https://$host$request_uri? permanent;
+          }
+        }
+      }

@@ -64,20 +64,20 @@ fi;
 # Read parameter values from file
 TF_STATE_BUCKET_NAME=`/gocd-data/scripts/read-parameter.sh ${BG_PARAMS_FILE} tf_state_bucket_name`
 TF_GLOBAL_ADMIRAL_STATE_KEY=`/gocd-data/scripts/read-parameter.sh ${BG_PARAMS_FILE} global_admiral_state_key`
-TF_BG_STATE_KEY=`/gocd-data/scripts/read-parameter.sh ${BG_PARAMS_FILE} bg_state_key`
+ENV_STATE_KEY=`/gocd-data/scripts/read-parameter.sh ${BG_PARAMS_FILE} env_state_key`
 DEPLOY_INSTANCE_TYPE=`/gocd-data/scripts/read-parameter.sh ${BG_PARAMS_FILE} instance_type`
 ENABLE_SSL=`/gocd-data/scripts/read-parameter.sh ${BG_PARAMS_FILE} enable_ssl`
 INTERNAL_SUPPORT=`/gocd-data/scripts/read-parameter.sh ${BG_PARAMS_FILE} internal_support`
 # Remove unwanted characters
 TF_STATE_BUCKET_NAME=${TF_STATE_BUCKET_NAME//\"}
 TF_GLOBAL_ADMIRAL_STATE_KEY=${TF_GLOBAL_ADMIRAL_STATE_KEY//\"}
-TF_BG_STATE_KEY=${TF_BG_STATE_KEY//\"}
+ENV_STATE_KEY=${ENV_STATE_KEY//\"}
 DEPLOY_INSTANCE_TYPE=${DEPLOY_INSTANCE_TYPE//\"}
 ENABLE_SSL=${ENABLE_SSL//\"}
 INTERNAL_SUPPORT=${INTERNAL_SUPPORT//\"}
 
 ## Get deployment state values
-DEPLOYMENT_STATE_FILE_PATH="/app/${APP_NAME}-${ENVIRONMENT}/cd/blue-green-deployment"
+DEPLOYMENT_STATE_FILE_PATH="/app/${APP_NAME}/${ENVIRONMENT}/cd/blue-green-deployment"
 DEPLOYMENT_STATE_FILE_NAME="${APP_NAME}_${ENVIRONMENT}_deployment_state.txt"
 DEPLOYMENT_STATE_FILE="${DEPLOYMENT_STATE_FILE_PATH}/${DEPLOYMENT_STATE_FILE_NAME}"
 # Read parameters from file
@@ -105,7 +105,7 @@ echo "DEPLOYMENT_STATE_FILE: ${DEPLOYMENT_STATE_FILE_PATH}/${DEPLOYMENT_STATE_FI
 echo "DEPLOY_INSTANCE_TYPE: ${DEPLOY_INSTANCE_TYPE}"
 echo "TF_STATE_BUCKET_NAME: ${TF_STATE_BUCKET_NAME}"
 echo "TF_GLOBAL_ADMIRAL_STATE_KEY: ${TF_GLOBAL_ADMIRAL_STATE_KEY}"
-echo "TF_BG_STATE_KEY: ${TF_BG_STATE_KEY}"
+echo "TF_BG_STATE_KEY: ${ENV_STATE_KEY}"
 echo "DEPLOY_STATE_KEY: ${DEPLOY_STATE_KEY}"
 echo "ENABLE_SSL: ${ENABLE_SSL}"
 echo "INTERNAL_SUPPORT: ${INTERNAL_SUPPORT}"

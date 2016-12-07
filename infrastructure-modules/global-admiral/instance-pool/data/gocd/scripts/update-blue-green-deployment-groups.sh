@@ -39,8 +39,9 @@
 # Argument4: AWS_REGION
 # Argument5: DEPLOY_INSTANCE_TYPE
 # Argument6: DEPLOY_STATE_KEY
-# Argument6: ENABLE_SSL
-# Argument6: INTERNAL_SUPPORT
+# Argument7: ENABLE_SSL
+# Argument8: INTERNAL_SUPPORT
+# Argument9: ENV_STATE_KEY
 #----------------------------------------------
 
 # Get parameter values
@@ -52,6 +53,7 @@ DEPLOY_INSTANCE_TYPE=$5
 DEPLOY_STATE_KEY=$6
 ENABLE_SSL=$7
 INTERNAL_SUPPORT=$8
+ENV_STATE_KEY=$9
 
 CLUSTER_MIN_SIZE=1
 CLUSTER_MAX_SIZE=5
@@ -64,49 +66,48 @@ TEST_LOAD_BALANCER=${APP_NAME//_/\-}-${ENVIRONMENT//_/\-}-elb-test
 #################
 # Prod Params
 #################
-ARE_PROD_PARAMS_EMPTY=false;
-PROD_PARAMS_FILE="/gocd-data/scripts/${ENVIRONMENT}.parameters.txt"
+ARE_BG_PARAMS_EMPTY=false;
+BG_PARAMS_FILE="/gocd-data/scripts/bg.parameters.txt"
 # Check prod params file exist
-if [ ! -f ${PROD_PARAMS_FILE} ];
+if [ ! -f ${BG_PARAMS_FILE} ];
 then
-   echo "Error: [Deploy-to-AMI] ${ENVIRONMENT} parameters file not found";
+   echo "Error: [Deploy-to-AMI] bg parameters file not found";
    exit 1;
 fi;
 
 # Read parameter values from file
-TF_STATE_BUCKET_NAME=`/gocd-data/scripts/read-parameter.sh ${PROD_PARAMS_FILE} TF_STATE_BUCKET_NAME`
-TF_GLOBAL_ADMIRAL_STATE_KEY=`/gocd-data/scripts/read-parameter.sh ${PROD_PARAMS_FILE} TF_GLOBAL_ADMIRAL_STATE_KEY`
-TF_PROD_STATE_KEY=`/gocd-data/scripts/read-parameter.sh ${PROD_PARAMS_FILE} TF_PROD_STATE_KEY`
+TF_STATE_BUCKET_NAME=`/gocd-data/scripts/read-parameter.sh ${BG_PARAMS_FILE} TF_STATE_BUCKET_NAME`
+TF_GLOBAL_ADMIRAL_STATE_KEY=`/gocd-data/scripts/read-parameter.sh ${BG_PARAMS_FILE} TF_GLOBAL_ADMIRAL_STATE_KEY`
 
 # Check parameter values not empty
 if test -z ${TF_STATE_BUCKET_NAME};
 then
    echo "Error: Value for TF_STATE_BUCKET_NAME not defined.";
-   ARE_PROD_PARAMS_EMPTY=true;
+   ARE_BG_PARAMS_EMPTY=true;
 fi;
 
 if test -z ${TF_GLOBAL_ADMIRAL_STATE_KEY};
 then
    echo "Error: Value for TF_GLOBAL_ADMIRAL_STATE_KEY not defined.";
-   ARE_PROD_PARAMS_EMPTY=true;
+   ARE_BG_PARAMS_EMPTY=true;
 fi;
 
-if test -z ${TF_PROD_STATE_KEY};
+if test -z ${ENV_STATE_KEY};
 then
-   echo "Error: Value for TF_PROD_STATE_KEY not defined.";
-   ARE_PROD_PARAMS_EMPTY=true;
+   echo "Error: Value for ENV_STATE_KEY not defined.";
+   ARE_BG_PARAMS_EMPTY=true;
 fi;
 
 # Check ami params not empty
-if $ARE_PROD_PARAMS_EMPTY;
+if $ARE_BG_PARAMS_EMPTY;
 then
     echo "ERROR: Invalid PROD parameters.";
     exit 1;
 fi;
 
 ## Get deployment state values
-DEPLOYMENT_STATE_FILE_PATH="/app/${APP_NAME}/cd/blue-green-deployment"
-DEPLOYMENT_STATE_FILE_NAME="${APP_NAME}_deployment_state.txt"
+DEPLOYMENT_STATE_FILE_PATH="/app/${APP_NAME}/${ENVIRONMENT}/cd/blue-green-deployment"
+DEPLOYMENT_STATE_FILE_NAME="${APP_NAME}_${ENVIRONMENT}_deployment_state.txt"
 DEPLOYMENT_STATE_FILE="${DEPLOYMENT_STATE_FILE_PATH}/${DEPLOYMENT_STATE_FILE_NAME}"
 # Read parameters from file
 LIVE_GROUP=`/gocd-data/scripts/read-parameter.sh ${DEPLOYMENT_STATE_FILE} LIVE_GROUP`
@@ -126,7 +127,7 @@ echo "DEPLOYMENT_STATE_FILE: ${DEPLOYMENT_STATE_FILE_PATH}/${DEPLOYMENT_STATE_FI
 echo "DEPLOY_INSTANCE_TYPE: ${DEPLOY_INSTANCE_TYPE}"
 echo "TF_STATE_BUCKET_NAME: ${TF_STATE_BUCKET_NAME}"
 echo "TF_GLOBAL_ADMIRAL_STATE_KEY: ${TF_GLOBAL_ADMIRAL_STATE_KEY}"
-echo "TF_PROD_STATE_KEY: ${TF_PROD_STATE_KEY}"
+echo "ENV_STATE_KEY: ${ENV_STATE_KEY}"
 echo "ENABLE_SSL: ${ENABLE_SSL}"
 echo "INTERNAL_SUPPORT: ${INTERNAL_SUPPORT}"
 echo "###################################################"
@@ -205,7 +206,7 @@ echo "#######################################################################"
 
 ## Automated Deployment
 # Write terraform variables to .tfvars file
-/gocd-data/scripts/write-terraform-variables.sh ${APP_NAME} ${ENVIRONMENT} ${AWS_REGION} ${TF_STATE_BUCKET_NAME} ${TF_PROD_STATE_KEY} ${TF_GLOBAL_ADMIRAL_STATE_KEY} ${DEPLOY_INSTANCE_TYPE} ${BLUE_GROUP_AMI_ID} ${BLUE_CLUSTER_MIN_SIZE} ${BLUE_CLUSTER_MAX_SIZE} ${BLUE_CLUSTER_DESIRED_SIZE} ${BLUE_GROUP_LOAD_BALANCERS} ${BLUE_GROUP_MIN_ELB_CAPACITY} ${GREEN_GROUP_AMI_ID} ${GREEN_CLUSTER_MIN_SIZE} ${GREEN_CLUSTER_MAX_SIZE} ${GREEN_CLUSTER_DESIRED_SIZE} ${GREEN_GROUP_LOAD_BALANCERS} ${GREEN_GROUP_MIN_ELB_CAPACITY} ${ENABLE_SSL} ${INTERNAL_SUPPORT}
+/gocd-data/scripts/write-terraform-variables.sh ${APP_NAME} ${ENVIRONMENT} ${AWS_REGION} ${TF_STATE_BUCKET_NAME} ${ENV_STATE_KEY} ${TF_GLOBAL_ADMIRAL_STATE_KEY} ${DEPLOY_INSTANCE_TYPE} ${BLUE_GROUP_AMI_ID} ${BLUE_CLUSTER_MIN_SIZE} ${BLUE_CLUSTER_MAX_SIZE} ${BLUE_CLUSTER_DESIRED_SIZE} ${BLUE_GROUP_LOAD_BALANCERS} ${BLUE_GROUP_MIN_ELB_CAPACITY} ${GREEN_GROUP_AMI_ID} ${GREEN_CLUSTER_MIN_SIZE} ${GREEN_CLUSTER_MAX_SIZE} ${GREEN_CLUSTER_DESIRED_SIZE} ${GREEN_GROUP_LOAD_BALANCERS} ${GREEN_GROUP_MIN_ELB_CAPACITY} ${ENABLE_SSL} ${INTERNAL_SUPPORT}
 
 # Apply terraform changes
 /gocd-data/scripts/terraform-apply-changes.sh ${APP_NAME} ${ENVIRONMENT} ${TF_STATE_BUCKET_NAME} ${DEPLOY_STATE_KEY} ${AWS_REGION}

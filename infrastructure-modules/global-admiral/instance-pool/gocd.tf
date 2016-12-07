@@ -40,6 +40,8 @@ data "template_file" "gocd-policy" {
     cloudinit_bucket_arn = "${module.cloudinit-bucket.arn}"
     prod_config_bucket_name = "${var.prod_config_bucket_name}"
     prod_cloudinit_bucket_name = "${var.prod_cloudinit_bucket_name}"
+    stage_config_bucket_name = "${var.stage_config_bucket_name}"
+    stage_cloudinit_bucket_name = "${var.stage_cloudinit_bucket_name}"
     tf_state_bucket_name = "${var.tf_state_bucket_name}"
   }
 }
@@ -74,13 +76,12 @@ data "template_file" "gocd-params-tmpl" {
   }
 }
 
-data "template_file" "gocd-BG-deploy-params-tmpl" {
+data "template_file" "gocd-bg-deploy-params-tmpl" {
   template = "${file("./data/gocd/scripts/BG.parameters.txt.tmpl")}"
 
   vars {
     tf_state_bucket_name = "${var.tf_state_bucket_name}"
     global_admiral_state_key = "${var.tf_state_global_admiral_key}"
-    bg_state_key = "${var.tf_state_bg_key}"
   }
 }
 
@@ -139,7 +140,7 @@ resource "aws_s3_bucket_object" "gocd_gocd_parameters" {
 resource "aws_s3_bucket_object" "gocd_bg_deploy_params" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/bg.parameters.txt"
-  content = "${data.template_file.gocd-prod-deploy-params-tmpl.rendered}"
+  content = "${data.template_file.gocd-bg-deploy-params-tmpl.rendered}"
 }
 resource "aws_s3_bucket_object" "gocd_read_parameter" {
   bucket = "${module.config-bucket.bucket_name}"

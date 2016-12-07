@@ -33,7 +33,8 @@
             "arn:aws:s3:::${tf_state_bucket_name}/global-admiral/*",
             "arn:aws:s3:::${tf_state_bucket_name}/dev/*",
             "arn:aws:s3:::${tf_state_bucket_name}/qa/*",
-            "arn:aws:s3:::${tf_state_bucket_name}/prod/terraform.tfstate"
+            "arn:aws:s3:::${tf_state_bucket_name}/prod/terraform.tfstate",
+            "arn:aws:s3:::${tf_state_bucket_name}/stage/terraform.tfstate"
         ]
     },
     {
@@ -46,7 +47,9 @@
         "${config_bucket_arn}/etcd/initial-cluster",
         "${config_bucket_arn}/docker-registry/registry-certificates/*",
         "arn:aws:s3:::${prod_cloudinit_bucket_name}/",
-        "arn:aws:s3:::${prod_cloudinit_bucket_name}/*"
+        "arn:aws:s3:::${prod_cloudinit_bucket_name}/*",
+        "arn:aws:s3:::${stage_cloudinit_bucket_name}/",
+        "arn:aws:s3:::${stage_cloudinit_bucket_name}/*"
       ]
     },
     {
@@ -56,7 +59,9 @@
         ],
         "Resource": [
             "arn:aws:s3:::${prod_config_bucket_name}/keypairs",
-            "arn:aws:s3:::${prod_config_bucket_name}/keypairs/*"
+            "arn:aws:s3:::${prod_config_bucket_name}/keypairs/*",
+            "arn:aws:s3:::${stage_config_bucket_name}/keypairs",
+            "arn:aws:s3:::${stage_config_bucket_name}/keypairs/*"
         ]
     },
     {

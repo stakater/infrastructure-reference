@@ -13,9 +13,13 @@ TF_STATE_GLOBAL_ADMIRAL_KEY=${TF_STATE_GLOBAL_ADMIRAL_KEY}
 TF_STATE_DEV_KEY=${TF_STATE_DEV_KEY}
 TF_STATE_QA_KEY=${TF_STATE_QA_KEY}
 TF_STATE_PROD_KEY=${TF_STATE_PROD_KEY}
+TF_STATE_STAGE_KEY=${TF_STATE_STAGE_KEY}
 
 PROD_CLOUDINIT_BUCKET_NAME=${PROD_CLOUDINIT_BUCKET_NAME}
 PROD_CONFIG_BUCKET_NAME=${PROD_CONFIG_BUCKET_NAME}
+
+STAGE_CLOUDINIT_BUCKET_NAME=${STAGE_CLOUDINIT_BUCKET_NAME}
+STAGE_CONFIG_BUCKET_NAME=${STAGE_CONFIG_BUCKET_NAME}
 
 # Database properties
 DEV_DATABASE_USERNAME=${DEV_DATABASE_USERNAME}
@@ -27,6 +31,9 @@ QA_DATABASE_NAME=${QA_DATABASE_NAME}
 PROD_DATABASE_USERNAME=${PROD_DATABASE_USERNAME}
 PROD_DATABASE_PASSWORD=${PROD_DATABASE_PASSWORD}
 PROD_DATABASE_NAME=${PROD_DATABASE_NAME}
+STAGE_DATABASE_USERNAME=${STAGE_DATABASE_USERNAME}
+STAGE_DATABASE_PASSWORD=${STAGE_DATABASE_PASSWORD}
+STAGE_DATABASE_NAME=${STAGE_DATABASE_NAME}
 # Get options from the command line
 while getopts ":c:z:t:" OPTION
 do
@@ -87,6 +94,9 @@ variable "tf_state_qa_key" { default = "${TF_STATE_QA_KEY}" }
 variable "tf_state_prod_key" { default = "${TF_STATE_PROD_KEY}" }
 variable "prod_cloudinit_bucket_name" { default = "${PROD_CLOUDINIT_BUCKET_NAME}" }
 variable "prod_config_bucket_name" { default = "${PROD_CONFIG_BUCKET_NAME}" }
+variable "tf_state_stage_key" { default = "${TF_STATE_STAGE_KEY}" }
+variable "stage_cloudinit_bucket_name" { default = "${STAGE_CLOUDINIT_BUCKET_NAME}" }
+variable "stage_config_bucket_name" { default = "${STAGE_CONFIG_BUCKET_NAME}" }
 variable "dev_database_username" { default= "${DEV_DATABASE_USERNAME}" }
 variable "dev_database_password" { default= "${DEV_DATABASE_PASSWORD}" }
 variable "dev_database_name" { default= "${DEV_DATABASE_NAME}" }
@@ -96,4 +106,7 @@ variable "qa_database_name" { default= "${QA_DATABASE_NAME}" }
 variable "prod_database_username" { default= "${PROD_DATABASE_USERNAME}" }
 variable "prod_database_password" { default= "${PROD_DATABASE_PASSWORD}" }
 variable "prod_database_name" { default= "${PROD_DATABASE_NAME}" }
+variable "stage_database_username" { default= "${STAGE_DATABASE_USERNAME}" }
+variable "stage_database_password" { default= "${STAGE_DATABASE_PASSWORD}" }
+variable "stage_database_name" { default= "${STAGE_DATABASE_NAME}" }
 EOF

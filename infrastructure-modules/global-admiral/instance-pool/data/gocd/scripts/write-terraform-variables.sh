@@ -39,7 +39,7 @@ APP_NAME=$1
 ENVIRONMENT=$2
 AWS_REGION=$3
 TF_STATE_BUCKET_NAME=$4
-TF_BG_STATE_KEY=$5
+ENV_STATE_KEY=$5
 TF_GLOBAL_ADMIRAL_STATE_KEY=$6
 DEPLOY_INSTANCE_TYPE=$7
 BLUE_GROUP_AMI_ID=$8
@@ -63,7 +63,7 @@ terraformFolderPath="${deployCodeLocation}/deploy-prod/.terraform/"
 tfvarsFile="${terraformFolderPath}/deploy.tfvars"
 
 # Check if production deployment code exists
-/gocd-data/scripts/clone-deployment-application-code.sh ${APP_NAME} ${ENVIRONMENT}
+/gocd-data/scripts/clone-deployment-application-code.sh ${deployCodeLocation}
 
 # Check if .terraform folder exists
 if [ ! -d "${terraformFolderPath}" ];
@@ -85,9 +85,10 @@ fi;
 # Write vars to be used by the deploy code in a TF vars file
 sudo sh -c "{
   echo \"app_name = \\\"${APP_NAME}\\\"
+  environment = \\\"${ENVIRONMENT}\\\"
   aws_region = \\\"${AWS_REGION}\\\"
   tf_state_bucket_name = \\\"${TF_STATE_BUCKET_NAME}\\\"
-  bg_state_key = \\\"${TF_BG_STATE_KEY}\\\"
+  env_state_key = \\\"${ENV_STATE_KEY}\\\"
   global_admiral_state_key = \\\"${TF_GLOBAL_ADMIRAL_STATE_KEY}\\\"
   instance_type = \\\"${DEPLOY_INSTANCE_TYPE}\\\"
   ami_blue_group = \\\"${BLUE_GROUP_AMI_ID}\\\"

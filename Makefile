@@ -16,12 +16,20 @@ TF_STATE_GLOBAL_ADMIRAL_KEY := global-admiral/terraform.tfstate
 TF_STATE_DEV_KEY := dev/terraform.tfstate
 TF_STATE_QA_KEY := qa/terraform.tfstate
 TF_STATE_PROD_KEY := prod/terraform.tfstate
+TF_STATE_STAGE_KEY := stage/terraform.tfstate
 
 # Prod env bucket names defined here, as these are to be allowed
 # in policy of the instance that deploys to prod (e.g. GoCD) in order to
 # download cloudconfig and upload keypairs
 PROD_CLOUDINIT_BUCKET_NAME := $(STACK_NAME)-prod-cloudinit
 PROD_CONFIG_BUCKET_NAME := $(STACK_NAME)-prod-config
+
+# Stage env bucket names defined here, as these are to be allowed
+# in policy of the instance that deploys to stage (e.g. GoCD) in order to
+# download cloudconfig and upload keypairs
+STAGE_CLOUDINIT_BUCKET_NAME := $(STACK_NAME)-stage-cloudinit
+STAGE_CONFIG_BUCKET_NAME := $(STACK_NAME)-stage-config
+
 
 # Database properties
 DEV_DATABASE_USERNAME := root
@@ -35,6 +43,10 @@ QA_DATABASE_NAME := mydb
 PROD_DATABASE_USERNAME := root
 PROD_DATABASE_PASSWORD := root
 PROD_DATABASE_NAME := mydb
+
+STAGE_DATABASE_USERNAME := root
+STAGE_DATABASE_PASSWORD := root
+STAGE_DATABASE_NAME := mydb
 
 # For get-vars.sh
 COREOS_UPDATE_CHANNEL=stable
@@ -50,24 +62,28 @@ INFRASTRUCTURE_MODULES := $(ROOT_DIR)infrastructure-modules
 INFRA_DEV := $(INFRASTRUCTURE_MODULES)/dev
 INFRA_QA := $(INFRASTRUCTURE_MODULES)/qa
 INFRA_PROD := $(INFRASTRUCTURE_MODULES)/prod
+INFRA_STAGE := $(INFRASTRUCTURE_MODULES)/stage
 INFRA_GLOBAL_ADMIRAL := $(INFRASTRUCTURE_MODULES)/global-admiral
 
 # Environment Build Directories
 BUILD_DEV := $(BUILD)/dev
 BUILD_QA := $(BUILD)/qa
 BUILD_PROD := $(BUILD)/prod
+BUILD_STAGE := $(BUILD)/stage
 BUILD_GLOBAL_ADMIRAL := $(BUILD)/global-admiral
 
 # Environment specific files
 MODULE_VARS_DEV=$(BUILD_DEV)/module_vars.tf
 MODULE_VARS_QA=$(BUILD_QA)/module_vars.tf
 MODULE_VARS_PROD=$(BUILD_PROD)/module_vars.tf
+MODULE_VARS_STAGE=$(BUILD_STAGE)/module_vars.tf
 MODULE_VARS_GLOBAL_ADMIRAL=$(BUILD_GLOBAL_ADMIRAL)/module_vars.tf
 
 # Terraform provider files
 TF_PROVIDER_DEV := $(BUILD_DEV)/provider.tf
 TF_PROVIDER_QA := $(BUILD_QA)/provider.tf
 TF_PROVIDER_PROD := $(BUILD_PROD)/provider.tf
+TF_PROVIDER_STAGE := $(BUILD_STAGE)/provider.tf
 TF_PROVIDER_GLOBAL_ADMIRAL := $(BUILD_GLOBAL_ADMIRAL)/provider.tf
 
 # Terraform commands
