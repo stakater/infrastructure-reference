@@ -1,8 +1,7 @@
 #!/bin/bash
-# This script stops Stack for specified ',' separated environments in the current region
+# This script stops stack for specified ',' separated environments in the current region
 #----------------------------------------------
 # Argument1: ENVIRONMENTS
-# Argument2: REGION
 #----------------------------------------------
 
 #Input Parameters
@@ -21,5 +20,5 @@ region=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-
 region=${region::-1}
 
 /gocd-data/scripts/suspend-ASG-processes.sh $ENVIRONMENTS $region
-/gocd-data/scripts/stopInstances.sh $ENVIRONMENTS $region
+/gocd-data/scripts/stop-instances.sh $ENVIRONMENTS $region
 

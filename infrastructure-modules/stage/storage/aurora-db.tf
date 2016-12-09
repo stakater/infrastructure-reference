@@ -1,14 +1,14 @@
 module "aurora-db" {
   source = "github.com/stakater/blueprint-storage-aws.git//modules/rds/aurora-db"
 
-  name = "${var.stack_name}-prod"
+  name = "${var.stack_name}-stage"
   vpc_id = "${module.network.vpc_id}"
   vpc_cidr = "${module.network.vpc_cidr}"
   subnets = "${module.network.private_persistence_subnet_ids}"
 
-  aurora_db_name = "${var.prod_database_name}"
-  aurora_db_username = "${var.prod_database_username}"
-  aurora_db_password = "${var.prod_database_password}"
+  aurora_db_name = "${var.stage_database_name}"
+  aurora_db_username = "${var.stage_database_username}"
+  aurora_db_password = "${var.stage_database_password}"
 
   # DB Backup
   backup_retention_period = 14
@@ -25,7 +25,7 @@ module "aurora-db" {
 ########################
 resource "aws_route53_record" "aurora-db-record" {
     zone_id = "${module.route53-private.zone_id}"
-    name = "aurora-db-prod"
+    name = "aurora-db-stage"
     type = "CNAME"
     ttl = 60
     records = [ "${module.aurora-db.endpoint}" ]

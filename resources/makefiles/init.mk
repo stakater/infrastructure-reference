@@ -5,6 +5,7 @@ init_build_dir:
 	@mkdir -p $(BUILD)
 	@mkdir -p $(BUILD_DEV)
 	@mkdir -p $(BUILD_PROD)
+	@mkdir -p $(BUILD_STAGE)
 	@mkdir -p $(BUILD_QA)
 	@mkdir -p $(BUILD_GLOBAL_ADMIRAL)
 

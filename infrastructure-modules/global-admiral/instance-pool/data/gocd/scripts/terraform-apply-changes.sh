@@ -53,7 +53,7 @@ tfvarsFile="${deployCodeLocation}/deploy-prod/.terraform/deploy.tfvars"
 /gocd-data/scripts/clone-deployment-application-code.sh ${deployCodeLocation}
 
 cd ${deployCodeLocation}
-sudo git pull origin master
+# sudo git pull origin master
 
 cd ${deployCodeLocation}/deploy-prod
 

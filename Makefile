@@ -2,9 +2,9 @@
 ## Customization ##
 ###################
 # Profile
-AWS_PROFILE := stakater-reference
-# Stack name may only contain letters (Uppercase & lowercase), numbers or the characters . _ -
-STACK_NAME := stakater-reference
+AWS_PROFILE := qbtech-stack
+# Application name may only contain letters (Uppercase & lowercase), numbers or the characters . _ -
+STACK_NAME := qbtech-stack
 
 # To prevent you mistakenly using a wrong account (and end up destroying live environment),
 # a list of allowed AWS account IDs should be defined:
@@ -32,21 +32,21 @@ STAGE_CONFIG_BUCKET_NAME := $(STACK_NAME)-stage-config
 
 
 # Database properties
-DEV_DATABASE_USERNAME := root
-DEV_DATABASE_PASSWORD := root
-DEV_DATABASE_NAME := mydb
+DEV_DATABASE_USERNAME := qbcheck
+DEV_DATABASE_PASSWORD := Qbx14Chk
+DEV_DATABASE_NAME := qbcheck_dev
 
-QA_DATABASE_USERNAME := root
-QA_DATABASE_PASSWORD := root
-QA_DATABASE_NAME := mydb
+QA_DATABASE_USERNAME := qbcheck
+QA_DATABASE_PASSWORD := Qbx14Chk
+QA_DATABASE_NAME := qbcheck_qa
 
-PROD_DATABASE_USERNAME := root
-PROD_DATABASE_PASSWORD := root
-PROD_DATABASE_NAME := mydb
+PROD_DATABASE_USERNAME := qbcheck
+PROD_DATABASE_PASSWORD := Qbx14Chk
+PROD_DATABASE_NAME := qbcheck_www
 
-STAGE_DATABASE_USERNAME := root
-STAGE_DATABASE_PASSWORD := root
-STAGE_DATABASE_NAME := mydb
+STAGE_DATABASE_USERNAME := qbcheck
+STAGE_DATABASE_PASSWORD := Qbx14Chk
+STAGE_DATABASE_NAME := qbcheck_qa
 
 # For get-vars.sh
 COREOS_UPDATE_CHANNEL=stable
