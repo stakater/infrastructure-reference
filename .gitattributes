@@ -1,0 +1,2 @@
+*.tf linguist-language=Terraform
+*.sh linguist-language=Shell
