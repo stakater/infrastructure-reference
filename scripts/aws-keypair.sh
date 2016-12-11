@@ -14,7 +14,7 @@ AWS_ACCOUNT=$(aws --profile ${AWS_PROFILE} iam get-user | jq ".User.Arn" | grep 
 echo $AWS_ACCOUNT
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-AWS_REGION=$($DIR/read_cfg.sh $HOME/.aws/config "profile $AWS_PROFILE" region)
+AWS_REGION=$($DIR/read-cfg.sh $HOME/.aws/config "profile $AWS_PROFILE" region)
 
 TMP_DIR=${BUILD}/keypairs
 

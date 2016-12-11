@@ -7,7 +7,7 @@
 
 AWS_PROFILE=${AWS_PROFILE}
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-AWS_REGION=$($DIR/read_cfg.sh $HOME/.aws/config "profile $AWS_PROFILE" region)
+AWS_REGION=$($DIR/read-cfg.sh $HOME/.aws/config "profile $AWS_PROFILE" region)
 
 BUCKET_NAME=""
 STATE_KEY=""
