@@ -1,6 +1,6 @@
 #!/bin/bash
 # Read INI formatted file, return the value of a given key in a given section
-# E.g. ./read_cfg.sh FILE SECTION INI_VAR
+# E.g. ./read-cfg.sh FILE SECTION INI_VAR
 while [ $# -gt 0 ]
 do
     case $1 in 
