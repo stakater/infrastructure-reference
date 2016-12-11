@@ -8,9 +8,9 @@ BUILD=${BUILD:-$ROOT_DIR/build}
 AWS_PROFILE=${AWS_PROFILE}
 STACK_NAME=${STACK_NAME}
 
-TF_VAR_aws_access_key=$($DIR/read_cfg.sh $HOME/.aws/credentials $AWS_PROFILE aws_access_key_id)
-TF_VAR_aws_secret_key=$($DIR/read_cfg.sh $HOME/.aws/credentials $AWS_PROFILE aws_secret_access_key)
-TF_VAR_aws_region=$($DIR/read_cfg.sh $HOME/.aws/config "profile $AWS_PROFILE" region)
+TF_VAR_aws_access_key=$($DIR/read-cfg.sh $HOME/.aws/credentials $AWS_PROFILE aws_access_key_id)
+TF_VAR_aws_secret_key=$($DIR/read-cfg.sh $HOME/.aws/credentials $AWS_PROFILE aws_secret_access_key)
+TF_VAR_aws_region=$($DIR/read-cfg.sh $HOME/.aws/config "profile $AWS_PROFILE" region)
 aws_user=$(aws --profile $AWS_PROFILE iam get-user)
 TF_VAR_aws_account=$(echo $aws_user | jq ".User.Arn" | grep -Eo '[[:digit:]]{12}')
 TF_VAR_aws_user=$(echo $aws_user | jq --raw-output '.User.UserName')
