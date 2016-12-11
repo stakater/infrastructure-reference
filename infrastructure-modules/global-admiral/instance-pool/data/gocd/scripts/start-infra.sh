@@ -19,6 +19,6 @@ fi
 region=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)
 region=${region::-1}
 
-/gocd-data/scripts/startInstances.sh $ENVIRONMENTS $region
+/gocd-data/scripts/start-instances.sh $ENVIRONMENTS $region
 /gocd-data/scripts/resume-ASG-processes.sh $ENVIRONMENTS $region
 
