@@ -79,7 +79,6 @@ for k in ${!instances[@]}; do
 done | sort -k3 -r | awk '{print $1}' | readarray -t instanceId
 for k in ${instanceId[@]}; do
   if [ "$k" != "$gocdId"  ]
-  if [ "$k" != "$gocdId"  ]
   then
     echo "stopping instance " $k
     echo $(aws ec2 stop-instances --instance-ids $k --region $REGION)
