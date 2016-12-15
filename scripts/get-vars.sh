@@ -6,7 +6,7 @@ VM_TYPE=${VM_TYPE}                                        # hvm/pv - note: t1.mi
 
 AWS_PROFILE=${AWS_PROFILE}
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-AWS_REGION=$($DIR/read_cfg.sh $HOME/.aws/config "profile $AWS_PROFILE" region)
+AWS_REGION=$($DIR/read-cfg.sh $HOME/.aws/config "profile $AWS_PROFILE" region)
 
 TF_STATE_BUCKET_NAME=${TF_STATE_BUCKET_NAME}
 TF_STATE_GLOBAL_ADMIRAL_KEY=${TF_STATE_GLOBAL_ADMIRAL_KEY}

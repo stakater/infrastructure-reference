@@ -47,6 +47,7 @@ APP_NAME=$1
 CLUSTER_ENV=$2
 APP_DOCKER_IMAGE=$3
 APP_DOCKER_OPTS=$4
+EXTRA_UNIT_OPTS=$5
 
 # Convert CLUSTER_ENV value to lowercase
 CLUSTER_ENV=`echo "$CLUSTER_ENV" | sed 's/./\L&/g'`
@@ -70,7 +71,7 @@ else
 fi;
 
 cd /app/application-unit;
-./substitute-Docker-vars.sh -f application.service.tmpl -d "${APP_DOCKER_IMAGE}" -o "${APP_DOCKER_OPTS}";
+./substitute-Docker-vars.sh -f application.service.tmpl -d "${APP_DOCKER_IMAGE}" -o "${APP_DOCKER_OPTS}" -u "${EXTRA_UNIT_OPTS}";
 sudo mv application.service application-${APP_NAME}-${CLUSTER_ENV}.service
 
 cluster_endpoint=""
