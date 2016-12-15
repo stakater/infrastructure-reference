@@ -34,15 +34,19 @@
 AWS_REGION=""
 DEPLOY_STATE_KEY=""
 APP_NAME=""
+ENVIRONMENT=""
 DEPLOY_INSTANCE_TYPE="t2.nano" # default value
 ENABLE_SSL=false;
 INTERNAL_SUPPORT=false;
+ENV_STATE_KEY=""
 
 kOptionFlag=false;
 rOptionFlag=false;
 aOptionFlag=false;
+eOptionFlag=false;
+fOptionFlag=false;
 # Get options from the command line
-while getopts ":k:r:a:i:s:t:" OPTION
+while getopts ":k:r:a:e:f:i:s:t:" OPTION
 do
     case $OPTION in
         k)
@@ -57,6 +61,14 @@ do
           aOptionFlag=true;
           APP_NAME=$OPTARG
           ;;
+        e)
+          eOptionFlag=true;
+          ENVIRONMENT=$OPTARG
+          ;;
+        f)
+          fOptionFlag=true;
+          ENV_STATE_KEY=$OPTARG
+          ;;
         i)
           DEPLOY_INSTANCE_TYPE=$OPTARG
           ;;
@@ -67,22 +79,22 @@ do
           INTERNAL_SUPPORT=$OPTARG
           ;;
         *)
-          echo "Usage: $(basename $0) -k <key for the state file> -r <aws-region> -a <app-name> -i <deploy instance type> -s <Enable SSL ? > (optional) -t <INTERNAL SUPPORT ? > (optional)"
+          echo "Usage: $(basename $0) -k <key for the state file> -r <aws-region> -a <app-name> -e <environment> -f <tf-state-key> -i <deploy instance type> -s <Enable SSL ? > (optional) -t <INTERNAL SUPPORT ? > (optional)"
           exit 0
           ;;
     esac
 done
 
-if ! $kOptionFlag || ! $rOptionFlag || ! $aOptionFlag;
+if ! $kOptionFlag || ! $rOptionFlag || ! $aOptionFlag || ! $eOptionFlag;
 then
-  echo "Usage: $(basename $0) -k <key for the state file> -r <aws-region> -a <app-name> -i <deploy instance type> -s <Enable SSL ? > (optional) -t <INTERNAL SUPPORT ? > (optional)"
+  echo "Usage: $(basename $0) -k <key for the state file> -r <aws-region> -a <app-name> -e <environment> -f <tf-state-key> -i <deploy instance type> -s <Enable SSL ? > (optional) -t <INTERNAL SUPPORT ? > (optional)"
   exit 0;
 fi
 
 ##################
 # AMI Params
 ##################
-AMI_PARAMS_FILE="/app/${APP_NAME}/cd/vars/${APP_NAME}_ami_params.txt"
+AMI_PARAMS_FILE="/app/${APP_NAME}/${ENVIRONMENT}/cd/vars/${APP_NAME}_${ENVIRONMENT}_ami_params.txt"
 # Check ami params file exist
 if [ ! -f ${AMI_PARAMS_FILE} ];
 then
@@ -101,5 +113,4 @@ fi;
 ##############################################
 
 # Update blue green deployment group
-/gocd-data/scripts/update-blue-green-deployment-groups.sh ${APP_NAME} ${AMI_ID} ${AWS_REGION} ${DEPLOY_INSTANCE_TYPE} ${DEPLOY_STATE_KEY} ${ENABLE_SSL} ${INTERNAL_SUPPORT}
-
+/gocd-data/scripts/update-blue-green-deployment-groups.sh ${APP_NAME} ${ENVIRONMENT} ${AMI_ID} ${AWS_REGION} ${DEPLOY_INSTANCE_TYPE} ${DEPLOY_STATE_KEY} ${ENABLE_SSL} ${INTERNAL_SUPPORT} ${ENV_STATE_KEY}

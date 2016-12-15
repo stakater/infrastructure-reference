@@ -27,7 +27,7 @@ fileList+=("gocd/scripts/deploy-to-cluster.sh")
 fileList+=("gocd/scripts/deploy-to-prod.sh")
 fileList+=("gocd/scripts/docker-cleanup.sh")
 fileList+=("gocd/scripts/gocd.parameters.txt")
-fileList+=("gocd/scripts/prod.parameters.txt")
+fileList+=("gocd/scripts/bg.parameters.txt")
 fileList+=("gocd/scripts/read-parameter.sh")
 fileList+=("gocd/scripts/rollback-deployment.sh")
 fileList+=("gocd/scripts/switch-deployment-group.sh")
@@ -136,9 +136,9 @@ if [ -f ${gocdDownloadDir}/gocd.parameters.txt ] ;
 then
   cp ${gocdDownloadDir}/gocd.parameters.txt ${gocdScriptsDir}/gocd.parameters.txt
 fi
-if [ -f ${gocdDownloadDir}/prod.parameters.txt ] ;
+if [ -f ${gocdDownloadDir}/bg.parameters.txt ] ;
 then
-  cp ${gocdDownloadDir}/prod.parameters.txt ${gocdScriptsDir}/prod.parameters.txt
+  cp ${gocdDownloadDir}/bg.parameters.txt ${gocdScriptsDir}/bg.parameters.txt
 fi
 if [ -f ${gocdDownloadDir}/read-parameter.sh ] ;
 then

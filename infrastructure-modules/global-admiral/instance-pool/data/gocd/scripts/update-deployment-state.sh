@@ -34,24 +34,27 @@
 # Update deployment state for blue/green deployment
 #--------------------------------------------------
 # Argument1: APP_NAME
-# Argument2: LIVE_GROUP
-# Argument3: BLUE_GROUP_AMI_ID
-# Argument4: GREEN_GROUP_AMI_ID
-# Argument5: IS_DEPLOYMENT_ROLLBACK_VALID
-# Argument6: IS_GROUP_SWITCH_VALID
+# Argument2: ENVIRONMENT
+# Argument3: LIVE_GROUP
+# Argument4: BLUE_GROUP_AMI_ID
+# Argument5: GREEN_GROUP_AMI_ID
+# Argument6: IS_DEPLOYMENT_ROLLBACK_VALID
+# Argument7: IS_GROUP_SWITCH_VALID
+# Argument8: SWITCHED_TO_NEW_GROUP
 #--------------------------------------------------
 
 # Get parameter values
 APP_NAME=$1
-LIVE_GROUP=$2
-BLUE_GROUP_AMI_ID=$3
-GREEN_GROUP_AMI_ID=$4
-IS_DEPLOYMENT_ROLLBACK_VALID=$5
-IS_GROUP_SWITCH_VALID=$6
-SWITCHED_TO_NEW_GROUP=$7
+ENVIRONMENT=$2
+LIVE_GROUP=$3
+BLUE_GROUP_AMI_ID=$4
+GREEN_GROUP_AMI_ID=$5
+IS_DEPLOYMENT_ROLLBACK_VALID=$6
+IS_GROUP_SWITCH_VALID=$7
+SWITCHED_TO_NEW_GROUP=$8
 
-DEPLOYMENT_STATE_FILE_PATH="/app/${APP_NAME}/cd/blue-green-deployment"
-DEPLOYMENT_STATE_FILE_NAME="${APP_NAME}_deployment_state.txt"
+DEPLOYMENT_STATE_FILE_PATH="/app/${APP_NAME}/${ENVIRONMENT}/cd/blue-green-deployment"
+DEPLOYMENT_STATE_FILE_NAME="${APP_NAME}_${ENVIRONMENT}_deployment_state.txt"
 DEPLOYMENT_STATE_FILE="${DEPLOYMENT_STATE_FILE_PATH}/${DEPLOYMENT_STATE_FILE_NAME}"
 
 # Create directory if it does npt exists

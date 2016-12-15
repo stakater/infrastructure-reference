@@ -34,24 +34,26 @@
 # Applies terraform changes
 #---------------------------------
 # Argument1: APP_NAME
-# Argument2: TF_STATE_BUCKET_NAME
-# Argument3: DEPLOY_STATE_KEY
-# Argument4: AWS_REGION
+# Argument2: ENVIRONMENT
+# Argument3: TF_STATE_BUCKET_NAME
+# Argument4: DEPLOY_STATE_KEY
+# Argument5: AWS_REGION
 #--------------------------------
 
 APP_NAME=$1
-TF_STATE_BUCKET_NAME=$2
-DEPLOY_STATE_KEY=$3
-AWS_REGION=$4
+ENVIRONMENT=$2
+TF_STATE_BUCKET_NAME=$3
+DEPLOY_STATE_KEY=$4
+AWS_REGION=$5
 
 # Clone deployment code
-deployCodeLocation="/app/stakater/prod-deployment-reference-${APP_NAME}"
+deployCodeLocation="/app/stakater/prod-deployment-reference-${APP_NAME}-${ENVIRONMENT}"
 tfvarsFile="${deployCodeLocation}/deploy-prod/.terraform/deploy.tfvars"
 
-/gocd-data/scripts/clone-deployment-application-code.sh ${APP_NAME}
+/gocd-data/scripts/clone-deployment-application-code.sh ${deployCodeLocation}
 
 cd ${deployCodeLocation}
-sudo git pull origin master
+# sudo git pull origin master
 
 cd ${deployCodeLocation}/deploy-prod
 

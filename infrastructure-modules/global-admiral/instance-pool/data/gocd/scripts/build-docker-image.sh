@@ -76,10 +76,10 @@ then
 fi;
 
 # Copy war file to root directory
-sudo cp -f /app/${APP_NAME}/*.war ./
+sudo cp -f /app/${APP_NAME}_${ENVIRONMENT}/*.war ./
 
 # Remove copies of new war file not needed anymore
-sudo rm -r /app/${APP_NAME}/*.war
+sudo rm -r /app/${APP_NAME}_${ENVIRONMENT}/*.war
 
 # Publish
 # Build image

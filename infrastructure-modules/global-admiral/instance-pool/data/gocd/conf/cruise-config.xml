@@ -73,6 +73,7 @@
       <params>
         <param name="SOURCE_DIR" />
         <param name="APP_NAME">app</param>
+        <param name="ENVIRONMENT">prod</param>
         <param name="APP_DOCKER_IMAGE">registry.stakater-reference.local:80/app_prod</param>
         <param name="APP_DOCKER_OPTS">-p 8080:8080</param>
         <param name="PROD_CLOUDINIT_S3_FULL_PATH" />
@@ -89,10 +90,12 @@
       <params>
         <param name="SOURCE_DIR" />
         <param name="APP_NAME">app</param>
+        <param name="ENVIRONMENT">prod</param>
         <param name="APP_DOCKER_IMAGE">registry.stakater-reference.local:80/app_prod</param>
         <param name="ENABLE_SSL">false</param>
         <param name="INTERNAL_SUPPORT">false</param>
         <param name="INSTANCE_TYPE">t2.micro</param>
+        <param name="ENV_TF_STATE_KEY"/>
       </params>
       <materials>
         <pipeline pipelineName="app-create-ami-prod" stageName="Build-AMI" />
@@ -102,6 +105,7 @@
       <params>
         <param name="SOURCE_DIR" />
         <param name="APP_NAME">app</param>
+        <param name="ENVIRONMENT">prod</param>
       </params>
       <materials>
         <pipeline pipelineName="app-deploy-prod" stageName="Launch-AMI" />
@@ -111,6 +115,7 @@
       <params>
         <param name="SOURCE_DIR" />
         <param name="APP_NAME">app</param>
+        <param name="ENVIRONMENT">prod</param>
       </params>
       <materials>
         <pipeline pipelineName="app-deploy-prod" stageName="Launch-AMI" />
