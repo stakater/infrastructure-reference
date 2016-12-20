@@ -54,8 +54,8 @@ GREEN_CLUSTER_MAX_SIZE=${16}
 GREEN_CLUSTER_DESIRED_SIZE=${17}
 GREEN_GROUP_LOAD_BALANCERS=${18}
 GREEN_GROUP_MIN_ELB_CAPACITY=${19}
-ENABLE_SSL=${20}
-INTERNAL_SUPPORT=${21}
+SSL_CERTIFICATE_ARN=${20}
+IS_ELB_INTERNAL=${21}
 
 # file path
 deployCodeLocation="/app/stakater/prod-deployment-reference-${APP_NAME}-${ENVIRONMENT}"
@@ -69,17 +69,6 @@ tfvarsFile="${terraformFolderPath}/deploy.tfvars"
 if [ ! -d "${terraformFolderPath}" ];
 then
   sudo mkdir -p ${terraformFolderPath}
-fi;
-
-# If enable_ssl is set, set the value in tfvars to 1 (as used by terraform)
-# And fetch ssl certificate id from cert-arn file
-ENABLE_SSL_CONVERTED_VALUE=0;
-SSL_CERTIFICATE_ID=""
-if [[ "${ENABLE_SSL}" == "true" || "${ENABLE_SSL}" == "1" ]];
-then
-  ENABLE_SSL_CONVERTED_VALUE=1;
-  CRT_PARAM_FILE="/app/certs/cert-arn.txt"
-  SSL_CERTIFICATE_ID=`/gocd-data/scripts/read-parameter.sh ${CRT_PARAM_FILE} ssl_certificate_id`
 fi;
 
 # Write vars to be used by the deploy code in a TF vars file
@@ -103,8 +92,7 @@ sudo sh -c "{
   green_cluster_desired_size = \\\"${GREEN_CLUSTER_DESIRED_SIZE}\\\"
   green_group_load_balancers = \\\"${GREEN_GROUP_LOAD_BALANCERS}\\\"
   green_group_min_elb_capacity = \\\"${GREEN_GROUP_MIN_ELB_CAPACITY}\\\"
-  enable_ssl = \\\"${ENABLE_SSL_CONVERTED_VALUE}\\\"
-  ssl_certificate_id = \\\"${SSL_CERTIFICATE_ID}\\\"
-  internal_support = \\\"${INTERNAL_SUPPORT}\\\"
+  ssl_certificate_arn = \\\"${SSL_CERTIFICATE_ARN}\\\"
+  is_elb_internal = \\\"${IS_ELB_INTERNAL}\\\"
 \"
 } > ${tfvarsFile}"

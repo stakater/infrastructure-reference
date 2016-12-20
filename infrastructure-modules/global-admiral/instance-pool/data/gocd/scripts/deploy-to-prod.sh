@@ -36,8 +36,8 @@ DEPLOY_STATE_KEY=""
 APP_NAME=""
 ENVIRONMENT=""
 DEPLOY_INSTANCE_TYPE="t2.nano" # default value
-ENABLE_SSL=false;
-INTERNAL_SUPPORT=false;
+SSL_CERTIFICATE_ARN="";
+IS_ELB_INTERNAL=false;
 ENV_STATE_KEY=""
 
 kOptionFlag=false;
@@ -73,13 +73,13 @@ do
           DEPLOY_INSTANCE_TYPE=$OPTARG
           ;;
         s)
-          ENABLE_SSL=$OPTARG
+          SSL_CERTIFICATE_ARN=$OPTARG
           ;;
         t)
-          INTERNAL_SUPPORT=$OPTARG
+          IS_ELB_INTERNAL=$OPTARG
           ;;
         *)
-          echo "Usage: $(basename $0) -k <key for the state file> -r <aws-region> -a <app-name> -e <environment> -f <tf-state-key> -i <deploy instance type> -s <Enable SSL ? > (optional) -t <INTERNAL SUPPORT ? > (optional)"
+          echo "Usage: $(basename $0) -k <key for the state file> -r <aws-region> -a <app-name> -e <environment> -f <tf-state-key> -i <deploy instance type> -s <SSL CERTIFICATE ARN?> -t <IS ELB INTERNAL ? > (optional)"
           exit 0
           ;;
     esac
@@ -87,7 +87,7 @@ done
 
 if ! $kOptionFlag || ! $rOptionFlag || ! $aOptionFlag || ! $eOptionFlag;
 then
-  echo "Usage: $(basename $0) -k <key for the state file> -r <aws-region> -a <app-name> -e <environment> -f <tf-state-key> -i <deploy instance type> -s <Enable SSL ? > (optional) -t <INTERNAL SUPPORT ? > (optional)"
+  echo "Usage: $(basename $0) -k <key for the state file> -r <aws-region> -a <app-name> -e <environment> -f <tf-state-key> -i <deploy instance type> -s <SSL CERTIFICATE ARN?> (optional) -t <IS ELB INTERNAL ? > (optional)"
   exit 0;
 fi
 
