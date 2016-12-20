@@ -92,8 +92,8 @@
         <param name="APP_NAME">app</param>
         <param name="ENVIRONMENT">prod</param>
         <param name="APP_DOCKER_IMAGE">registry.stakater-reference.local:80/app_prod</param>
-        <param name="ENABLE_SSL">false</param>
-        <param name="INTERNAL_SUPPORT">false</param>
+        <param name="SSL_CERTIFICATE_ARN"/>
+        <param name="IS_ELB_INTERNAL">false</param>
         <param name="INSTANCE_TYPE">t2.micro</param>
         <param name="ENV_TF_STATE_KEY"/>
       </params>
@@ -207,7 +207,7 @@
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>AWS_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
-                   /gocd-data/scripts/deploy-to-prod.sh -r $AWS_REGION -k prod/#{APP_NAME}/terraform.tfstate -a #{APP_NAME} -s #{ENABLE_SSL} -i "#{INSTANCE_TYPE}" -t "#{INTERNAL_SUPPORT}"</arg>
+                   /gocd-data/scripts/deploy-to-prod.sh -r $AWS_REGION -k prod/#{APP_NAME}/terraform.tfstate -a #{APP_NAME} -s "#{SSL_CERTIFICATE_ARN}" -i "#{INSTANCE_TYPE}" -t "#{IS_ELB_INTERNAL}"</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
