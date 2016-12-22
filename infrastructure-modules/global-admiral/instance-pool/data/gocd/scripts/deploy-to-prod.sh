@@ -113,4 +113,4 @@ fi;
 ##############################################
 
 # Update blue green deployment group
-/gocd-data/scripts/update-blue-green-deployment-groups.sh ${APP_NAME} ${ENVIRONMENT} ${AMI_ID} ${AWS_REGION} ${DEPLOY_INSTANCE_TYPE} ${DEPLOY_STATE_KEY} ${ENABLE_SSL} ${INTERNAL_SUPPORT} ${ENV_STATE_KEY}
+/gocd-data/scripts/update-blue-green-deployment-groups.sh ${APP_NAME} ${ENVIRONMENT} ${AMI_ID} ${AWS_REGION} ${DEPLOY_INSTANCE_TYPE} ${DEPLOY_STATE_KEY} "${SSL_CERTIFICATE_ARN}" ${IS_ELB_INTERNAL} ${ENV_STATE_KEY}
