@@ -180,7 +180,7 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>/gocd-data/scripts/deploy-to-cluster.sh #{APP_NAME} #{CLUSTER_ENV} #{APP_DOCKER_IMAGE} "#{APP_DOCKER_OPTS} "#{EXTRA_UNIT_OPTS}"</arg>
+                <arg>/gocd-data/scripts/deploy-to-cluster.sh #{APP_NAME} #{CLUSTER_ENV} #{APP_DOCKER_IMAGE} "#{APP_DOCKER_OPTS}" "#{EXTRA_UNIT_OPTS}"</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -195,7 +195,7 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>/gocd-data/scripts/build-ami.sh -a #{APP_NAME} -b ${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER} -u $(uuid -v4) -d #{APP_DOCKER_IMAGE} -o "#{APP_DOCKER_OPTS}" -c "#{PROD_CLOUDINIT_S3_FULL_PATH}" -e #{DATA_EBS_DEVICE_NAME} -z #{DATA_EBS_VOL_SIZE} -l #{LOGS_EBS_DEVICE_NAME} -x #{LOGS_EBS_VOL_SIZE}</arg>
+                <arg>/gocd-data/scripts/build-ami.sh -a #{APP_NAME} -r #{ENVIRONMENT} -b ${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER} -u $(uuid -v4) -d #{APP_DOCKER_IMAGE} -o "#{APP_DOCKER_OPTS}" -c "#{CLOUDINIT_S3_FULL_PATH}" -e "#{DATA_EBS_DEVICE_NAME}" -z "#{DATA_EBS_VOL_SIZE}" -l "#{LOGS_EBS_DEVICE_NAME}" -x "#{LOGS_EBS_VOL_SIZE}"</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -212,7 +212,7 @@
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>AWS_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
-                   /gocd-data/scripts/deploy-to-prod.sh -r $AWS_REGION -k prod/#{APP_NAME}/terraform.tfstate -a #{APP_NAME} -s "#{SSL_CERTIFICATE_ARN}" -i "#{INSTANCE_TYPE}" -t "#{IS_ELB_INTERNAL}"</arg>
+                  /gocd-data/scripts/deploy-to-prod.sh -r $AWS_REGION -e #{ENVIRONMENT} -f #{ENV_TF_STATE_KEY} -k #{ENVIRONMENT}/#{APP_NAME}/terraform.tfstate -a #{APP_NAME} -s "#{SSL_CERTIFICATE_ARN}" -i "#{INSTANCE_TYPE}"  -t "#{IS_ELB_INTERNAL}"</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -229,7 +229,7 @@
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>AWS_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
-                   /gocd-data/scripts/switch-deployment-group.sh #{APP_NAME} $AWS_REGION prod/#{APP_NAME}/terraform.tfstate</arg>
+                  /gocd-data/scripts/switch-deployment-group.sh #{APP_NAME} #{ENVIRONMENT} $AWS_REGION #{ENVIRONMENT}/#{APP_NAME}/terraform.tfstate</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -246,7 +246,7 @@
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>AWS_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
-                   /gocd-data/scripts/rollback-deployment.sh #{APP_NAME} $AWS_REGION prod/#{APP_NAME}/terraform.tfstate</arg>
+                  /gocd-data/scripts/rollback-deployment.sh #{APP_NAME} #{ENVIRONMENT} $AWS_REGION #{ENVIRONMENT}/#{APP_NAME}/terraform.tfstate</arg>
                 <runif status="passed" />
               </exec>
             </tasks>

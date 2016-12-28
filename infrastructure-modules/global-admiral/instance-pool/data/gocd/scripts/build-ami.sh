@@ -106,7 +106,7 @@ do
           DATA_EBS_DEVICE_NAME=$OPTARG
           ;;
         z)
-          volOptionCnt=$((volOptionCnt+1));
+          volOptionCnt=$((volOptionCnt-1));
           DATA_EBS_VOL_SIZE=$OPTARG
           ;;
         l)
@@ -114,7 +114,7 @@ do
           LOGS_EBS_DEVICE_NAME=$OPTARG
           ;;
         x)
-          volOptionCnt=$((volOptionCnt+1));
+          volOptionCnt=$((volOptionCnt-1));
           LOGS_EBS_VOL_SIZE=$OPTARG
           ;;
         *)
@@ -123,7 +123,7 @@ do
           ;;
     esac
 done
-if [[ ! $aOptionFlag || ! $bOptionFlag || ! $uOptionFlag || ! $dOptionFlag || ! $oOptionFlag || ! $rOptionFlag ]] || [[ "$volOptionCnt" -lt  "4" ]] ;
+if [[ ! $aOptionFlag || ! $bOptionFlag || ! $uOptionFlag || ! $dOptionFlag || ! $oOptionFlag || ! $rOptionFlag ]] || [[ $volOptionCnt -ne  0 ]] ;
 then
   echo "Usage: $(basename $0) -a <APP NAME> -b <APP IMAGE BUILD VERSION> -r <ENVIRONMENT> -u <Build UUID> -d <APP DOCKER IMAGE> -o <APP DOCKER OPTIONS> -c <Full path (incl bucket name) of cloud config file> (optional) -e <EBS data volume device name> -z <EBS data volume device size> -l <EBS logs volume device name> -x <EBS logs volume size>"
   exit 0;
@@ -183,7 +183,7 @@ then
 fi;
 
 # Bake AMI
-sudo docker exec packer_${GO_PIPELINE_NAME} /bin/bash -c "./bake-ami.sh -r $aws_region -v $vpc_id -s $subnet_id -b $build_uuid -n ${APP_NAME}_${ENVIRONMENT}_${APP_IMAGE_BUILD_VERSION} -c ${CLOUD_CONFIG_TMPL_PATH} -d ${APP_DOCKER_IMAGE} -o \"${APP_DOCKER_OPTS}\" -g $docker_registry_path -e ${DATA_EBS_DEVICE_NAME} -z ${DATA_EBS_VOL_SIZE} -l ${LOGS_EBS_DEVICE_NAME} -x ${LOGS_EBS_VOL_SIZE}"
+sudo docker exec packer_${GO_PIPELINE_NAME} /bin/bash -c "./bake-ami.sh -r $aws_region -v $vpc_id -s $subnet_id -b $build_uuid -n ${APP_NAME}_${ENVIRONMENT}_${APP_IMAGE_BUILD_VERSION} -c ${CLOUD_CONFIG_TMPL_PATH} -d ${APP_DOCKER_IMAGE} -o \"${APP_DOCKER_OPTS}\" -g $docker_registry_path -e \"${DATA_EBS_DEVICE_NAME}\" -z \"${DATA_EBS_VOL_SIZE}\" -l \"${LOGS_EBS_DEVICE_NAME}\" -x \"${LOGS_EBS_VOL_SIZE}\""
 
 aws_describe_json=$(aws ec2 describe-images --region $aws_region --filters Name=tag:BuildUUID,Values=${build_uuid});
 AMI_ID=$(echo "$aws_describe_json" | jq --raw-output '.Images[0].ImageId');
