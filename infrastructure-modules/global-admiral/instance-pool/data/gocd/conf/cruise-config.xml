@@ -142,6 +142,18 @@
       </materials>
     </pipeline>
   </pipelines>
+  <pipelines group="Destroy_BG_Groups">
+      <pipeline name="Destroy-App-Prod" template="destroy-BG">
+          <params>
+              <param name="SOURCE_DIR" />
+              <param name="APP_NAME">app</param>
+              <param name="ENVIRONMENT">prod</param>
+          </params>
+          <materials>
+              <git url="https://github.com/stakater/dummy-repo.git" shallowClone="true" autoUpdate="false" />
+          </materials>
+      </pipeline>
+  </pipelines>
   <templates>
     <pipeline name="stakater_build">
       <stage name="Build">
@@ -285,6 +297,22 @@
         </jobs>
       </stage>
     </pipeline>
+    <pipeline name="destroy-BG">
+        <stage name="Destroy" fetchMaterials="false">
+            <approval type="manual" />
+            <jobs>
+                <job name="Run">
+                    <tasks>
+                        <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                            <arg>-c</arg>
+                            <arg>sudo /gocd-data/scripts/destroy-BG-group.sh -a #{APP_NAME} -e #{ENVIRONMENT}</arg>
+                            <runif status="passed" />
+                        </exec>
+                    </tasks>
+                </job>
+            </jobs>
+        </stage>
+    </pipeline>
   </templates>
   <environments>
     <environment name="Build">
@@ -328,6 +356,7 @@
       <pipelines>
         <pipeline name="Start-Dev" />
         <pipeline name="Stop-Dev" />
+        <pipeline name="Destroy-App-Prod" />
       </pipelines>
     </environment>
   </environments>
