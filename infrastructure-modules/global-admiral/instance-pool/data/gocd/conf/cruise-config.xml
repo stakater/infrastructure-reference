@@ -86,6 +86,16 @@
         <pipeline pipelineName="app-build-prod" stageName="Build" />
       </materials>
     </pipeline>
+    <pipeline name="app-delete-ami-prod" template="stakater_delete_ami">
+      <params>
+        <param name="SOURCE_DIR" />
+        <param name="APP_NAME">app</param>
+        <param name="ENVIRONMENT">prod</param>
+      </params>
+      <materials>
+        <pipeline pipelineName="app-create-ami-prod" stageName="Build-AMI" />
+      </materials>
+    </pipeline>
     <pipeline name="app-deploy-prod" template="stakater_launch_ami">
       <params>
         <param name="SOURCE_DIR" />
@@ -98,7 +108,7 @@
         <param name="ENV_TF_STATE_KEY"/>
       </params>
       <materials>
-        <pipeline pipelineName="app-create-ami-prod" stageName="Build-AMI" />
+        <pipeline pipelineName="app-delete-ami-prod" stageName="Delete-AMI" />
       </materials>
     </pipeline>
     <pipeline name="app-switch-group" template="stakater_switch_deployment_group">
@@ -209,6 +219,21 @@
                 <arg>-c</arg>
                 <arg>/gocd-data/scripts/build-ami.sh -a #{APP_NAME} -r #{ENVIRONMENT} -b ${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER} -u $(uuid -v4) -d #{APP_DOCKER_IMAGE} -o "#{APP_DOCKER_OPTS}" -c "#{CLOUDINIT_S3_FULL_PATH}" -e "#{DATA_EBS_DEVICE_NAME}" -z "#{DATA_EBS_VOL_SIZE}" -l "#{LOGS_EBS_DEVICE_NAME}" -x "#{LOGS_EBS_VOL_SIZE}"</arg>
                 <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="stakater_delete_ami">
+      <stage name="Delete-AMI" fetchMaterials="false">
+        <jobs>
+          <job name="Delete-AMI">
+            <tasks>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>/gocd-data/scripts/delete-ami.sh -a #{APP_NAME} -e #{ENVIRONMENT}</arg>
+                <runif status="any" />
               </exec>
             </tasks>
           </job>
@@ -357,6 +382,7 @@
         <pipeline name="Start-Dev" />
         <pipeline name="Stop-Dev" />
         <pipeline name="Destroy-App-Prod" />
+        <pipeline name="app-delete-ami-prod" />
       </pipelines>
     </environment>
   </environments>
