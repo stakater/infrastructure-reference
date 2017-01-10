@@ -1,0 +1,38 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "${config_bucket_arn}/house-keeper",
+        "${config_bucket_arn}/house-keeper/*",
+        "${cloudinit_bucket_arn}/house-keeper",
+        "${cloudinit_bucket_arn}/house-keeper/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:Describe*",
+        "ec2:Start*",
+        "ec2:Stop*",
+        "autoscaling:Describe*",
+        "autoscaling:Resume*",
+        "autoscaling:Suspend*"
+      ],
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+}
