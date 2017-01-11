@@ -86,15 +86,25 @@ latestAmi="'`/gocd-data/scripts/read-parameter.sh ${OUTPUT_STATE_FILE} AMI_ID`'"
 requiredAmis="["$blueGroupAmi","$greenGroupAmi","$latestAmi"]"
 echo "These AMIs will not be deleted "${requiredAmis}
 
-query="Images[?!contains(${requiredAmis},ImageId)].{id:ImageId}"
+query="Images[?!contains(${requiredAmis},ImageId)].{id:ImageId,tag:Tags[?Key=='BuildUUID'].Value|[0]}"
 filter="Name=name,Values=${APP_NAME}_${ENVIRONMENT}*"
 
-shopt -s lastpipe
-aws ec2 describe-images --filters $filter --query $query --region $region --output text | readarray -t deleteableAMIS
+data=`aws ec2 describe-images --filters $filter --query $query --region $region`
 
-echo ${deleteableAMIS[@]}
+length=`echo $data | jq '.| length'`
+length=$(($length-1))
 
-for k in ${deleteableAMIS[@]}; do
-   echo "deleting AMI $k"
-   aws ec2 deregister-image --image-id $k --region $region
+for i in $(seq 0 1 $length); do
+   ami=`echo $data | jq ".[${i}].id"`
+   ami=${ami//\"/}
+   tag=`echo $data | jq ".[${i}].tag"`
+   echo "deleting AMI $ami"
+   aws ec2 deregister-image --image-id $ami --region $region
+   filter="Name=tag:BuildUUID,Values=$tag"
+   snapshots=(`aws ec2 describe-snapshots --filters $filter --query 'Snapshots[].SnapshotId' --region $region --output text`)
+   for snapshot in ${snapshots[@]}; do
+      snapshot=${snapshot//\"/}
+      echo "deleting snapshot $snapshot"
+      aws ec2 delete-snapshot --snapshot-id $snapshot --region $region
+   done
 done
