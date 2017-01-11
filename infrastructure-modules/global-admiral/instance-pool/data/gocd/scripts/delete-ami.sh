@@ -89,7 +89,6 @@ echo "These AMIs will not be deleted "${requiredAmis}
 query="Images[?!contains(${requiredAmis},ImageId)].{id:ImageId,tag:Tags[?Key=='BuildUUID'].Value|[0]}"
 filter="Name=name,Values=${APP_NAME}_${ENVIRONMENT}*"
 
-
 data=`aws ec2 describe-images --filters $filter --query $query --region $region`
 
 length=`echo $data | jq '.| length'`
