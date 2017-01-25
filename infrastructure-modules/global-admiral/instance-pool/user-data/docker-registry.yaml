@@ -92,8 +92,8 @@ coreos:
                   -v /opt/data/registry/ssl:/certs \
                   -e CA_SUBJECT=registry.${stack_name}.local \
                   -e SSL_DNS=registry.${stack_name}.local \
-                  -e SSL_EXPIRY=24820 \
-                  -e CA_EXPIRY=24820 \
+                  -e SSL_EXPIRE=24820 \
+                  -e CA_EXPIRE=24820 \
                   paulczar/omgwtfssl
         ExecStop=/usr/bin/sh -c "/etc/scripts/upload-registry-certs.sh /opt/data/registry/ssl registry-certificates"
         Restart=on-failure
