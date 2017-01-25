@@ -3,28 +3,32 @@ coreos:
   update:
     reboot-strategy: off
   units:
-    - name: format-opt-data.service
-      command: start
-      content: |
-        [Unit]
-        Description=Formats opt data drive
-        [Service]
-        Type=oneshot
-        RemainAfterExit=yes
-        Environment="LABEL=opt-data"
-        Environment="DEV=/dev/xvdh"
-        ExecStart=-/bin/bash -c "if ! findfs LABEL=$LABEL > /tmp/label.$LABEL; then  wipefs -a -f $DEV && mkfs.ext4 -F -L $LABEL $DEV && echo wiped; fi"
-    - name: opt-data.mount
-      command: start
-      content: |
-        [Unit]
-        Description=Mount data to /opt/data
-        Requires=format-opt-data.service
-        After=format-opt-data.service
-        [Mount]
-        What=/dev/xvdh
-        Where=/opt/data
-        Type=ext4
+##################################################################
+# If you want to mount EBS for storing docker data for mysql,
+# Uncomment the following and comment the blocks for mounting EFS.
+##################################################################
+#    - name: format-opt-data.service
+#      command: start
+#      content: |
+#        [Unit]
+#        Description=Formats opt data drive
+#        [Service]
+#        Type=oneshot
+#        RemainAfterExit=yes
+#        Environment="LABEL=opt-data"
+#        Environment="DEV=/dev/xvdh"
+#        ExecStart=-/bin/bash -c "if ! findfs LABEL=$LABEL > /tmp/label.$LABEL; then  wipefs -a -f $DEV && mkfs.ext4 -F -L $LABEL $DEV && echo wiped; fi"
+#    - name: opt-data.mount
+#      command: start
+#      content: |
+#        [Unit]
+#        Description=Mount data to /opt/data
+#        Requires=format-opt-data.service
+#        After=format-opt-data.service
+#        [Mount]
+#        What=/dev/xvdh
+#        Where=/opt/data
+#        Type=ext4
     - name: mysql.service
       command: start
       content: |
@@ -32,10 +36,36 @@ coreos:
         Description=Mysql Service
         Requires=docker.service
         After=docker.service
+        After=runcmd.service
         [Service]
         TimeoutStartSec=0
         ExecStartPre=-/usr/bin/docker rm %n
-        ExecStart=/usr/bin/docker run --rm --name %n -p 3306:3306 -e MYSQL_USER="${db_username}" -e MYSQL_ROOT_PASSWORD="${db_password}" -e MYSQL_PASSWORD="${db_password}" -e MYSQL_DATABASE="${db_name}" -v /opt/data/mysql:/var/lib/mysql mysql
+        ExecStart=/usr/bin/docker run --rm --name %n -p 3306:3306 -e MYSQL_USER="${db_username}" -e MYSQL_ROOT_PASSWORD="${db_password}" -e MYSQL_PASSWORD="${db_password}" -e MYSQL_DATABASE="${db_name}" -v /data/mysql:/var/lib/mysql mysql
         ExecStop=/usr/bin/docker stop %n
         [Install]
         WantedBy=multi-user.target
+#############################################################
+# Mounting EFS to instance inorder to store mysql data
+#############################################################
+    - name: data.mount
+      content: |
+        [Mount]
+        What=EFS_DNS:/
+        Where=/data
+        Type=nfs
+    - name: runcmd.service
+      command: start
+      content: |
+        [Unit]
+        Description=command
+        [Service]
+        RemainAfterExit=true
+        Type=oneshot
+        Environment="EFS_DNS=${efs_dns}"
+        ExecStart=/bin/sh -c "AZ_ZONE=$(curl -s -L http://169.254.169.254/latest/meta-data/placement/availability-zone); \
+                              sed -i \"s/EFS_DNS/$AZ_ZONE.$EFS_DNS/\" /etc/systemd/system/data.mount; \
+                              systemctl daemon-reload; \
+                              systemctl restart data.mount"
+    # 1- Append current availability-zone to EFS_DNS Substring
+    # 2- Replace EFS_DNS with the resulting value in systemd file
+    # 3- Restart the systemd unit

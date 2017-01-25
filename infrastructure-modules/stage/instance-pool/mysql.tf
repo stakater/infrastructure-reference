@@ -47,11 +47,11 @@ module "mysql" {
   iam_role_policy  = "${data.template_file.mysql-policy.rendered}"
   user_data        = "${data.template_file.mysql-bootstrap-user-data.rendered}"
   key_name         = "mysql-stage"
-  root_vol_size    = 30
-  data_ebs_device_name  = "/dev/sdh"
-  data_ebs_vol_size     = 150
-  logs_ebs_device_name  = "/dev/sdg"
-  logs_ebs_vol_size     = 20
+  root_vol_size    = 20
+  data_ebs_device_name  = ""
+  data_ebs_vol_size     = 0
+  logs_ebs_device_name  = ""
+  logs_ebs_vol_size     = 0
 
   # ASG parameters
   max_size         = "1"
@@ -89,6 +89,7 @@ data "template_file" "mysql-user-data" {
 
   vars {
     stack_name = "${var.stack_name}"
+    efs_dns = "${replace(element(split(",", module.efs-mount-targets.dns-names), 0), "/^(.+?)\\./", "")}"
     db_username = "${var.stage_database_username}"
     db_password = "${var.stage_database_password}"
     db_name = "${var.stage_database_name}"
