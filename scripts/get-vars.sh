@@ -15,9 +15,13 @@ TF_STATE_QA_KEY=${TF_STATE_QA_KEY}
 TF_STATE_PROD_KEY=${TF_STATE_PROD_KEY}
 TF_STATE_STAGE_KEY=${TF_STATE_STAGE_KEY}
 
+# S3 Bucket names
+DEV_CLOUDINIT_BUCKET_NAME=${DEV_CLOUDINIT_BUCKET_NAME}
+DEV_CONFIG_BUCKET_NAME=${DEV_CONFIG_BUCKET_NAME}
+QA_CLOUDINIT_BUCKET_NAME=${QA_CLOUDINIT_BUCKET_NAME}
+QA_CONFIG_BUCKET_NAME=${QA_CONFIG_BUCKET_NAME}
 PROD_CLOUDINIT_BUCKET_NAME=${PROD_CLOUDINIT_BUCKET_NAME}
 PROD_CONFIG_BUCKET_NAME=${PROD_CONFIG_BUCKET_NAME}
-
 STAGE_CLOUDINIT_BUCKET_NAME=${STAGE_CLOUDINIT_BUCKET_NAME}
 STAGE_CONFIG_BUCKET_NAME=${STAGE_CONFIG_BUCKET_NAME}
 
@@ -92,6 +96,10 @@ variable "tf_state_global_admiral_key" { default = "${TF_STATE_GLOBAL_ADMIRAL_KE
 variable "tf_state_dev_key" { default = "${TF_STATE_DEV_KEY}" }
 variable "tf_state_qa_key" { default = "${TF_STATE_QA_KEY}" }
 variable "tf_state_prod_key" { default = "${TF_STATE_PROD_KEY}" }
+variable "dev_cloudinit_bucket_name" { default = "${DEV_CLOUDINIT_BUCKET_NAME}" }
+variable "dev_config_bucket_name" { default = "${DEV_CONFIG_BUCKET_NAME}" }
+variable "qa_cloudinit_bucket_name" { default = "${QA_CLOUDINIT_BUCKET_NAME}" }
+variable "qa_config_bucket_name" { default = "${QA_CONFIG_BUCKET_NAME}" }
 variable "prod_cloudinit_bucket_name" { default = "${PROD_CLOUDINIT_BUCKET_NAME}" }
 variable "prod_config_bucket_name" { default = "${PROD_CONFIG_BUCKET_NAME}" }
 variable "tf_state_stage_key" { default = "${TF_STATE_STAGE_KEY}" }
