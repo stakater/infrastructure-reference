@@ -47,11 +47,14 @@ module "worker" {
   iam_role_policy  = "${data.template_file.worker-policy.rendered}"
   user_data        = "${data.template_file.worker-bootstrap-user-data.rendered}"
   key_name         = "worker-dev"
-  root_vol_size    = 30
-  data_ebs_device_name  = "/dev/sdf"
-  data_ebs_vol_size     = 50
-  logs_ebs_device_name  = "/dev/sdg"
-  logs_ebs_vol_size     = 20
+  root_vol_size    = 50
+  # Leave empty & 0 if you do not wish to
+  # attach EBS to instances of this module
+  root_vol_del_on_term = true
+  data_ebs_device_name  = ""
+  data_ebs_vol_size     = 0
+  logs_ebs_device_name  = ""
+  logs_ebs_vol_size     = 0
 
   # ASG parameters
   max_size         = "2"
@@ -72,6 +75,14 @@ data "template_file" "worker-policy" {
   }
 }
 
+data "template_file" "worker-filebeat-additional-user-data" {
+  template = "${file("./scripts/download-filebeat-template.sh.tmpl")}"
+
+  vars {
+    dev_config_bucket="${module.config-bucket.bucket_name}"
+  }
+}
+
 data "template_file" "worker-bootstrap-user-data" {
   template = "${file("./user-data/bootstrap-user-data.sh.tmpl")}"
 
@@ -80,7 +91,8 @@ data "template_file" "worker-bootstrap-user-data" {
     config_bucket_name = "${data.terraform_remote_state.global-admiral.config-bucket-name}"
     cloudinit_bucket_name = "${module.cloudinit-bucket.bucket_name}"
     module_name = "worker"
-    additional_user_data_scripts = "${file("./scripts/download-registry-certificates.sh")}"
+    additional_user_data_scripts = "${file("./scripts/download-registry-certificates.sh")}
+    ${data.template_file.worker-filebeat-additional-user-data.rendered}"
   }
 }
 
@@ -91,6 +103,7 @@ data "template_file" "worker-user-data" {
     stack_name = "${var.stack_name}"
     efs_dns = "${replace(element(split(",", module.efs-mount-targets.dns-names), 0), "/^(.+?)\\./", "")}"
     # Using first value in the comma-separated list and remove the availability zone
+    global_admiral_config_bucket="${data.terraform_remote_state.global-admiral.config-bucket-name}"
   }
 }
 
@@ -103,6 +116,12 @@ resource "aws_s3_bucket_object" "worker-cloud-config" {
   content = "${data.template_file.worker-user-data.rendered}"
 }
 
+# Upload filebeat template to s3 bucket
+resource "aws_s3_bucket_object" "filebeat-config-tmpl" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "worker/consul-templates/filebeat.ctmpl"
+  source = "./data/worker/consul-templates/filebeat.ctmpl"
+}
 ## Creates ELB security group
 resource "aws_security_group" "worker-sg-elb" {
   name_prefix = "${var.stack_name}-dev-worker-elb-"
@@ -219,7 +238,7 @@ resource "aws_lb_cookie_stickiness_policy" "worker-elb-stickiness-policy" {
 }
 
 # Route53 record
-# Add to global-admiral's private dns
+# Add to dev's private dns
 resource "aws_route53_record" "worker" {
   zone_id = "${module.route53-private.zone_id}"
   name = "worker-dev"
@@ -232,6 +251,7 @@ resource "aws_route53_record" "worker" {
   }
 }
 
+# Add to global-admiral's private dns
 resource "aws_route53_record" "worker-internal" {
   zone_id = "${data.terraform_remote_state.global-admiral.route53_private_zone_id}"
   name = "worker-dev-fleet"
