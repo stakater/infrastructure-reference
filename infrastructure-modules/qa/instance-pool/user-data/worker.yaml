@@ -26,45 +26,54 @@ coreos:
         [Unit]
         Description= Unit file to run update-initial-cluster script
         [Service]
-        Type=oneshot
-        TimeoutStartSec=0
-        ExecStart=/usr/bin/sh -c "/opt/bin/update-initial-cluster.sh -b ${global_admiral_config_bucket}"
-    - name: format-disk.service
-      command: start
-      content: |
-        [Unit]
-        Description=Formats the disk drive
-        [Service]
         Type=oneshot
-        RemainAfterExit=yes
-        Environment="LABEL=var-lib-docker"
-        Environment="DEV=/dev/xvdf"
-        # Make Dev letter is same as the ebs device mounted e.g. xvdf for sdf
-        # Do not wipe the disk if it's already being used, so the docker images persistent cross reboot.
-        ExecStart=-/bin/bash -c "if ! findfs LABEL=$LABEL > /tmp/label.$LABEL; then wipefs -a -f $DEV && mkfs.ext4 -T news -F -L $LABEL $DEV && echo wiped; fi"
-    - name: var-lib-docker.mount
+        TimeoutStartSec=0
+        ExecStart=/usr/bin/sh -c "/opt/bin/update-initial-cluster.sh -b ${global_admiral_config_bucket}"
+    - name: consul-agent.service
       command: start
+      enable: true
       content: |
         [Unit]
-        Description=Mount disk to /var/lib/docker
-        Requires=format-disk.service
-        After=format-disk.service
-        Before=docker.service
-        [Mount]
-        What=/dev/xvdf
-        Where=/var/lib/docker
-        Type=ext4
-    - name: docker.service
+        Description=Consul Agent
+        After=docker.service
+        Requires=docker.service
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment CONSUL_SERVER=$(etcdctl get /qa/consul/server/endpoint)"
+        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment FALLBACK_HOST_DNS=$(nslookup $(hostname -i) | grep 'Server' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')"
+        ExecStartPre=/usr/bin/docker pull consul:0.7.1
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/docker run --rm --name %n \
+                                  --net="host" \
+                                  -e 'CONSUL_ALLOW_PRIVILEGED_PORTS=' \
+                                  -v /consul/data:/consul/data \
+                                  consul:0.7.1 agent -retry-join=$${CONSUL_SERVER} -dns-port=53 -bind=$private_ipv4 -client=0.0.0.0 -recursor=$${FALLBACK_HOST_DNS}
+        ExecStop=/usr/bin/docker stop %n
+        RestartSec=650
+        Restart=always
+    - name: registrator.service
       command: start
-      drop-ins:
-        - name: 60-docker-wait-for-var-lib.conf
-          content: |
-              [Unit]
-              Requires=var-lib-docker.mount
-              After=var-lib-docker.mount
-              [Service]
-              Restart=always
-              RestartSec=5
+      enable: true
+      content: |
+        [Unit]
+        Description=Docker Registrator, Registers running docker containers with consul
+        After=docker.service
+        Requires=docker.service
+        After=consul-agent.service
+        Requires=consul-agent.service
+
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull gliderlabs/registrator:latest
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStartPre=-/usr/bin/sleep 10
+        ExecStart=/usr/bin/docker run --rm --name %n \
+                                  --net "host" \
+                                  -v /var/run/docker.sock:/tmp/docker.sock \
+                                  gliderlabs/registrator:latest consul://localhost:8500
+        ExecStop=/usr/bin/docker stop %n
+        RestartSec=660
+        Restart=always
     - name: data.mount
       content: |
         [Mount]
@@ -77,8 +86,8 @@ coreos:
         [Unit]
         Description=command
         [Service]
-        Type=oneshot
         RemainAfterExit=true
+        Type=oneshot
         Environment="EFS_DNS=${efs_dns}"
         ExecStart=/bin/sh -c "AZ_ZONE=$(curl -s -L http://169.254.169.254/latest/meta-data/placement/availability-zone); \
                               sed -i \"s/EFS_DNS/$AZ_ZONE.$EFS_DNS/\" /etc/systemd/system/data.mount; \
@@ -87,6 +96,32 @@ coreos:
 # 1- Append current availability-zone to EFS_DNS Substring
 # 2- Replace EFS_DNS with the resulting value in systemd file
 # 3- Restart the systemd unit
+    - name: filebeat.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Filebeat service, for beating logs and sending them to Logstash
+        Requires=docker.service
+        After=docker.service
+        Requires=runcmd.service
+        After=runcmd.service
+
+        [Service]
+        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment HOSTNAME=$(hostname -i)"
+        ExecStartPre=/usr/bin/docker pull stakater/filebeat-with-consul-template
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
+                                  --dns=$${HOSTNAME} \
+                                  --dns-search=service.consul \
+                                  -v /data/logs:/var/log/app \
+                                  -v /docker-data/filebeat/:/filebeat-data \
+                                  -v /admiral-config/filebeat/consul-templates:/templates \
+                                  -e SERVICE_NAME=filebeat \
+                                  stakater/filebeat-with-consul-template"
+        ExecStop=/usr/bin/docker stop %n
+        RestartSec=30
+        Restart=always
     - name: nginx.service
       command: start
       content: |
@@ -96,8 +131,16 @@ coreos:
         After=docker.service
         [Service]
         TimeoutStartSec=0
+        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment HOSTNAME=$(hostname -i)"
         ExecStartPre=-/usr/bin/docker rm %n
-        ExecStart=/usr/bin/docker run --rm --name %n -p 80:80 -v /nginx/conf:/etc/nginx/conf.d/ nginx
+        ExecStart=/usr/bin/docker run --rm \
+                                      --name %n \
+                                      --dns=$${HOSTNAME} \
+                                      --dns-search=service.consul \
+                                      -e SERVICE_NAME=nginx \
+                                      -p 80:80 \
+                                      -v /nginx/conf:/etc/nginx/conf.d/ \
+                                      nginx
         ExecStop=/usr/bin/docker stop %n
         [Install]
         WantedBy=multi-user.target
