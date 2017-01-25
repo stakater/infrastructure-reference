@@ -10,3 +10,4 @@ build
 
 # File backups
 *~
+.idea/

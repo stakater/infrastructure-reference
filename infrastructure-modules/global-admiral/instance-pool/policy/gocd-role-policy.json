@@ -58,6 +58,10 @@
             "s3:Put*"
         ],
         "Resource": [
+            "arn:aws:s3:::${dev_config_bucket_name}/admiral",
+            "arn:aws:s3:::${dev_config_bucket_name}/admiral/*",
+            "arn:aws:s3:::${qa_config_bucket_name}/admiral",
+            "arn:aws:s3:::${qa_config_bucket_name}/admiral/*",
             "arn:aws:s3:::${prod_config_bucket_name}/keypairs",
             "arn:aws:s3:::${prod_config_bucket_name}/keypairs/*",
             "arn:aws:s3:::${stage_config_bucket_name}/keypairs",

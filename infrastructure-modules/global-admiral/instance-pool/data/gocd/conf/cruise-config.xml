@@ -132,6 +132,18 @@
       </materials>
     </pipeline>
   </pipelines>
+  <pipelines group="Admiral">
+    <pipeline name="deploy-to-admiral-dev" template="stakater_deploy_admiral">
+      <params>
+        <param name="SOURCE_DIR" />
+        <param name="APP_NAME">logstash</param>
+        <param name="CLUSTER_ENV">dev</param>
+      </params>
+      <materials>
+        <git url="https://github.com/stakater/infrastructure-app-units" shallowClone="true" autoUpdate="false" />
+      </materials>
+    </pipeline>
+  </pipelines>
   <pipelines group="Manage_Dev_Servers">
     <pipeline name="Stop-Dev" template="stop_infra">
       <params>
@@ -203,6 +215,22 @@
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
                 <arg>/gocd-data/scripts/deploy-to-cluster.sh #{APP_NAME} #{CLUSTER_ENV} #{APP_DOCKER_IMAGE} "#{APP_DOCKER_OPTS}" "#{EXTRA_UNIT_OPTS}"</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="stakater_deploy_admiral">
+      <stage name="Deploy-to-Admiral">
+        <approval type="manual" />
+        <jobs>
+          <job name="Run">
+            <tasks>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>/gocd-data/scripts/deploy-to-admiral.sh -a "#{APP_NAME}" -e "#{CLUSTER_ENV}"</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -371,6 +399,7 @@
       <agents>
       </agents>
       <pipelines>
+        <pipeline name="deploy-to-admiral-dev" />
         <pipeline name="app-deploy-dev" />
         <pipeline name="app-deploy-qa" />
       </pipelines>

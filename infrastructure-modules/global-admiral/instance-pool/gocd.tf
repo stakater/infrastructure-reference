@@ -68,6 +68,8 @@ data "template_file" "gocd-policy" {
   vars {
     config_bucket_arn = "${module.config-bucket.arn}"
     cloudinit_bucket_arn = "${module.cloudinit-bucket.arn}"
+    dev_config_bucket_name = "${var.dev_config_bucket_name}"
+    qa_config_bucket_name = "${var.qa_config_bucket_name}"
     prod_config_bucket_name = "${var.prod_config_bucket_name}"
     prod_cloudinit_bucket_name = "${var.prod_cloudinit_bucket_name}"
     stage_config_bucket_name = "${var.stage_config_bucket_name}"
@@ -103,6 +105,8 @@ data "template_file" "gocd-params-tmpl" {
 
   vars {
     stack_name = "${var.stack_name}"
+    dev_config_bucket_name = "${var.dev_config_bucket_name}"
+    qa_config_bucket_name = "${var.qa_config_bucket_name}"
   }
 }
 

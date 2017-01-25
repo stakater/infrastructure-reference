@@ -18,6 +18,18 @@ TF_STATE_QA_KEY := qa/terraform.tfstate
 TF_STATE_PROD_KEY := prod/terraform.tfstate
 TF_STATE_STAGE_KEY := stage/terraform.tfstate
 
+# Dev env bucket names defined here, as these are to be allowed
+# in policy of the instance that deploys to stage (e.g. GoCD) and
+# are to be passed to pipelines by GoCD
+DEV_CLOUDINIT_BUCKET_NAME := $(STACK_NAME)-dev-cloudinit
+DEV_CONFIG_BUCKET_NAME := $(STACK_NAME)-dev-config
+
+# QA env bucket names defined here, as these are to be allowed
+# in policy of the instance that deploys to stage (e.g. GoCD) and
+# are to be passed to pipelines by GoCD
+QA_CLOUDINIT_BUCKET_NAME := $(STACK_NAME)-qa-cloudinit
+QA_CONFIG_BUCKET_NAME := $(STACK_NAME)-qa-config
+
 # Prod env bucket names defined here, as these are to be allowed
 # in policy of the instance that deploys to prod (e.g. GoCD) in order to
 # download cloudconfig and upload keypairs
