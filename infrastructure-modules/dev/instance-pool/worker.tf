@@ -91,6 +91,7 @@ data "template_file" "worker-user-data" {
     stack_name = "${var.stack_name}"
     efs_dns = "${replace(element(split(",", module.efs-mount-targets.dns-names), 0), "/^(.+?)\\./", "")}"
     # Using first value in the comma-separated list and remove the availability zone
+    global_admiral_config_bucket = "${data.terraform_remote_state.global-admiral.config-bucket-name}"
   }
 }
 

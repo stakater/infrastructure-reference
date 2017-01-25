@@ -19,6 +19,16 @@ coreos:
             EnvironmentFile=/etc/sysconfig/initial-cluster
     - name: fleet.service
       command: start
+    - name: update-initial-cluster.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description= Unit file to run update-initial-cluster script
+        [Service]
+        Type=oneshot
+        TimeoutStartSec=0
+        ExecStart=/usr/bin/sh -c "/opt/bin/update-initial-cluster.sh -b ${global_admiral_config_bucket}"
     - name: format-disk.service
       command: start
       content: |
@@ -113,3 +123,64 @@ write_files:
           }
         }
       }
+  - path: /opt/bin/update-initial-cluster.sh
+    permissions: 0700
+    owner: root
+    content: |
+        #!/bin/bash
+        # This script downloads the initial-cluster file from S3 buckets and updates etcd files
+
+        BUCKET_NAME=""
+        bOptionFlag=false;
+        # Get options from the command line
+        while getopts ":b:" OPTION
+        do
+            case $OPTION in
+                b)
+                  BUCKET_NAME=$OPTARG
+                  bOptionFlag=true;
+                  ;;
+                *)
+                  echo "Usage: $(basename $0) -b <Name of Bucket containing ETCD initial-cluster file>"
+                  exit 0
+                  ;;
+            esac
+        done
+
+        if ! $bOptionFlag
+        then
+          echo "Usage: $(basename $0) -b <Name of Bucket containing ETCD initial-cluster file>"
+          exit 0;
+        fi
+
+        # Download initial cluster file from S3 bucket
+        docker run -d --name aws-cli -v $(pwd)/aws-cli:/aws stakater/aws-cli aws s3 cp s3://$BUCKET_NAME/etcd/initial-cluster .
+
+        # Wait for file to download
+        sleep 5;
+
+        if [ ! -f $(pwd)/aws-cli/initial-cluster ];
+        then
+          echo "Initial Cluster file not found in $(pwd)/aws-cli/"
+          exit 1;
+        fi
+
+        # Copy it to specified locations
+        sudo cp $(pwd)/aws-cli/initial-cluster /etc/sysconfig/
+        sudo cp $(pwd)/aws-cli/initial-cluster /root/cloudinit
+
+        # Replace the new ip in the etcd cluster file
+        newip=$(cat $(pwd)/aws-cli/initial-cluster | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}');
+        if [ "$newip" != "" ];
+        then
+          sudo sed -i -r 's/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b'/$newip/ /var/lib/etcd2/proxy/cluster
+        fi
+
+        # Restart etcd and fleet
+        sudo systemctl restart etcd2
+        sudo systemctl restart fleet
+
+        # Cleanup
+        docker rm -vf aws-cli
+        sudo rm -rf $(pwd)/aws-cli
+        echo "Etcd initial cluster updated"
