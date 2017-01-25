@@ -1,0 +1,44 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "${config_bucket_arn}/admiral",
+        "${config_bucket_arn}/admiral/*",
+        "${cloudinit_bucket_arn}/admiral",
+        "${cloudinit_bucket_arn}/admiral/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:List*",
+        "s3:Get*"
+      ],
+      "Resource": [
+        "${global_admiral_config_bucket_arn}/etcd/initial-cluster"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:Describe*",
+        "autoscaling:Describe*"
+      ],
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+}
