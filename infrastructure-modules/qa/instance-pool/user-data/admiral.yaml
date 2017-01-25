@@ -5,8 +5,8 @@ coreos:
     listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
   fleet:
     public-ip: $private_ipv4
-    metadata: "env=${stack_name},platform=ec2,provider=aws,role=docker_registry"
-    etcd_key_prefix: "/stakater/dev/consul/server/"
+    metadata: "env=${stack_name},platform=ec2,provider=aws,role=admiral"
+    etcd_key_prefix: "/stakater/qa/admiral/"
   update:
     reboot-strategy: off
   units:
@@ -29,28 +29,70 @@ coreos:
         Type=oneshot
         TimeoutStartSec=0
         ExecStart=/usr/bin/sh -c "/opt/bin/update-initial-cluster.sh -b ${global_admiral_config_bucket}"
-    - name: consul.service
+    - name: s3sync-admiral.service
       command: start
       enable: true
       content: |
         [Unit]
-        Description=Consul Server
+        Description=Synchronizes local folder with Module's folder in S3 config bucket
         After=docker.service
         Requires=docker.service
-        After=etcd2.service
-        Requires=etcd2.service
 
         [Service]
         TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull stakater/s3sync
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/docker run --rm --name %n \
+                                  -e S3_BUCKET_LOCATION=${config_bucket_name}/${module_name} \
+                                  -v /admiral-config:/s3sync \
+                                  stakater/s3sync
+        ExecStop=/usr/bin/docker stop %n
+        RestartSec=30
+        Restart=always
+    - name: consul-agent.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Consul Agent
+        After=docker.service
+        Requires=docker.service
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment CONSUL_SERVER=$(etcdctl get /qa/consul/server/endpoint)"
+        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment FALLBACK_HOST_DNS=$(nslookup $(hostname -i) | grep 'Server' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')"
         ExecStartPre=/usr/bin/docker pull consul:0.7.1
         ExecStartPre=-/usr/bin/docker rm %n
-        ExecStartPre=/usr/bin/sh -c "etcdctl set /dev/consul/server/endpoint $private_ipv4"
         ExecStart=/usr/bin/docker run --rm --name %n \
                                   --net="host" \
+                                  -e 'CONSUL_ALLOW_PRIVILEGED_PORTS=' \
                                   -v /consul/data:/consul/data \
-                                  consul:0.7.1 agent -server -ui -bind=$private_ipv4 -client=0.0.0.0 -bootstrap
+                                  consul:0.7.1 agent -retry-join=$${CONSUL_SERVER} -dns-port=53 -bind=$private_ipv4 -client=0.0.0.0 -recursor=$${FALLBACK_HOST_DNS}
         ExecStop=/usr/bin/docker stop %n
         RestartSec=650
+        Restart=always
+    - name: registrator.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Docker Registrator, Registers running docker containers with consul
+        After=docker.service
+        Requires=docker.service
+        After=consul-agent.service
+        Requires=consul-agent.service
+
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull gliderlabs/registrator:latest
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStartPre=-/usr/bin/sleep 10
+        ExecStart=/usr/bin/docker run --rm --name %n \
+                                  --net "host" \
+                                  -v /var/run/docker.sock:/tmp/docker.sock \
+                                  gliderlabs/registrator:latest consul://localhost:8500
+        ExecStop=/usr/bin/docker stop %n
+        RestartSec=660
         Restart=always
 write_files:
   - path: /opt/bin/update-initial-cluster.sh

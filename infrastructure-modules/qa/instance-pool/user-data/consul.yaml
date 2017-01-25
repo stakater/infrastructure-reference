@@ -6,7 +6,7 @@ coreos:
   fleet:
     public-ip: $private_ipv4
     metadata: "env=${stack_name},platform=ec2,provider=aws,role=docker_registry"
-    etcd_key_prefix: "/stakater/dev/consul/server/"
+    etcd_key_prefix: "/stakater/qa/consul/server/"
   update:
     reboot-strategy: off
   units:
@@ -44,7 +44,7 @@ coreos:
         TimeoutStartSec=0
         ExecStartPre=/usr/bin/docker pull consul:0.7.1
         ExecStartPre=-/usr/bin/docker rm %n
-        ExecStartPre=/usr/bin/sh -c "etcdctl set /dev/consul/server/endpoint $private_ipv4"
+        ExecStartPre=/usr/bin/sh -c "etcdctl set /qa/consul/server/endpoint $private_ipv4"
         ExecStart=/usr/bin/docker run --rm --name %n \
                                   --net="host" \
                                   -v /consul/data:/consul/data \

@@ -1,0 +1,37 @@
+#######################################################################
+# This script is an additional user-data script to download filebeat
+# template
+# NOTE: This is not a standalone script and is to be used with
+#       combination of the bootstrap-user-data script.
+#######################################################################
+
+# aws_region variable from bootstrap-user-data.sh
+
+downloadDir="/etc/downloads"
+mkdir -m 700 -p $${downloadDir}
+cd $${downloadDir}
+
+filebeatTmplFile="worker/consul-templates/filebeat.ctmpl"
+
+qaConfigBucket="${qa_config_bucket}";
+resource="/$${qaConfigBucket}/$${filebeatTmplFile}"
+create_string_to_sign
+signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac $${s3Secret} -binary | base64)
+debug_log
+curl -s -L -O -H "Host: $${qaConfigBucket}.s3-$${aws_region}.amazonaws.com" \
+  -H "Content-Type: $${contentType}" \
+  -H "Authorization: AWS $${s3Key}:$${signature}" \
+  -H "x-amz-security-token:$${s3Token}" \
+  -H "Date: $${dateValue}" \
+  https://$${qaConfigBucket}.s3-$${aws_region}.amazonaws.com/$${filebeatTmplFile}
+
+# if filebeat.ctmpl file is downloaded and is a valid configfile copy to filebeat consul-templates location
+# else delete the downloaded files
+if [ -f $${downloadDir}/filebeat.ctmpl ] && grep -q "filebeat" $${downloadDir}/filebeat.ctmpl ;
+then
+  filebeatTmplDir="/admiral-config/filebeat/consul-templates/"
+  mkdir -p $${filebeatTmplDir}
+  cp $${downloadDir}/filebeat.ctmpl $${filebeatTmplDir}/filebeat.ctmpl
+else
+  rm -f $${filebeatTmplFile}/*
+fi

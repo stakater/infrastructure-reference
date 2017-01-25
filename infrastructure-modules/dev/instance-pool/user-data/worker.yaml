@@ -26,15 +26,6 @@ coreos:
         [Unit]
         Description= Unit file to run update-initial-cluster script
         [Service]
-        Type=oneshot
-        TimeoutStartSec=0
-        ExecStart=/usr/bin/sh -c "/opt/bin/update-initial-cluster.sh -b ${global_admiral_config_bucket}"
-      command: start
-      enable: true
-      content: |
-        [Unit]
-        Description= Unit file to run update-initial-cluster script
-        [Service]
         Type=oneshot
         TimeoutStartSec=0
         ExecStart=/usr/bin/sh -c "/opt/bin/update-initial-cluster.sh -b ${global_admiral_config_bucket}"

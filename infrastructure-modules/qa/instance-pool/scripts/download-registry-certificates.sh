@@ -4,7 +4,7 @@
 # NOTE: This is not a standalone script and is to be used with
 #       combination of the bootstrap-user-data script.
 #######################################################################
-aws_region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
+# aws_region variable from bootstrap-user-data.sh
 
 regCertDir="/etc/registry-certificates"
 mkdir -m 700 -p ${regCertDir}
