@@ -30,10 +30,10 @@
 
 module "config-bucket" {
   source = "github.com/stakater/blueprint-storage-aws.git//modules/s3"
-  name = "${var.stack_name}-qa-config"
+  name = "${var.qa_config_bucket_name}"
 }
 
 module "cloudinit-bucket" {
   source = "github.com/stakater/blueprint-storage-aws.git//modules/s3"
-  name = "${var.stack_name}-qa-cloudinit"
+  name = "${var.qa_cloudinit_bucket_name}"
 }
