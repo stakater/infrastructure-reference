@@ -1,0 +1,39 @@
+#cloud-config
+coreos:
+  etcd2:
+    proxy: on
+    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+  fleet:
+    public-ip: $private_ipv4
+    metadata: "env=${stack_name},platform=ec2,provider=aws,role=admiral"
+    etcd_key_prefix: "/stakater/dev/admiral/"
+  update:
+    reboot-strategy: off
+  units:
+    - name: etcd2.service
+      command: start
+      drop-ins:
+        - name: 60-initial-cluster.conf
+          content: |
+            [Service]
+            EnvironmentFile=/etc/sysconfig/initial-cluster
+    - name: fleet.service
+      command: start
+    - name: update-initial-cluster.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description= Unit file to run update-initial-cluster script
+        [Service]
+        Type=oneshot
+        TimeoutStartSec=0
+        ExecStart=/usr/bin/sh -c "/opt/bin/update-initial-cluster.sh -b ${global_admiral_config_bucket}"
+    - name: s3sync-admiral.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Synchronizes local folder with Module's folder in S3 config bucket
+        After=docker.service
+        Requires=docker.service
