@@ -30,10 +30,20 @@
 # limitations under the License. 
 ###############################################################################
 
+# This shell script cleans docker images
+#--------------------------------------------
+# Argument1: APP_DOCKER_IMAGE
+#--------------------------------------------
+
+APP_DOCKER_IMAGE=$1
+# Check number of parameters equals 1
+if [ "$#" -ne 1 ]; then
+    echo "ERROR: [Docker Clean Up] Illegal number of parameters"
+    exit 1
+fi
 
 # Delete orphaned docker images with <none> repository and tag
 #--------------------------------------------
-
 echo "Delete Empty Docker Images ...";
 deleteImage()
 {
@@ -42,7 +52,7 @@ deleteImage()
   bash -c "$images"
 }
 
-cmd="sudo docker images | grep 'none'"
+cmd="sudo docker images | grep 'none' | awk '{print $3}'"
 count=$(bash -c "$cmd")
 echo $count
 if [ -n "$count" ]
@@ -53,3 +63,14 @@ else
   echo "No empty Docker images found."
 fi
 
+# Delete Old tagged images
+old_images=$(sudo docker images | grep $APP_DOCKER_IMAGE | grep 'latest' -v | awk 'NR!=1{print $3}')
+
+if [[ ! -z "$old_images" ]]
+then
+  echo "Old images with tags are $old_images."
+  echo "Deleting them"
+  sudo docker rmi $old_images
+else
+  echo "No Old images with tags found"
+fi

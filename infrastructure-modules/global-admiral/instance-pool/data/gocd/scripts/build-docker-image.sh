@@ -90,15 +90,15 @@ sudo docker push ${APP_DOCKER_IMAGE}
 
 newTag=${APP_DOCKER_IMAGE}:${APP_IMAGE_BUILD_VERSION}
 echo ${newTag}
-sudo docker tag -f ${APP_DOCKER_IMAGE} ${newTag}
+sudo docker tag ${APP_DOCKER_IMAGE} ${newTag}
 sudo docker push ${newTag}
 
 # Delete unwanted images/containers
-sudo docker rmi -f ${SIMPLE_APP_NAME}${ENVIRONMENT}_compile
-sudo docker rmi -f ${SIMPLE_APP_NAME}${ENVIRONMENT}_test
-sudo docker rmi -f ${SIMPLE_APP_NAME}${ENVIRONMENT}_app
 sudo docker rm -vf ${SIMPLE_APP_NAME}${ENVIRONMENT}_app_1
+sudo docker rmi ${SIMPLE_APP_NAME}${ENVIRONMENT}_compile
+sudo docker rmi ${SIMPLE_APP_NAME}${ENVIRONMENT}_test
+sudo docker rmi ${SIMPLE_APP_NAME}${ENVIRONMENT}_app
 
 # Delete empty docker images
-/gocd-data/scripts/docker-cleanup.sh
+/gocd-data/scripts/docker-cleanup.sh $APP_DOCKER_IMAGE
 
