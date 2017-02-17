@@ -1,33 +1,33 @@
-#!/bin/bash 
+#!/bin/bash
 
-############################################################################### 
-# Copyright 2016 Aurora Solutions 
-# 
-#    http://www.aurorasolutions.io 
-# 
-# Aurora Solutions is an innovative services and product company at 
-# the forefront of the software industry, with processes and practices 
-# involving Domain Driven Design(DDD), Agile methodologies to build 
+###############################################################################
+# Copyright 2016 Aurora Solutions
+#
+#    http://www.aurorasolutions.io
+#
+# Aurora Solutions is an innovative services and product company at
+# the forefront of the software industry, with processes and practices
+# involving Domain Driven Design(DDD), Agile methodologies to build
 # scalable, secure, reliable and high performance products.
-# 
-# Stakater is an Infrastructure-as-a-Code DevOps solution to automate the 
-# creation of web infrastructure stack on Amazon. Stakater is a collection 
-# of Blueprints; where each blueprint is an opinionated, reusable, tested, 
-# supported, documented, configurable, best-practices definition of a piece 
-# of infrastructure. Stakater is based on Docker, CoreOS, Terraform, Packer, 
-# Docker Compose, GoCD, Fleet, ETCD, and much more. 
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); 
-# you may not use this file except in compliance with the License. 
-# You may obtain a copy of the License at 
-# 
-#    http://www.apache.org/licenses/LICENSE-2.0 
-# 
-# Unless required by applicable law or agreed to in writing, software 
-# distributed under the License is distributed on an "AS IS" BASIS, 
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-# See the License for the specific language governing permissions and 
-# limitations under the License. 
+#
+# Stakater is an Infrastructure-as-a-Code DevOps solution to automate the
+# creation of web infrastructure stack on Amazon. Stakater is a collection
+# of Blueprints; where each blueprint is an opinionated, reusable, tested,
+# supported, documented, configurable, best-practices definition of a piece
+# of infrastructure. Stakater is based on Docker, CoreOS, Terraform, Packer,
+# Docker Compose, GoCD, Fleet, ETCD, and much more.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 ###############################################################################
 
 
@@ -39,7 +39,7 @@
 # Argument4: BUILD_UUID
 # Argument5: APP_DOCKER_IMAGE
 # Argument6: APP_DOCKER_OPTS
-# Argument7: PROD_CLOUDINIT_S3_FULL_PATH - path to prodcution enviornment's cloudinit file in s3 (e.g. bucket-name/file/location)
+# Argument7: CLOUDINIT_S3_FULL_PATH - path to prodcution enviornment's cloudinit file in s3 (e.g. bucket-name/file/location)
 # Argument8: DATA_EBS_DEVICE_NAME: Data device name
 # Argument9: DATA_EBS_VOL_SIZE: data device size
 # Argument10: LOGS_EBS_DEVICE_NAME: logs device name
@@ -56,13 +56,15 @@ APP_IMAGE_BUILD_VERSION=""
 BUILD_UUID=""
 APP_DOCKER_IMAGE=""
 APP_DOCKER_OPTS=""
+EXTRA_CLOUDCONFIG_UNITS=""
 CLOUDINIT_S3_FULL_PATH=""
+BAKER_INSTANCE_TYPE=""
 DATA_EBS_DEVICE_NAME=""
 DATA_EBS_VOL_SIZE=""
 LOGS_EBS_DEVICE_NAME=""
 LOGS_EBS_VOL_SIZE=""
 
-# Flags to make sure all options are given
+# Flags to make sure required all options are given
 aOptionFlag=false;
 bOptionFlag=false;
 uOptionFlag=false;
@@ -71,7 +73,7 @@ oOptionFlag=false;
 rOptionFlag=false;
 volOptionCnt=0;
 # Get options from the command line
-while getopts ":a:b:u:d:o:c:e:z:l:x:r:" OPTION
+while getopts ":a:b:u:d:o:c:y:e:z:l:x:r:i:" OPTION
 do
     case $OPTION in
         a)
@@ -101,6 +103,10 @@ do
         c)
           CLOUDINIT_S3_FULL_PATH=$OPTARG #optional
           ;;
+        y)
+          dOptionFlag=true; # Set APP_DOCKER_IMAGE option to true, so that either(or both) of APP_DOCKER_IMAGE or EXTRA_CLOUDCONFIG_UNITS must be specified
+          EXTRA_CLOUDCONFIG_UNITS=$OPTARG
+          ;;
         e)
           volOptionCnt=$((volOptionCnt+1));
           DATA_EBS_DEVICE_NAME=$OPTARG
@@ -117,16 +123,19 @@ do
           volOptionCnt=$((volOptionCnt-1));
           LOGS_EBS_VOL_SIZE=$OPTARG
           ;;
+        i)
+          BAKER_INSTANCE_TYPE=$OPTARG
+          ;;
         *)
-          echo "Usage: $(basename $0) -a <APP NAME> -b <APP IMAGE BUILD VERSION> -r <ENVIRONMENT> -u <Build UUID> -d <APP DOCKER IMAGE>  -o <APP DOCKER OPTIONS> -c <Full path (incl bucket name) of cloud config file> (optional) -e <EBS data volume device name> -z <EBS data volume device size> -l <EBS logs volume device name> -x <EBS logs volume size>"
-          exit 0
+          echo "Usage: $(basename $0) -a <APP NAME> -b <APP IMAGE BUILD VERSION> -r <ENVIRONMENT> -u <Build UUID> -d <APP DOCKER IMAGE>(or -y <EXTRA_CLOUDCONFIG_UNITS>)  -o <APP DOCKER OPTIONS> -c <Full path (incl bucket name) of cloud config file> (optional) -e <EBS data volume device name> -z <EBS data volume device size> -l <EBS logs volume device name> -x <EBS logs volume size> -i <baker instance type> (optional)"
+          exit 1
           ;;
     esac
 done
 if [[ ! $aOptionFlag || ! $bOptionFlag || ! $uOptionFlag || ! $dOptionFlag || ! $oOptionFlag || ! $rOptionFlag ]] || [[ $volOptionCnt -ne  0 ]] ;
 then
-  echo "Usage: $(basename $0) -a <APP NAME> -b <APP IMAGE BUILD VERSION> -r <ENVIRONMENT> -u <Build UUID> -d <APP DOCKER IMAGE> -o <APP DOCKER OPTIONS> -c <Full path (incl bucket name) of cloud config file> (optional) -e <EBS data volume device name> -z <EBS data volume device size> -l <EBS logs volume device name> -x <EBS logs volume size>"
-  exit 0;
+  echo "Usage: $(basename $0) -a <APP NAME> -b <APP IMAGE BUILD VERSION> -r <ENVIRONMENT> -u <Build UUID> -d <APP DOCKER IMAGE>(or -y <EXTRA_CLOUDCONFIG_UNITS>) -o <APP DOCKER OPTIONS> -c <Full path (incl bucket name) of cloud config file> (optional) -e <EBS data volume device name> -z <EBS data volume device size> -l <EBS logs volume device name> -x <EBS logs volume size> -i <baker instance type> (optional)"
+  exit 1;
 fi
 
 # AMI Baker
@@ -183,7 +192,7 @@ then
 fi;
 
 # Bake AMI
-sudo docker exec packer_${GO_PIPELINE_NAME} /bin/bash -c "./bake-ami.sh -r $aws_region -v $vpc_id -s $subnet_id -b $build_uuid -n ${APP_NAME}_${ENVIRONMENT}_${APP_IMAGE_BUILD_VERSION} -c ${CLOUD_CONFIG_TMPL_PATH} -d ${APP_DOCKER_IMAGE} -o \"${APP_DOCKER_OPTS}\" -g $docker_registry_path -e \"${DATA_EBS_DEVICE_NAME}\" -z \"${DATA_EBS_VOL_SIZE}\" -l \"${LOGS_EBS_DEVICE_NAME}\" -x \"${LOGS_EBS_VOL_SIZE}\""
+sudo docker exec packer_${GO_PIPELINE_NAME} /bin/bash -c "./bake-ami.sh -r $aws_region -v $vpc_id -s $subnet_id -b $build_uuid -n ${APP_NAME}_${ENVIRONMENT}_${APP_IMAGE_BUILD_VERSION} -c ${CLOUD_CONFIG_TMPL_PATH} -y '${EXTRA_CLOUDCONFIG_UNITS}' -d \"${APP_DOCKER_IMAGE}\" -o \"${APP_DOCKER_OPTS}\" -g \"$docker_registry_path\" -e \"${DATA_EBS_DEVICE_NAME}\" -z \"${DATA_EBS_VOL_SIZE}\" -l \"${LOGS_EBS_DEVICE_NAME}\" -x \"${LOGS_EBS_VOL_SIZE}\" -i \"${BAKER_INSTANCE_TYPE}\""
 
 aws_describe_json=$(aws ec2 describe-images --region $aws_region --filters Name=tag:BuildUUID,Values=${build_uuid});
 AMI_ID=$(echo "$aws_describe_json" | jq --raw-output '.Images[0].ImageId');
