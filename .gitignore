@@ -1,6 +1,6 @@
 build
 .vagrant
-
+.idea
 # Compiled files
 *.tfstate
 *.tfstate.backup
@@ -10,4 +10,3 @@ build
 
 # File backups
 *~
-.idea/
