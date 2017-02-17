@@ -21,10 +21,15 @@ fileList+=("gocd/conf/sudoers")
 fileList+=("gocd/conf/cruise-config.xml")
 fileList+=("gocd/conf/passwd")
 fileList+=("gocd/scripts/build-ami.sh")
+fileList+=("gocd/scripts/build-admiral-ami.sh")
 fileList+=("gocd/scripts/clone-deployment-application-code.sh")
+fileList+=("gocd/scripts/clean-up.sh")
 fileList+=("gocd/scripts/build-docker-image.sh")
 fileList+=("gocd/scripts/deploy-to-cluster.sh")
+fileList+=("gocd/scripts/deploy-to-admiral.sh")
+fileList+=("gocd/scripts/deploy-to-admiral-ami.sh")
 fileList+=("gocd/scripts/deploy-to-prod.sh")
+fileList+=("gocd/scripts/destroy-BG-group.sh")
 fileList+=("gocd/scripts/docker-cleanup.sh")
 fileList+=("gocd/scripts/gocd.parameters.txt")
 fileList+=("gocd/scripts/bg.parameters.txt")
@@ -36,8 +41,10 @@ fileList+=("gocd/scripts/test-code.sh")
 fileList+=("gocd/scripts/update-blue-green-deployment-groups.sh")
 fileList+=("gocd/scripts/update-deployment-state.sh")
 fileList+=("gocd/scripts/compile-code.sh")
+fileList+=("gocd/scripts/delete-ami.sh")
 fileList+=("gocd/scripts/write-ami-parameters.sh")
 fileList+=("gocd/scripts/write-terraform-variables.sh")
+fileList+=("gocd/scripts/sort-and-combine-comma-separated-list.sh")
 fileList+=("gocd/scripts/resume-ASG-processes.sh")
 fileList+=("gocd/scripts/start-infra.sh")
 fileList+=("gocd/scripts/start-instances.sh")
@@ -112,9 +119,17 @@ if [ -f ${gocdDownloadDir}/build-ami.sh ] ;
 then
   cp ${gocdDownloadDir}/build-ami.sh ${gocdScriptsDir}/build-ami.sh
 fi
+if [ -f ${gocdDownloadDir}/build-admiral-ami.sh ] ;
+then
+  cp ${gocdDownloadDir}/build-admiral-ami.sh ${gocdScriptsDir}/build-admiral-ami.sh
+fi
 if [ -f ${gocdDownloadDir}/clone-deployment-application-code.sh ] ;
 then
   cp ${gocdDownloadDir}/clone-deployment-application-code.sh ${gocdScriptsDir}/clone-deployment-application-code.sh
+fi
+if [ -f ${gocdDownloadDir}/clean-up.sh ] ;
+then
+  cp ${gocdDownloadDir}/clean-up.sh ${gocdScriptsDir}/clean-up.sh
 fi
 if [ -f ${gocdDownloadDir}/build-docker-image.sh ] ;
 then
@@ -124,9 +139,21 @@ if [ -f ${gocdDownloadDir}/deploy-to-cluster.sh ] ;
 then
   cp ${gocdDownloadDir}/deploy-to-cluster.sh ${gocdScriptsDir}/deploy-to-cluster.sh
 fi
+if [ -f ${gocdDownloadDir}/deploy-to-admiral.sh ] ;
+then
+  cp ${gocdDownloadDir}/deploy-to-admiral.sh ${gocdScriptsDir}/deploy-to-admiral.sh
+fi
+if [ -f ${gocdDownloadDir}/deploy-to-admiral-ami.sh ] ;
+then
+  cp ${gocdDownloadDir}/deploy-to-admiral-ami.sh ${gocdScriptsDir}/deploy-to-admiral-ami.sh
+fi
 if [ -f ${gocdDownloadDir}/deploy-to-prod.sh ] ;
 then
   cp ${gocdDownloadDir}/deploy-to-prod.sh ${gocdScriptsDir}/deploy-to-prod.sh
+fi
+if [ -f ${gocdDownloadDir}/destroy-BG-group.sh ] ;
+then
+  cp ${gocdDownloadDir}/destroy-BG-group.sh ${gocdScriptsDir}/destroy-BG-group.sh
 fi
 if [ -f ${gocdDownloadDir}/docker-cleanup.sh ] ;
 then
@@ -172,6 +199,10 @@ if [ -f ${gocdDownloadDir}/compile-code.sh ] ;
 then
   cp ${gocdDownloadDir}/compile-code.sh ${gocdScriptsDir}/compile-code.sh
 fi
+if [ -f ${gocdDownloadDir}/delete-ami.sh ] ;
+then
+  cp ${gocdDownloadDir}/delete-ami.sh ${gocdScriptsDir}/delete-ami.sh
+fi
 if [ -f ${gocdDownloadDir}/write-ami-parameters.sh ] ;
 then
   cp ${gocdDownloadDir}/write-ami-parameters.sh ${gocdScriptsDir}/write-ami-parameters.sh
@@ -179,6 +210,10 @@ fi
 if [ -f ${gocdDownloadDir}/write-terraform-variables.sh ] ;
 then
   cp ${gocdDownloadDir}/write-terraform-variables.sh ${gocdScriptsDir}/write-terraform-variables.sh
+fi
+if [ -f ${gocdDownloadDir}/sort-and-combine-comma-separated-list.sh ] ;
+then
+  cp ${gocdDownloadDir}/sort-and-combine-comma-separated-list.sh ${gocdScriptsDir}/sort-and-combine-comma-separated-list.sh
 fi
 if [ -f ${gocdDownloadDir}/resume-ASG-processes.sh ] ;
 then

@@ -107,11 +107,13 @@ data "template_file" "gocd-params-tmpl" {
     stack_name = "${var.stack_name}"
     dev_config_bucket_name = "${var.dev_config_bucket_name}"
     qa_config_bucket_name = "${var.qa_config_bucket_name}"
+    stage_config_bucket_name = "${var.stage_config_bucket_name}"
+    prod_config_bucket_name = "${var.prod_config_bucket_name}"
   }
 }
 
 data "template_file" "gocd-bg-deploy-params-tmpl" {
-  template = "${file("./data/gocd/scripts/BG.parameters.txt.tmpl")}"
+  template = "${file("./data/gocd/scripts/bg.parameters.txt.tmpl")}"
 
   vars {
     tf_state_bucket_name = "${var.tf_state_bucket_name}"
@@ -151,20 +153,45 @@ resource "aws_s3_bucket_object" "gocd_compile_code" {
   key = "gocd/scripts/compile-code.sh"
   source = "./data/gocd/scripts/compile-code.sh"
 }
+resource "aws_s3_bucket_object" "gocd_delete_ami" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/delete-ami.sh"
+  source = "./data/gocd/scripts/delete-ami.sh"
+}
 resource "aws_s3_bucket_object" "gocd_deploy_to_cluster" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/deploy-to-cluster.sh"
   source = "./data/gocd/scripts/deploy-to-cluster.sh"
+}
+resource "aws_s3_bucket_object" "gocd_deploy_to_admiral" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/deploy-to-admiral.sh"
+  source = "./data/gocd/scripts/deploy-to-admiral.sh"
+}
+resource "aws_s3_bucket_object" "gocd_deploy_to_admiral_ami" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/deploy-to-admiral-ami.sh"
+  source = "./data/gocd/scripts/deploy-to-admiral-ami.sh"
 }
 resource "aws_s3_bucket_object" "gocd_deploy_to_prod" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/deploy-to-prod.sh"
   source = "./data/gocd/scripts/deploy-to-prod.sh"
 }
+resource "aws_s3_bucket_object" "gocd_destroy_BG_group" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/destroy-BG-group.sh"
+  source = "./data/gocd/scripts/destroy-BG-group.sh"
+}
 resource "aws_s3_bucket_object" "gocd_docker_cleanup" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/docker-cleanup.sh"
   source = "./data/gocd/scripts/docker-cleanup.sh"
+}
+resource "aws_s3_bucket_object" "gocd_clean-up" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/clean-up.sh"
+  source = "./data/gocd/scripts/clean-up.sh"
 }
 resource "aws_s3_bucket_object" "gocd_gocd_parameters" {
   bucket = "${module.config-bucket.bucket_name}"
@@ -220,6 +247,11 @@ resource "aws_s3_bucket_object" "gocd_write_terraform_variables" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/write-terraform-variables.sh"
   source = "./data/gocd/scripts/write-terraform-variables.sh"
+}
+resource "aws_s3_bucket_object" "sort-and-combine-script" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/sort-and-combine-comma-separated-list.sh"
+  source = "./data/gocd/scripts/sort-and-combine-comma-separated-list.sh"
 }
 resource "aws_s3_bucket_object" "gocd_resume_ASG_processes" {
   bucket = "${module.config-bucket.bucket_name}"
