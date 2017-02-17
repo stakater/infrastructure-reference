@@ -69,7 +69,7 @@ coreos:
                                   -v /consul/data:/consul/data \
                                   consul:0.7.1 agent -retry-join=$${CONSUL_SERVER} -dns-port=53 -bind=$private_ipv4 -client=0.0.0.0 -recursor=$${FALLBACK_HOST_DNS}
         ExecStop=/usr/bin/docker stop %n
-        RestartSec=650
+        RestartSec=100
         Restart=always
     - name: registrator.service
       command: start
@@ -92,7 +92,7 @@ coreos:
                                   -v /var/run/docker.sock:/tmp/docker.sock \
                                   gliderlabs/registrator:latest consul://localhost:8500
         ExecStop=/usr/bin/docker stop %n
-        RestartSec=660
+        RestartSec=120
         Restart=always
 write_files:
   - path: /opt/bin/update-initial-cluster.sh
@@ -126,7 +126,7 @@ write_files:
         fi
 
         # Download initial cluster file from S3 bucket
-        docker run -d --name aws-cli -v $(pwd)/aws-cli:/aws stakater/aws-cli aws s3 cp s3://$BUCKET_NAME/etcd/initial-cluster .
+        docker run --rm --name aws-cli -v $(pwd)/aws-cli:/aws stakater/aws-cli aws s3 cp s3://$BUCKET_NAME/etcd/initial-cluster .
 
         # Wait for file to download
         sleep 5;
@@ -153,6 +153,6 @@ write_files:
         sudo systemctl restart fleet
 
         # Cleanup
-        docker rm -vf aws-cli
+
         sudo rm -rf $(pwd)/aws-cli
         echo "Etcd initial cluster updated"

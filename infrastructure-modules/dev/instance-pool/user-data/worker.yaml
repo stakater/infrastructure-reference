@@ -117,7 +117,7 @@ coreos:
                                   -v /data/logs:/var/log/app \
                                   -v /docker-data/filebeat/:/filebeat-data \
                                   -v /admiral-config/filebeat/consul-templates:/templates \
-                                  -e SERVICE_NAME=filebeat \
+                                  -l SERVICE_NAME=filebeat \
                                   stakater/filebeat-with-consul-template"
         ExecStop=/usr/bin/docker stop %n
         RestartSec=30
@@ -137,7 +137,7 @@ coreos:
                                       --name %n \
                                       --dns=$${HOSTNAME} \
                                       --dns-search=service.consul \
-                                      -e SERVICE_NAME=nginx \
+                                      -l SERVICE_NAME=nginx \
                                       -p 80:80 \
                                       -v /nginx/conf:/etc/nginx/conf.d/ \
                                       nginx
@@ -197,7 +197,7 @@ write_files:
         fi
 
         # Download initial cluster file from S3 bucket
-        docker run -d --name aws-cli -v $(pwd)/aws-cli:/aws stakater/aws-cli aws s3 cp s3://$BUCKET_NAME/etcd/initial-cluster .
+        docker run --rm --name aws-cli -v $(pwd)/aws-cli:/aws stakater/aws-cli aws s3 cp s3://$BUCKET_NAME/etcd/initial-cluster .
 
         # Wait for file to download
         sleep 5;
@@ -208,15 +208,25 @@ write_files:
           exit 1;
         fi
 
-        # Copy it to specified locations
-        sudo cp $(pwd)/aws-cli/initial-cluster /etc/sysconfig/
-        sudo cp $(pwd)/aws-cli/initial-cluster /root/cloudinit
+        initialClusterLocation="/etc/sysconfig"
 
-        # Replace the new ip in the etcd cluster file
-        newip=$(cat $(pwd)/aws-cli/initial-cluster | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}');
-        if [ "$newip" != "" ];
+        # check whether initial cluster is already downloaded or not
+        if [ ! -f "$initialClusterLocation"/initial-cluster ];
         then
-          sudo sed -i -r 's/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b'/$newip/ /var/lib/etcd2/proxy/cluster
+          sudo mkdir -p $initialClusterLocation;
+          # Copy it to specified locations
+          sudo cp $(pwd)/aws-cli/initial-cluster $initialClusterLocation
+        else
+          # Copy it to specified locations
+          sudo cp $(pwd)/aws-cli/initial-cluster $initialClusterLocation
+          sudo cp $(pwd)/aws-cli/initial-cluster /root/cloudinit
+
+          # Replace the new ip in the etcd cluster file
+          newip=$(cat $(pwd)/aws-cli/initial-cluster | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}');
+          if [ "$newip" != "" ];
+          then
+            sudo sed -i -r 's/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b'/$newip/ /var/lib/etcd2/proxy/cluster
+          fi
         fi
 
         # Restart etcd and fleet
@@ -224,6 +234,6 @@ write_files:
         sudo systemctl restart fleet
 
         # Cleanup
-        docker rm -vf aws-cli
+
         sudo rm -rf $(pwd)/aws-cli
         echo "Etcd initial cluster updated"
