@@ -1,0 +1,34 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "${config_bucket_arn}/tools-portal",
+        "${config_bucket_arn}/tools-portal/*",
+        "${cloudinit_bucket_arn}/tools-portal",
+        "${cloudinit_bucket_arn}/tools-portal/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:List*",
+        "s3:Get*"
+      ],
+      "Resource": [
+        "${config_bucket_arn}/consul/consul-server-ip"
+      ]
+    }
+  ]
+}
