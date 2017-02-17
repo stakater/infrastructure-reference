@@ -6,9 +6,14 @@ gocd_global_admiral: plan_gocd_global_admiral
 	            -target aws_s3_bucket_object.clone_deployment_application_code \
                 -target aws_s3_bucket_object.gocd_build_docker_image \
                 -target aws_s3_bucket_object.gocd_compile_code \
+			    -target aws_s3_bucket_object.gocd_delete_ami \
                 -target aws_s3_bucket_object.gocd_deploy_to_cluster \
+                -target aws_s3_bucket_object.gocd_deploy_to_admiral \
+                -target aws_s3_bucket_object.gocd_deploy_to_admiral_ami \
                 -target aws_s3_bucket_object.gocd_deploy_to_prod \
+                -target aws_s3_bucket_object.gocd_destroy_BG_group \
                 -target aws_s3_bucket_object.gocd_docker_cleanup \
+                -target aws_s3_bucket_object.gocd_clean-up \
                 -target aws_s3_bucket_object.gocd_gocd_parameters \
                 -target aws_s3_bucket_object.gocd_bg_deploy_params \
                 -target aws_s3_bucket_object.gocd_read_parameter \
@@ -20,7 +25,8 @@ gocd_global_admiral: plan_gocd_global_admiral
                 -target aws_s3_bucket_object.gocd_update_deployment_state \
                 -target aws_s3_bucket_object.gocd_write_ami_parameters \
                 -target aws_s3_bucket_object.gocd_write_terraform_variables \
-                -target aws_s3_bucket_object.gocd_resume_ASG_processes \
+                -target aws_s3_bucket_object.sort-and-combine-script \
+				-target aws_s3_bucket_object.gocd_resume_ASG_processes \
                 -target aws_s3_bucket_object.gocd_start_infra \
                 -target aws_s3_bucket_object.gocd_start_instances \
                 -target aws_s3_bucket_object.gocd_stop_infra \
@@ -48,9 +54,14 @@ plan_gocd_global_admiral: init_gocd_global_admiral
                -target aws_s3_bucket_object.clone_deployment_application_code \
                -target aws_s3_bucket_object.gocd_build_docker_image \
                -target aws_s3_bucket_object.gocd_compile_code \
+			   -target aws_s3_bucket_object.gocd_delete_ami \
                -target aws_s3_bucket_object.gocd_deploy_to_cluster \
+               -target aws_s3_bucket_object.gocd_deploy_to_admiral \
+               -target aws_s3_bucket_object.gocd_deploy_to_admiral_ami \
                -target aws_s3_bucket_object.gocd_deploy_to_prod \
+               -target aws_s3_bucket_object.gocd_destroy_BG_group \
                -target aws_s3_bucket_object.gocd_docker_cleanup \
+               -target aws_s3_bucket_object.gocd_clean-up \
                -target aws_s3_bucket_object.gocd_gocd_parameters \
                -target aws_s3_bucket_object.gocd_bg_deploy_params \
                -target aws_s3_bucket_object.gocd_read_parameter \
@@ -62,6 +73,7 @@ plan_gocd_global_admiral: init_gocd_global_admiral
                -target aws_s3_bucket_object.gocd_update_deployment_state \
                -target aws_s3_bucket_object.gocd_write_ami_parameters \
                -target aws_s3_bucket_object.gocd_write_terraform_variables \
+               -target aws_s3_bucket_object.sort-and-combine-script \
                -target aws_s3_bucket_object.gocd_resume_ASG_processes \
                -target aws_s3_bucket_object.gocd_start_infra \
                -target aws_s3_bucket_object.gocd_start_instances \
@@ -88,9 +100,14 @@ refresh_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
 	            	-target aws_s3_bucket_object.clone_deployment_application_code \
                     -target aws_s3_bucket_object.gocd_build_docker_image \
                     -target aws_s3_bucket_object.gocd_compile_code \
+                    -target aws_s3_bucket_object.gocd_delete_ami \
                     -target aws_s3_bucket_object.gocd_deploy_to_cluster \
+                	-target aws_s3_bucket_object.gocd_deploy_to_admiral \
+                	-target aws_s3_bucket_object.gocd_deploy_to_admiral_ami \
                     -target aws_s3_bucket_object.gocd_deploy_to_prod \
+                    -target aws_s3_bucket_object.gocd_destroy_BG_group \
                     -target aws_s3_bucket_object.gocd_docker_cleanup \
+                	-target aws_s3_bucket_object.gocd_clean-up \
                     -target aws_s3_bucket_object.gocd_gocd_parameters \
                     -target aws_s3_bucket_object.gocd_bg_deploy_params \
                     -target aws_s3_bucket_object.gocd_read_parameter \
@@ -102,6 +119,7 @@ refresh_gocd_global_admiral: | $(TF_PROVIDER_GLOBAL_ADMIRAL) pull_global_admiral
                     -target aws_s3_bucket_object.gocd_update_deployment_state \
                     -target aws_s3_bucket_object.gocd_write_ami_parameters \
                     -target aws_s3_bucket_object.gocd_write_terraform_variables \
+                	-target aws_s3_bucket_object.sort-and-combine-script \
                     -target aws_s3_bucket_object.gocd_resume_ASG_processes \
                     -target aws_s3_bucket_object.gocd_start_infra \
                     -target aws_s3_bucket_object.gocd_start_instances \
@@ -134,13 +152,18 @@ destroy_gocd_global_admiral: init_gocd_global_admiral
                   -target module.gocd.module.auto-scaling-group \
                   -target module.gocd.module.launch-configuration \
                   -target aws_s3_bucket_object.gocd_cloud_config \
-		          		-target aws_s3_bucket_object.gocd_build_ami \
-		          		-target aws_s3_bucket_object.clone_deployment_application_code \
+				  -target aws_s3_bucket_object.gocd_build_ami \
+				  -target aws_s3_bucket_object.clone_deployment_application_code \
                   -target aws_s3_bucket_object.gocd_build_docker_image \
                   -target aws_s3_bucket_object.gocd_compile_code \
+                  -target aws_s3_bucket_object.gocd_delete_ami \
                   -target aws_s3_bucket_object.gocd_deploy_to_prod \
+                  -target aws_s3_bucket_object.gocd_destroy_BG_group \
                   -target aws_s3_bucket_object.gocd_deploy_to_cluster \
+                  -target aws_s3_bucket_object.gocd_deploy_to_admiral \
+                  -target aws_s3_bucket_object.gocd_deploy_to_admiral_ami \
                   -target aws_s3_bucket_object.gocd_docker_cleanup \
+                  -target aws_s3_bucket_object.gocd_clean-up \
                   -target aws_s3_bucket_object.gocd_bg_deploy_params \
                   -target aws_s3_bucket_object.gocd_gocd_parameters \
                   -target aws_s3_bucket_object.gocd_read_parameter \
@@ -152,6 +175,7 @@ destroy_gocd_global_admiral: init_gocd_global_admiral
                   -target aws_s3_bucket_object.gocd_update_blue_green_deployment_groups \
                   -target aws_s3_bucket_object.gocd_update_deployment_state \
                   -target aws_s3_bucket_object.gocd_write_terraform_variables \
+                  -target aws_s3_bucket_object.sort-and-combine-script \
                   -target aws_s3_bucket_object.gocd_resume_ASG_processes \
                   -target aws_s3_bucket_object.gocd_start_infra \
                   -target aws_s3_bucket_object.gocd_start_instances \

@@ -10,6 +10,7 @@ worker_dev: plan_worker_dev
 							-target module.worker \
 							-target aws_route53_record.worker \
 							-target aws_route53_record.worker-internal \
+							-target aws_route53_record.worker-dev-internal \
 							-target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
 							-target aws_security_group_rule.sg-worker-ssh \
 							-target aws_security_group_rule.sg-worker-outgoing \
@@ -31,6 +32,7 @@ plan_worker_dev: init_worker_dev
 						 -target module.worker \
 						 -target aws_route53_record.worker \
 						 -target aws_route53_record.worker-internal \
+						 -target aws_route53_record.worker-dev-internal \
 						 -target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
 						 -target aws_security_group_rule.sg-worker-ssh \
 						 -target aws_security_group_rule.sg-worker-outgoing \
@@ -50,6 +52,7 @@ refresh_worker_dev: | $(TF_PROVIDER_DEV) pull_dev_state
 								-target module.worker \
 								-target aws_route53_record.worker \
 								-target aws_route53_record.worker-internal \
+								-target aws_route53_record.worker-dev-internal \
 								-target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
 								-target aws_security_group_rule.sg-worker-ssh \
 								-target aws_security_group_rule.sg-worker-outgoing \
@@ -69,8 +72,9 @@ destroy_worker_dev: | $(TF_PROVIDER_DEV) pull_dev_state
 								-target aws_security_group_rule.sg-worker-fleet \
 								-target aws_lb_cookie_stickiness_policy.worker-elb-stickiness-policy \
 								-target aws_route53_record.worker-internal \
-	              -target aws_route53_record.worker \
-	              -target module.worker \
+								-target aws_route53_record.worker-dev-internal \
+	             				-target aws_route53_record.worker \
+								-target module.worker \
 								-target module.worker-scale-up-policy \
 								-target module.worker-scale-down-policy \
 								-target module.worker.module.auto-scaling-group \
