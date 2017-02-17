@@ -1,3 +1,4 @@
+STACK_NAME=${stack_name}
 DOCKER_REGISTRY=registry.${stack_name}.local:80
 DEV_CLUSTER_ENDPOINT=worker-dev-fleet.${stack_name}.local
 QA_CLUSTER_ENDPOINT=worker-qa-fleet.${stack_name}.local
@@ -5,3 +6,5 @@ DEV_ADMIRAL_ENDPOINT=admiral-dev-internal.${stack_name}.local
 QA_ADMIRAL_ENDPOINT=admiral-qa-internal.${stack_name}.local
 DEV_CONFIG_BUCKET_NAME=${dev_config_bucket_name}
 QA_CONFIG_BUCKET_NAME=${qa_config_bucket_name}
+STAGE_CONFIG_BUCKET_NAME=${stage_config_bucket_name}
+PROD_CONFIG_BUCKET_NAME=${prod_config_bucket_name}
