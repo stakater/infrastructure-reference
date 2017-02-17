@@ -32,7 +32,7 @@
 ###############################################################################
 # Deploy to Admiral
 # This script deploys infrastructure apps to admiral cluster
-# Autuhors: Hazim
+# Authors: Hazim
 ###############################################################################
 
 APP_NAME=""
@@ -58,7 +58,7 @@ do
           # Convert CLUSTER_ENV value to lowercase
           CLUSTER_ENV=`echo "$CLUSTER_ENV" | sed 's/./\L&/g'`
           if [[ "$CLUSTER_ENV" != "dev" && "$CLUSTER_ENV" != "qa" ]]; then
-            echo "ERROR: Unkown value for CLUSTER_ENV, please enter one of 'dev' or 'qa'";
+            echo "ERROR: Unknown value for CLUSTER_ENV, please enter one of 'dev' or 'qa'";
             exit 1;
           fi
           ;;

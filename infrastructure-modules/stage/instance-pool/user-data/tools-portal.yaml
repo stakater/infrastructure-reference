@@ -1,35 +1,9 @@
 #cloud-config
 coreos:
-  etcd2:
-    proxy: on
-    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
-  fleet:
-    public-ip: $private_ipv4
-    metadata: "env=${stack_name},platform=ec2,provider=aws,role=admiral"
-    etcd_key_prefix: "/stakater/qa/admiral/"
   update:
     reboot-strategy: off
   units:
-    - name: etcd2.service
-      command: start
-      drop-ins:
-        - name: 60-initial-cluster.conf
-          content: |
-            [Service]
-            EnvironmentFile=/etc/sysconfig/initial-cluster
-    - name: fleet.service
-      command: start
-    - name: update-initial-cluster.service
-      command: start
-      enable: true
-      content: |
-        [Unit]
-        Description= Unit file to run update-initial-cluster script
-        [Service]
-        Type=oneshot
-        TimeoutStartSec=0
-        ExecStart=/usr/bin/sh -c "/opt/bin/update-initial-cluster.sh -b ${global_admiral_config_bucket}"
-    - name: s3sync-admiral.service
+    - name: s3sync-tools-portal.service
       command: start
       enable: true
       content: |
@@ -44,7 +18,7 @@ coreos:
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/docker run --rm --name %n \
                                   -e S3_BUCKET_LOCATION=${config_bucket_name}/${module_name} \
-                                  -v /admiral-config:/s3sync \
+                                  -v /tools-portal-config:/s3sync \
                                   stakater/s3sync
         ExecStop=/usr/bin/docker stop %n
         RestartSec=30
@@ -59,7 +33,8 @@ coreos:
         Requires=docker.service
         [Service]
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment CONSUL_SERVER=$(etcdctl get /qa/consul/server/endpoint)"
+        ExecStartPre=/opt/bin/download-consul-server-ip.sh -b ${config_bucket_name}
+        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment CONSUL_SERVER=$(</consul/server-ip/consul-server-ip)"
         ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment FALLBACK_HOST_DNS=$(nslookup $(hostname -i) | grep 'Server' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')"
         ExecStartPre=/usr/bin/docker pull consul:0.7.1
         ExecStartPre=-/usr/bin/docker rm %n
@@ -69,7 +44,7 @@ coreos:
                                   -v /consul/data:/consul/data \
                                   consul:0.7.1 agent -retry-join=$${CONSUL_SERVER} -dns-port=53 -bind=$private_ipv4 -client=0.0.0.0 -recursor=$${FALLBACK_HOST_DNS}
         ExecStop=/usr/bin/docker stop %n
-        RestartSec=100
+        RestartSec=650
         Restart=always
     - name: registrator.service
       command: start
@@ -92,16 +67,40 @@ coreos:
                                   -v /var/run/docker.sock:/tmp/docker.sock \
                                   gliderlabs/registrator:latest consul://localhost:8500
         ExecStop=/usr/bin/docker stop %n
-        RestartSec=120
+        RestartSec=660
         Restart=always
+    - name: nginx.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Nginx
+        Requires=docker.service
+        Requires=consul-agent.service
+        After=consul-agent.service
+
+        [Service]
+        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment HOSTNAME=$(hostname -i)"
+        ExecStartPre=/usr/bin/docker pull stakater/nginx-with-consul-template:0.18.0-rc1
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/docker run --rm --name %n \
+                                  -v /tools-portal-config/nginx/consul-templates:/templates \
+                                  -p 80:80 \
+                                  --dns=$${HOSTNAME} \
+                                  --dns-search=service.consul \
+                                  -l SERVICE_NAME=nginx \
+                                  stakater/nginx-with-consul-template:0.18.0-rc1
+        ExecStop=/usr/bin/docker stop %n
+        RestartSec=30
+        Restart=always
+
 write_files:
-  - path: /opt/bin/update-initial-cluster.sh
+  - path: /opt/bin/download-consul-server-ip.sh
     permissions: 0700
     owner: root
     content: |
         #!/bin/bash
-        # This script downloads the initial-cluster file from S3 buckets and updates etcd files
-
+        # This script download a file with consul server's ip from s3
         BUCKET_NAME=""
         bOptionFlag=false;
         # Get options from the command line
@@ -113,56 +112,17 @@ write_files:
                   bOptionFlag=true;
                   ;;
                 *)
-                  echo "Usage: $(basename $0) -b <Name of Bucket containing ETCD initial-cluster file>"
-                  exit 0
+                  echo "Usage: $(basename $0) -b <Name of Bucket to download the file from>"
+                  exit 1
                   ;;
             esac
         done
 
         if ! $bOptionFlag
         then
-          echo "Usage: $(basename $0) -b <Name of Bucket containing ETCD initial-cluster file>"
-          exit 0;
-        fi
-
-        # Download initial cluster file from S3 bucket
-        docker run --rm --name aws-cli -v $(pwd)/aws-cli:/aws stakater/aws-cli aws s3 cp s3://$BUCKET_NAME/etcd/initial-cluster .
-
-        # Wait for file to download
-        sleep 5;
-
-        if [ ! -f $(pwd)/aws-cli/initial-cluster ];
-        then
-          echo "Initial Cluster file not found in $(pwd)/aws-cli/"
+          echo "Usage: $(basename $0) -b <Name of Bucket to download the file from>"
           exit 1;
         fi
 
-        initialClusterLocation="/etc/sysconfig"
-
-        # check whether initial cluster is already downloaded or not
-        if [ ! -f "$initialClusterLocation"/initial-cluster ];
-        then
-          sudo mkdir -p $initialClusterLocation;
-          # Copy it to specified locations
-          sudo cp $(pwd)/aws-cli/initial-cluster $initialClusterLocation
-        else
-          # Copy it to specified locations
-          sudo cp $(pwd)/aws-cli/initial-cluster $initialClusterLocation
-          sudo cp $(pwd)/aws-cli/initial-cluster /root/cloudinit
-
-          # Replace the new ip in the etcd cluster file
-          newip=$(cat $(pwd)/aws-cli/initial-cluster | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}');
-          if [ "$newip" != "" ];
-          then
-            sudo sed -i -r 's/(\b[0-9]{1,3}\.){3}[0-9]{1,3}\b'/$newip/ /var/lib/etcd2/proxy/cluster
-          fi
-        fi
-
-        # Restart etcd and fleet
-        sudo systemctl restart etcd2
-        sudo systemctl restart fleet
-
-        # Cleanup
-
-        sudo rm -rf $(pwd)/aws-cli
-        echo "Etcd initial cluster updated"
+        sudo mkdir -p /consul/server-ip
+        docker run --rm -v /consul/server-ip:/aws stakater/aws-cli aws s3 cp s3://$BUCKET_NAME/consul/consul-server-ip .
