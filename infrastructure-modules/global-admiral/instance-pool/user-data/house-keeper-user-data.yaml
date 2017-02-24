@@ -14,7 +14,6 @@ coreos:
         TimeoutStartSec=0
         #INSERT YOUR REPO LINK BELOW. MAKE SURE YOU ADD YOUR CREDENTIALS IN THE LINK IF IT IS A PRIVATE REPO
         ExecStart=/usr/bin/sh -c "/house-keeper/init.sh 'REPLACE_WITH_LINK_TO_YOUR_HOUSE_KEEPER_CONFIG_REPOSITORY'"
-        ExecStop=/usr/bin/docker stop %n
 
 write_files:
   - path: /house-keeper/init.sh
@@ -24,9 +23,11 @@ write_files:
         #!/bin/bash
         REPO=$1
         #clone repos
+        cd /house-keeper
         sudo ./git-cloner.sh https://github.com/stakater/house-keeper.git house-keeper
         sudo ./git-cloner.sh $REPO house-keeper-config
         sudo cp house-keeper/units/* /etc/systemd/system/
+        house-keeper/scripts/parser.sh
         sudo systemctl daemon-reload
         sudo systemctl start poller.timer
   - path: /house-keeper/git-cloner.sh
@@ -37,17 +38,17 @@ write_files:
         REPO=$1
         DEPLOY_CODE_LOCATION=$2
 
-        if [ ! -d "${DEPLOY_CODE_LOCATION}" ];
+        if [ ! -d "$${DEPLOY_CODE_LOCATION}" ];
         then
           echo "Ceating Directory."
-          sudo mkdir -p ${DEPLOY_CODE_LOCATION}
+          sudo mkdir -p $${DEPLOY_CODE_LOCATION}
         else
           echo "Directory Already Exists."
         fi;
 
-        if [ -d ${DEPLOY_CODE_LOCATION}/.git ]; then
-          echo "${DEPLOY_CODE_LOCATION} is a git repository.";
+        if [ -d $${DEPLOY_CODE_LOCATION}/.git ]; then
+          echo "$${DEPLOY_CODE_LOCATION} is a git repository.";
         else
-          echo "${DEPLOY_CODE_LOCATION} is not a git repository. Cloning ...."
-          sudo git clone ${REPO} ${DEPLOY_CODE_LOCATION};
+          echo "$${DEPLOY_CODE_LOCATION} is not a git repository. Cloning ...."
+          sudo git clone $${REPO} $${DEPLOY_CODE_LOCATION};
         fi;

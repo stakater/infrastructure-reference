@@ -47,7 +47,7 @@ module "house-keeper" {
   iam_role_policy  = "${data.template_file.house-keeper-policy.rendered}"
   user_data        = "${data.template_file.house-keeper-bootstrap-user-data.rendered}"
   key_name         = "house-keeper"
-  root_vol_size    = 20
+  root_vol_size    = 8
   data_ebs_device_name  = ""
   data_ebs_vol_size     = 0
   logs_ebs_device_name  = ""
