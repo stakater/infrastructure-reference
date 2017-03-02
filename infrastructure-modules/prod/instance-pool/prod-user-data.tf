@@ -38,6 +38,7 @@ data "template_file" "prod-user-data" {
 
   vars {
     stack_name = "${var.stack_name}"
+    config_bucket_name = "${module.config-bucket.bucket_name}"
     efs_dns = "${replace(element(split(",", module.efs-mount-targets.dns-names), 0), "/^(.+?)\\./", "")}"
     # Using first value in the comma-separated list and remove the availability zone
   }
@@ -47,4 +48,29 @@ resource "aws_s3_bucket_object" "prod-cloud-config" {
   bucket = "${module.cloudinit-bucket.bucket_name}"
   key = "prod/cloud-config.tmpl.yaml"
   content = "${data.template_file.prod-user-data.rendered}"
+}
+
+# Upload filebeat template to s3 bucket
+resource "aws_s3_bucket_object" "prod-filebeat-config-tmpl" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "worker/consul-templates/filebeat.ctmpl"
+  source = "./data/worker/consul-templates/filebeat.ctmpl"
+}
+
+# Admiral
+data "template_file" "admiral-user-data" {
+  template = "${file("./user-data/admiral.tmpl.yaml")}" #path relative to build dir
+
+  vars {
+    stack_name = "${var.stack_name}"
+    config_bucket_name = "${module.config-bucket.bucket_name}"
+    global_admiral_config_bucket="${data.terraform_remote_state.global-admiral.config-bucket-name}"
+    module_name = "admiral"
+  }
+}
+
+resource "aws_s3_bucket_object" "admiral-cloud-config" {
+  bucket = "${module.cloudinit-bucket.bucket_name}"
+  key = "admiral/cloud-config.tmpl.yaml"
+  content = "${data.template_file.admiral-user-data.rendered}"
 }
