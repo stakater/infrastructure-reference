@@ -115,7 +115,7 @@ coreos:
                                   --dns=$${HOSTNAME} \
                                   --dns-search=service.consul \
                                   -v /data/logs:/var/log/app \
-                                  -v /docker-data/filebeat/:/filebeat-data \
+                                  -v /data/docker-data/filebeat/:/filebeat-data \
                                   -v /admiral-config/filebeat/consul-templates:/templates \
                                   -e SERVICE_NAME=filebeat \
                                   stakater/filebeat-with-consul-template"
