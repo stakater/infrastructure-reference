@@ -2,7 +2,7 @@
 <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="81">
   <server artifactsdir="artifacts" agentAutoRegisterKey="123456789ytrewq" commandRepositoryLocation="default" serverId="e89d0b81-9c38-4e25-a946-ac1dc6944233">
     <security>
-      <passwordFile path="/passwd" />
+      <passwordFile path="/gocd-passwd/passwd" />
     </security>
   </server>
   <pipelines group="APP-Dev">
@@ -143,6 +143,56 @@
         <git url="https://github.com/stakater/infrastructure-app-units" shallowClone="true" autoUpdate="false" />
       </materials>
     </pipeline>
+    <pipeline name="Build-Admiral-AMI-stage" template="stakater_build_admiral_ami">
+      <params>
+        <param name="SOURCE_DIR" />
+        <param name="APP_NAMES">kibana,elasticsearch,logstash</param>
+        <param name="ENV">Stage</param>
+        <param name="CLOUDINIT_S3_FULL_PATH">stakater-reference-stage-cloudinit/admiral/cloud-config.tmpl.yaml</param>
+        <param name="BAKER_INSTANCE_TYPE">t2.medium</param>
+      </params>
+      <materials>
+        <git url="https://github.com/stakater/infrastructure-app-units" shallowClone="true" autoUpdate="false" />
+      </materials>
+    </pipeline>
+    <pipeline name="Deploy-Admiral-Stage" template="stakater_launch_admiral_ami">
+      <params>
+        <param name="SOURCE_DIR" />
+        <param name="APP_NAMES">kibana,elasticsearch,logstash</param>
+        <param name="ENVIRONMENT">stage</param>
+        <param name="INSTANCE_TYPE">t2.medium</param>
+        <param name="ENV_TF_STATE_KEY">stage/terraform.tfstate</param>
+      </params>
+      <materials>
+        <git url="https://github.com/stakater/infrastructure-app-units" shallowClone="true" autoUpdate="false" />
+      </materials>
+    </pipeline>
+  </pipelines>
+  <pipelines group="Admiral-Production">
+    <pipeline name="Build-Admiral-AMI-Prod" template="stakater_build_admiral_ami">
+      <params>
+        <param name="SOURCE_DIR" />
+        <param name="APP_NAMES">kibana,elasticsearch,logstash</param>
+        <param name="ENV">prod</param>
+        <param name="CLOUDINIT_S3_FULL_PATH">stakater-reference-prod-cloudinit/admiral/cloud-config.tmpl.yaml</param>
+        <param name="BAKER_INSTANCE_TYPE">t2.medium</param>
+      </params>
+      <materials>
+        <git url="https://github.com/stakater/infrastructure-app-units" shallowClone="true" autoUpdate="false" />
+      </materials>
+    </pipeline>
+    <pipeline name="Deploy-Admiral-Prod" template="stakater_launch_admiral_ami">
+      <params>
+        <param name="SOURCE_DIR" />
+        <param name="APP_NAMES">kibana,elasticsearch,logstash</param>
+        <param name="ENVIRONMENT">prod</param>
+        <param name="INSTANCE_TYPE">t2.large</param>
+        <param name="ENV_TF_STATE_KEY">prod/terraform.tfstate</param>
+      </params>
+      <materials>
+        <git url="https://github.com/stakater/infrastructure-app-units" shallowClone="true" autoUpdate="false" />
+      </materials>
+    </pipeline>
   </pipelines>
   <pipelines group="Manage_Dev_Servers">
     <pipeline name="Stop-Dev" template="stop_infra">
@@ -222,7 +272,7 @@
         </jobs>
       </stage>
     </pipeline>
-    <pipeline name="stakater_deploy_admiral">
+    <pipeline name="stakater_deploy_admiral_cluster">
       <stage name="Deploy-to-Admiral">
         <approval type="manual" />
         <jobs>
@@ -238,6 +288,42 @@
         </jobs>
       </stage>
     </pipeline>
+    <pipeline name="stakater_build_admiral_ami">
+      <stage name="Build-Admiral-AMI">
+        <approval type="manual" />
+        <jobs>
+          <job name="Run">
+            <tasks>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>/gocd-data/scripts/build-admiral-ami.sh -a "#{APP_NAMES}" -r "#{ENV}" -v "${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER}" -c "#{CLOUDINIT_S3_FULL_PATH}" -i "#{BAKER_INSTANCE_TYPE}"</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="stakater_launch_admiral_ami">
+      <stage name="Launch-Admiral-AMI" fetchMaterials="false">
+        <approval type="manual" />
+        <jobs>
+          <job name="Launch-AMI">
+            <tasks>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>JOINED_APP_NAME=$(/gocd-data/scripts/sort-and-combine-comma-separated-list.sh #{APP_NAMES});
+                  echo "joined: $JOINED_APP_NAME";
+                  if [[ -z "$JOINED_APP_NAME" ]]; then echo "JOINED_APP_NAME is empty";exit 1; fi;
+                  AWS_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
+                  /gocd-data/scripts/deploy-to-admiral-ami.sh -a "#{APP_NAMES}" -e "#{ENVIRONMENT}" -i "#{INSTANCE_TYPE}" -f "#{ENV_TF_STATE_KEY}" -k "#{ENVIRONMENT}/${JOINED_APP_NAME}/terraform.tfstate" -r "${AWS_REGION}"</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
     <pipeline name="stakater_build_ami">
       <stage name="Build-AMI" fetchMaterials="false">
         <jobs>
@@ -245,7 +331,7 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>/gocd-data/scripts/build-ami.sh -a #{APP_NAME} -r #{ENVIRONMENT} -b ${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER} -u $(uuid -v4) -d #{APP_DOCKER_IMAGE} -o "#{APP_DOCKER_OPTS}" -c "#{CLOUDINIT_S3_FULL_PATH}" -e "#{DATA_EBS_DEVICE_NAME}" -z "#{DATA_EBS_VOL_SIZE}" -l "#{LOGS_EBS_DEVICE_NAME}" -x "#{LOGS_EBS_VOL_SIZE}"</arg>
+                <arg>/gocd-data/scripts/build-ami.sh -a #{APP_NAME} -r #{ENVIRONMENT} -b ${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER} -u $(uuid -v4) -d #{APP_DOCKER_IMAGE} -o "#{APP_DOCKER_OPTS}" -c "#{CLOUDINIT_S3_FULL_PATH}" -e "#{DATA_EBS_DEVICE_NAME}" -z "#{DATA_EBS_VOL_SIZE}" -l "#{LOGS_EBS_DEVICE_NAME}" -x "#{LOGS_EBS_VOL_SIZE}" -i "t2.nano"</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -384,12 +470,16 @@
       </agents>
       <pipelines>
         <pipeline name="app-create-ami-prod" />
+        <pipeline name="Build-Admiral-AMI-Prod" />
+        <pipeline name="Build-Admiral-AMI-stage" />
       </pipelines>
     </environment>
     <environment name="Deploy-to-Production">
       <agents>
       </agents>
       <pipelines>
+        <pipeline name="Deploy-Admiral-Prod" />
+        <pipeline name="Deploy-Admiral-Stage" />
         <pipeline name="app-deploy-prod" />
         <pipeline name="app-switch-group" />
         <pipeline name="app-rollback-deployment" />
