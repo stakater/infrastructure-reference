@@ -27,7 +27,6 @@ coreos:
         ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment IPV4=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)"
         ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment HOSTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname)"
 
-        ExecStartPre=/usr/bin/docker pull consul:0.7.1
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/docker run --rm --name %n \
                                   --net="host" \
@@ -50,7 +49,6 @@ coreos:
 
         [Service]
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull gliderlabs/registrator:latest
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStartPre=-/usr/bin/sleep 10
         ExecStart=/usr/bin/docker run --rm --name %n \
@@ -107,16 +105,17 @@ coreos:
 
         [Service]
         ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment IPV4=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)"
-        ExecStartPre=/usr/bin/docker pull stakater/filebeat-with-consul-template:0.18.0-rc1
+        ExecStartPre=/usr/bin/docker pull stakater/filebeat-with-consul-template:5.2-0.18.0
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                                   --dns=$${IPV4} \
                                   --dns-search=service.consul \
                                   -v /data/logs:/var/log/app \
-                                  -v /docker-data/filebeat/:/filebeat-data \
+                                  -v /data/docker-data/filebeat/:/filebeat-data \
                                   -v /admiral-config/filebeat/consul-templates:/templates \
                                   -l SERVICE_NAME=filebeat \
-                                  stakater/filebeat-with-consul-template:0.18.0-rc1"
+                                  --memory=2048m \
+                                  stakater/filebeat-with-consul-template:5.2-0.18.0"
         ExecStop=/usr/bin/docker stop %n
         RestartSec=60
         Restart=always
