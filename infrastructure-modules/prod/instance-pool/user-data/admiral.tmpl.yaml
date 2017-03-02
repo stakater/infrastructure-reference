@@ -1,0 +1,112 @@
+#cloud-config
+coreos:
+  update:
+    reboot-strategy: off
+  units:
+    - name: s3sync-admiral.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Synchronizes local folder with Module's folder in S3 config bucket
+        After=docker.service
+        Requires=docker.service
+
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull stakater/s3sync
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/docker run --rm --name %n \
+                                  -e S3_BUCKET_LOCATION=${config_bucket_name}/${module_name} \
+                                  -v /admiral-config:/s3sync \
+                                  stakater/s3sync
+        ExecStop=/usr/bin/docker stop %n
+        RestartSec=30
+        Restart=always
+# fetching ip and hostname from AWS meta-data API instead of using local
+# commands/variables (private_ipv4 variable or hostname -i commands)
+# due to the "multiple private IPs" issue
+    - name: consul-agent.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Consul Agent
+        Requires=docker.service
+        After=docker.service
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=/opt/bin/download-consul-server-ip.sh -b ${config_bucket_name}
+        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment CONSUL_SERVER=$(</consul/server-ip/consul-server-ip)"
+        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment FALLBACK_HOST_DNS=$(nslookup $(hostname -i) | grep 'Server' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')"
+        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment IPV4=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)"
+        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment HOSTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname)"
+
+        ExecStartPre=/usr/bin/docker pull consul:0.7.1
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/docker run --rm --name %n \
+                                  --net="host" \
+                                  -e 'CONSUL_ALLOW_PRIVILEGED_PORTS=' \
+                                  -v /consul/data:/consul/data \
+                                  consul:0.7.1 agent -retry-join=$${CONSUL_SERVER} -dns-port=53 -node=$${HOSTNAME} -bind=$${IPV4} -client=0.0.0.0 -recursor=$${FALLBACK_HOST_DNS}
+        ExecStop=/usr/bin/docker stop %n
+        RestartSec=100
+        Restart=always
+    - name: registrator.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Docker Registrator, Registers running docker containers with consul
+        Requires=docker.service
+        Requires=consul-agent.service
+        After=consul-agent.service
+
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull gliderlabs/registrator:latest
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStartPre=-/usr/bin/sleep 10
+        ExecStart=/usr/bin/docker run --rm --name %n \
+                                  --net "host" \
+                                  -v /var/run/docker.sock:/tmp/docker.sock \
+                                  gliderlabs/registrator:latest consul://localhost:8500
+        ExecStop=/usr/bin/docker stop %n
+        RestartSec=120
+        Restart=always
+#################################################
+# Extra cloud-config units placeholder #
+#################################################
+<#EXTRA_CLOUDCONFIG_UNITS#>
+write_files:
+  - path: /opt/bin/download-consul-server-ip.sh
+    permissions: 0700
+    owner: root
+    content: |
+        #!/bin/bash
+        # This script download a file with consul server's ip from s3
+        BUCKET_NAME=""
+        bOptionFlag=false;
+        # Get options from the command line
+        while getopts ":b:" OPTION
+        do
+            case $OPTION in
+                b)
+                  BUCKET_NAME=$OPTARG
+                  bOptionFlag=true;
+                  ;;
+                *)
+                  echo "Usage: $(basename $0) -b <Name of Bucket to download the file from>"
+                  exit 1
+                  ;;
+            esac
+        done
+
+        if ! $bOptionFlag
+        then
+          echo "Usage: $(basename $0) -b <Name of Bucket to download the file from>"
+          exit 1;
+        fi
+
+        sudo mkdir -p /consul/server-ip
+        docker run --rm -v /consul/server-ip:/aws stakater/aws-cli aws s3 cp s3://$BUCKET_NAME/consul/consul-server-ip .
