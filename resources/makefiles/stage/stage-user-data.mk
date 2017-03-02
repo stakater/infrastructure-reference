@@ -14,13 +14,13 @@ refresh_stage_user_data: | $(TF_PROVIDER_STAGE) pull_stage_state
 	cd $(BUILD_STAGE); \
 	$(TF_REFRESH) -target aws_s3_bucket_object.stage-cloud-config \
 				  -target aws_s3_bucket_object.stage-filebeat-config-tmpl \
-                  -target aws_s3_bucket_object.admiral-cloud-config;
+				  -target aws_s3_bucket_object.admiral-cloud-config;
 
 destroy_stage_user_data: | $(TF_PROVIDER_STAGE) pull_stage_state
 	cd $(BUILD_STAGE); \
 	$(TF_DESTROY)	-target aws_s3_bucket_object.stage-cloud-config \
 					-target aws_s3_bucket_object.stage-filebeat-config-tmpl \
-                    -target aws_s3_bucket_object.admiral-cloud-config;
+					-target aws_s3_bucket_object.admiral-cloud-config;
 
 clean_stage_user_data: destroy_stage_user_data
 	rm -f $(BUILD_STAGE)/stage-user-data.tf
