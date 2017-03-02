@@ -136,10 +136,10 @@ then
     CONFIG_BUCKET_NAME=`/gocd-data/scripts/read-parameter.sh ${GOCD_PARAMS_FILE} STAGE_CONFIG_BUCKET_NAME`
   elif [ "$ENV" == "prod" ]
   then
-    CONFIG_BUCKET_NAME=$`/gocd-data/scripts/read-parameter.sh ${GOCD_PARAMS_FILE} PROD_CONFIG_BUCKET_NAME`
+    CONFIG_BUCKET_NAME=`/gocd-data/scripts/read-parameter.sh ${GOCD_PARAMS_FILE} PROD_CONFIG_BUCKET_NAME`
   fi
   # if still no value
-  if [ -z "$CONFIG_BUCKET_NAME" ]; then echo "ERROR: Could not read value for CONFIG_BUCKET_NAME"; exit 1; fi
+  if [ -z "$CONFIG_BUCKET_NAME" ] || [ "$CONFIG_BUCKET_NAME" == "null" ]; then echo "ERROR: Could not read value for CONFIG_BUCKET_NAME"; exit 1; fi
 fi
 
 # Parse comma separated list into an array
