@@ -264,6 +264,19 @@ resource "aws_route53_record" "worker-internal" {
   }
 }
 
+# Add to dev's private dns
+resource "aws_route53_record" "worker-dev-internal" {
+  zone_id = "${module.route53-private.zone_id}"
+  name = "worker-dev-internal"
+  type = "A"
+
+  alias {
+    name = "${aws_elb.worker-elb-internal.dns_name}"
+    zone_id = "${aws_elb.worker-elb-internal.zone_id}"
+    evaluate_target_health = true
+  }
+}
+
 ####################################
 # ASG Scaling Policies
 ####################################
