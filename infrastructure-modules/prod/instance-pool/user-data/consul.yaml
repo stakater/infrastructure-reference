@@ -1,0 +1,59 @@
+#cloud-config
+coreos:
+  update:
+    reboot-strategy: off
+  units:
+    - name: consul.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Consul Server
+        After=docker.service
+        Requires=docker.service
+
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull consul:0.7.1
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/docker run --rm --name %n \
+                                  --net="host" \
+                                  -v /consul/data:/consul/data \
+                                  consul:0.7.1 agent -server -ui -bind=$private_ipv4 -client=0.0.0.0 -bootstrap
+        ExecStartPost=/opt/bin/upload-consul-server-ip.sh -b ${config_bucket_name}
+        ExecStop=/usr/bin/docker stop %n
+        RestartSec=650
+        Restart=always
+write_files:
+  - path: /opt/bin/upload-consul-server-ip.sh
+    permissions: 0700
+    owner: root
+    content: |
+        #!/bin/bash
+        # This script uploads a file to s3 with consul server's ip
+        BUCKET_NAME=""
+        bOptionFlag=false;
+        # Get options from the command line
+        while getopts ":b:" OPTION
+        do
+            case $OPTION in
+                b)
+                  BUCKET_NAME=$OPTARG
+                  bOptionFlag=true;
+                  ;;
+                *)
+                  echo "Usage: $(basename $0) -b <Name of Bucket to upload the file to>"
+                  exit 1
+                  ;;
+            esac
+        done
+
+        if ! $bOptionFlag
+        then
+          echo "Usage: $(basename $0) -b <Name of Bucket to upload the file to>"
+          exit 1;
+        fi
+
+        sudo mkdir -p /consul/server-ip
+        echo "$private_ipv4" > /consul/server-ip/consul-server-ip
+        docker run --rm -v /consul/server-ip:/aws stakater/aws-cli aws s3 cp /aws/consul-server-ip s3://$BUCKET_NAME/consul/
