@@ -8,12 +8,34 @@ coreos:
       content: |
         [Unit]
         Description=house-keeper server init
+        Requires=python-install.service
+        After=python-install.service
         [Service]
         Type=oneshot
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
         #INSERT YOUR REPO LINK BELOW. MAKE SURE YOU ADD YOUR CREDENTIALS IN THE LINK IF IT IS A PRIVATE REPO
         ExecStart=/usr/bin/sh -c "/house-keeper/init.sh 'REPLACE_WITH_LINK_TO_YOUR_HOUSE_KEEPER_CONFIG_REPOSITORY'"
+    - name: python-install.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description= Install Python 3 via Miniconda
+        [Service]
+        RemainAfterExit=true
+        Type=oneshot
+        ExecStartPre=-/usr/bin/mkdir -p /etc/downloads/python
+        ExecStartPre=-/usr/bin/mkdir -p /opt/bin
+        ExecStartPre=-/usr/bin/wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -P /etc/downloads/python
+        ExecStartPre=-/usr/bin/chmod +x /etc/downloads/python/Miniconda3-latest-Linux-x86_64.sh
+        ExecStart=/etc/downloads/python/Miniconda3-latest-Linux-x86_64.sh -bf -p /opt/python
+        ExecStart=-/usr/bin/ln -s /opt/python/bin/easy_install /opt/bin/easy_install
+        ExecStart=-/usr/bin/ln -s /opt/python/bin/pip /opt/bin/pip
+        ExecStart=-/usr/bin/ln -s /opt/python/bin/python /opt/bin/python
+        ExecStart=-/usr/bin/ln -s /opt/python/bin/python /opt/bin/python3
+        ExecStart=-/usr/bin/ln -s /opt/python/bin/virtualenv /opt/bin/virtualenv
+        ExecStart=-/opt/bin/pip install pyyaml
 
 write_files:
   - path: /house-keeper/init.sh
@@ -27,7 +49,7 @@ write_files:
         sudo ./git-cloner.sh https://github.com/stakater/house-keeper.git house-keeper
         sudo ./git-cloner.sh $REPO house-keeper-config
         sudo cp house-keeper/units/* /etc/systemd/system/
-        house-keeper/scripts/parser.sh
+        /opt/bin/python house-keeper/scripts/parser.py
         sudo systemctl daemon-reload
         sudo systemctl start poller.timer
   - path: /house-keeper/git-cloner.sh
