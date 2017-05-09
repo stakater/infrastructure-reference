@@ -1,19 +1,7 @@
-#######################################################################
-# This script is an additional user-data script for GoCD module.
-# NOTE: This is not a standalone script and is to be used with
-#       combination of the bootstrap-user-data script.
-#
-# Download and place sudoers file in `/gocd-data/sudoers` to allow
-# GoCD to use `sudo` without password
-# Dowload and place `cruise-config.xml` to `/gocd-data/conf` to feed
-# `cruise-config.xml` to GoCD at startup
-#######################################################################
 aws_region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
-
 gocdDownloadDir="/gocd-downlaod"
 mkdir -m 700 -p ${gocdDownloadDir}
 cd ${gocdDownloadDir}
-
 # List of config files to download
 # Path relative to bucket
 fileList+=()
@@ -21,6 +9,7 @@ fileList+=("gocd/conf/sudoers")
 fileList+=("gocd/conf/cruise-config.xml")
 fileList+=("gocd/conf/passwd")
 fileList+=("gocd/scripts/build-ami.sh")
+fileList+=("gocd/scripts/git-cloner.sh")
 fileList+=("gocd/scripts/build-admiral-ami.sh")
 fileList+=("gocd/scripts/clone-deployment-application-code.sh")
 fileList+=("gocd/scripts/clean-up.sh")
@@ -111,135 +100,11 @@ then
   mkdir -p ${gocdDataDir}/gocd-passwd
   cp ${gocdDownloadDir}/passwd ${gocdDataDir}/gocd-passwd/passwd
 fi
-
+sudo rm -r ${gocdDownloadDir}/passwd ${gocdDownloadDir}/cruise-config.xml ${gocdDownloadDir}/sudoers
 # if script files from script folder have been dwnloaded, copy to `gocd-data` directory
 gocdScriptsDir="${gocdDataDir}/scripts/"
 mkdir -p ${gocdScriptsDir}
-if [ -f ${gocdDownloadDir}/build-ami.sh ] ;
-then
-  cp ${gocdDownloadDir}/build-ami.sh ${gocdScriptsDir}/build-ami.sh
-fi
-if [ -f ${gocdDownloadDir}/build-admiral-ami.sh ] ;
-then
-  cp ${gocdDownloadDir}/build-admiral-ami.sh ${gocdScriptsDir}/build-admiral-ami.sh
-fi
-if [ -f ${gocdDownloadDir}/clone-deployment-application-code.sh ] ;
-then
-  cp ${gocdDownloadDir}/clone-deployment-application-code.sh ${gocdScriptsDir}/clone-deployment-application-code.sh
-fi
-if [ -f ${gocdDownloadDir}/clean-up.sh ] ;
-then
-  cp ${gocdDownloadDir}/clean-up.sh ${gocdScriptsDir}/clean-up.sh
-fi
-if [ -f ${gocdDownloadDir}/build-docker-image.sh ] ;
-then
-  cp ${gocdDownloadDir}/build-docker-image.sh ${gocdScriptsDir}/build-docker-image.sh
-fi
-if [ -f ${gocdDownloadDir}/deploy-to-cluster.sh ] ;
-then
-  cp ${gocdDownloadDir}/deploy-to-cluster.sh ${gocdScriptsDir}/deploy-to-cluster.sh
-fi
-if [ -f ${gocdDownloadDir}/deploy-to-admiral.sh ] ;
-then
-  cp ${gocdDownloadDir}/deploy-to-admiral.sh ${gocdScriptsDir}/deploy-to-admiral.sh
-fi
-if [ -f ${gocdDownloadDir}/deploy-to-admiral-ami.sh ] ;
-then
-  cp ${gocdDownloadDir}/deploy-to-admiral-ami.sh ${gocdScriptsDir}/deploy-to-admiral-ami.sh
-fi
-if [ -f ${gocdDownloadDir}/deploy-to-prod.sh ] ;
-then
-  cp ${gocdDownloadDir}/deploy-to-prod.sh ${gocdScriptsDir}/deploy-to-prod.sh
-fi
-if [ -f ${gocdDownloadDir}/destroy-BG-group.sh ] ;
-then
-  cp ${gocdDownloadDir}/destroy-BG-group.sh ${gocdScriptsDir}/destroy-BG-group.sh
-fi
-if [ -f ${gocdDownloadDir}/docker-cleanup.sh ] ;
-then
-  cp ${gocdDownloadDir}/docker-cleanup.sh ${gocdScriptsDir}/docker-cleanup.sh
-fi
-if [ -f ${gocdDownloadDir}/gocd.parameters.txt ] ;
-then
-  cp ${gocdDownloadDir}/gocd.parameters.txt ${gocdScriptsDir}/gocd.parameters.txt
-fi
-if [ -f ${gocdDownloadDir}/bg.parameters.txt ] ;
-then
-  cp ${gocdDownloadDir}/bg.parameters.txt ${gocdScriptsDir}/bg.parameters.txt
-fi
-if [ -f ${gocdDownloadDir}/read-parameter.sh ] ;
-then
-  cp ${gocdDownloadDir}/read-parameter.sh ${gocdScriptsDir}/read-parameter.sh
-fi
-if [ -f ${gocdDownloadDir}/rollback-deployment.sh ] ;
-then
-  cp ${gocdDownloadDir}/rollback-deployment.sh ${gocdScriptsDir}/rollback-deployment.sh
-fi
-if [ -f ${gocdDownloadDir}/switch-deployment-group.sh ] ;
-then
-  cp ${gocdDownloadDir}/switch-deployment-group.sh ${gocdScriptsDir}/switch-deployment-group.sh
-fi
-if [ -f ${gocdDownloadDir}/terraform-apply-changes.sh ] ;
-then
-  cp ${gocdDownloadDir}/terraform-apply-changes.sh ${gocdScriptsDir}/terraform-apply-changes.sh
-fi
-if [ -f ${gocdDownloadDir}/test-code.sh ] ;
-then
-  cp ${gocdDownloadDir}/test-code.sh ${gocdScriptsDir}/test-code.sh
-fi
-if [ -f ${gocdDownloadDir}/update-blue-green-deployment-groups.sh ] ;
-then
-  cp ${gocdDownloadDir}/update-blue-green-deployment-groups.sh ${gocdScriptsDir}/update-blue-green-deployment-groups.sh
-fi
-if [ -f ${gocdDownloadDir}/update-deployment-state.sh ] ;
-then
-  cp ${gocdDownloadDir}/update-deployment-state.sh ${gocdScriptsDir}/update-deployment-state.sh
-fi
-if [ -f ${gocdDownloadDir}/compile-code.sh ] ;
-then
-  cp ${gocdDownloadDir}/compile-code.sh ${gocdScriptsDir}/compile-code.sh
-fi
-if [ -f ${gocdDownloadDir}/delete-ami.sh ] ;
-then
-  cp ${gocdDownloadDir}/delete-ami.sh ${gocdScriptsDir}/delete-ami.sh
-fi
-if [ -f ${gocdDownloadDir}/write-ami-parameters.sh ] ;
-then
-  cp ${gocdDownloadDir}/write-ami-parameters.sh ${gocdScriptsDir}/write-ami-parameters.sh
-fi
-if [ -f ${gocdDownloadDir}/write-terraform-variables.sh ] ;
-then
-  cp ${gocdDownloadDir}/write-terraform-variables.sh ${gocdScriptsDir}/write-terraform-variables.sh
-fi
-if [ -f ${gocdDownloadDir}/sort-and-combine-comma-separated-list.sh ] ;
-then
-  cp ${gocdDownloadDir}/sort-and-combine-comma-separated-list.sh ${gocdScriptsDir}/sort-and-combine-comma-separated-list.sh
-fi
-if [ -f ${gocdDownloadDir}/resume-ASG-processes.sh ] ;
-then
-  cp ${gocdDownloadDir}/resume-ASG-processes.sh ${gocdScriptsDir}/resume-ASG-processes.sh
-fi
-if [ -f ${gocdDownloadDir}/start-infra.sh ] ;
-then
-  cp ${gocdDownloadDir}/start-infra.sh ${gocdScriptsDir}/start-infra.sh
-fi
-if [ -f ${gocdDownloadDir}/start-instances.sh ] ;
-then
-  cp ${gocdDownloadDir}/start-instances.sh ${gocdScriptsDir}/start-instances.sh
-fi
-if [ -f ${gocdDownloadDir}/stop-infra.sh ] ;
-then
-  cp ${gocdDownloadDir}/stop-infra.sh ${gocdScriptsDir}/stop-infra.sh
-fi
-if [ -f ${gocdDownloadDir}/stop-instances.sh ] ;
-then
-  cp ${gocdDownloadDir}/stop-instances.sh ${gocdScriptsDir}/stop-instances.sh
-fi
-if [ -f ${gocdDownloadDir}/suspend-ASG-processes.sh ] ;
-then
-  cp ${gocdDownloadDir}/suspend-ASG-processes.sh ${gocdScriptsDir}/suspend-ASG-processes.sh
-fi
-
+cp ${gocdDownloadDir}/* ${gocdScriptsDir}/
 chmod +x ${gocdScriptsDir}/*
 # Delete temporary downloads folder
 rm -rf ${gocdDownloadDir}

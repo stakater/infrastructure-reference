@@ -19,42 +19,6 @@ coreos:
             EnvironmentFile=/etc/sysconfig/initial-cluster
     - name: fleet.service
       command: start
-    - name: format-disk.service
-      command: start
-      content: |
-        [Unit]
-        Description=Formats the disk drive
-        [Service]
-        Type=oneshot
-        RemainAfterExit=yes
-        Environment="LABEL=var-lib-docker"
-        Environment="DEV=/dev/xvdf"
-        # Make Dev letter is same as the ebs device mounted e.g. xvdf for sdf
-        # Do not wipe the disk if it's already being used, so the docker images persistent cross reboot.
-        ExecStart=-/bin/bash -c "if ! findfs LABEL=$LABEL > /tmp/label.$LABEL; then wipefs -a -f $DEV && mkfs.ext4 -T news -F -L $LABEL $DEV && echo wiped; fi"
-    - name: var-lib-docker.mount
-      command: start
-      content: |
-        [Unit]
-        Description=Mount disk to /var/lib/docker
-        Requires=format-disk.service
-        After=format-disk.service
-        Before=docker.service
-        [Mount]
-        What=/dev/xvdf
-        Where=/var/lib/docker
-        Type=ext4
-    - name: docker.service
-      command: start
-      drop-ins:
-        - name: 60-docker-wait-for-var-lib.conf
-          content: |
-              [Unit]
-              Requires=var-lib-docker.mount
-              After=var-lib-docker.mount
-              [Service]
-              Restart=always
-              RestartSec=5
     - name: install-docker-compose.service
       command: start
       content: |
@@ -263,33 +227,29 @@ coreos:
         ExecStop=-/usr/bin/docker stop %n
         RestartSec=10
         Restart=always
+    - name: ci-info.service
+      command: start
+      content: |
+        [Unit]
+        Description=qbtech-ci-info cloner
+        [Service]
+        Type=oneshot
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=0
+        #INSERT YOUR REPO LINK BELOW. MAKE SURE YOU ADD YOUR CREDENTIALS IN THE LINK IF IT IS A PRIVATE REPO
+        ExecStart=/usr/bin/sh -c "/gocd-data/scripts/git-cloner.sh 'LINK TO CI INFO REPO' /app/stakater/ci-info"
+    - name: pipeline-library.service
+      command: start
+      content: |
+        [Unit]
+        Description=pipeline-library cloner
+        [Service]
+        Type=oneshot
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=0
+        ExecStart=/usr/bin/sh -c "/gocd-data/scripts/git-cloner.sh 'https://github.com/stakater/pipeline-library.git' /app/stakater/pipeline-library"
 
 write_files:
-  - path: /opt/bin/update-window.sh
-    permissions: 0700
-    owner: root
-    content: |
-        #!/bin/bash
-        # If etcd is active, this uses locksmith. Otherwise, it randomly delays the reboot.
-        delay=$(/usr/bin/expr $RANDOM % 3600 )
-        rebootflag='NEED_REBOOT'
-        hostip=$(hostname -i | tr -d ' ')
-        ismember=$(etcdctl member list |grep -Eo "(http://$hostip:2380)")
-
-        if update_engine_client -status | grep $rebootflag;
-        then
-            echo -n "etcd2 is "
-            if systemctl is-active etcd2 && [[ $ismember != "" ]];
-            then
-                echo "Update reboot with locksmithctl."
-                locksmithctl reboot
-            else
-                echo "Update reboot in $delay seconds."
-                sleep $delay
-                reboot
-            fi
-        fi
-        exit 0
   - path: /opt/bin/install-docker-compose.sh
     permissions: 0700
     owner: root

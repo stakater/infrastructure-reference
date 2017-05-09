@@ -42,16 +42,16 @@ module "gocd" {
 
   # LC parameters
   ami              = "${var.ami}"
-  instance_type    = "t2.medium"
+  instance_type    = "t2.large"
   iam_assume_role_policy = "${file("./policy/assume-role-policy.json")}"
   iam_role_policy  = "${data.template_file.gocd-policy.rendered}"
   user_data        = "${data.template_file.gocd-bootstrap-user-data.rendered}"
   key_name         = "gocd"
-  root_vol_size    = 50
-  data_ebs_device_name  = "/dev/sdf"
-  data_ebs_vol_size     = 100
-  logs_ebs_device_name  = "/dev/sdg"
-  logs_ebs_vol_size     = 20
+  root_vol_size    = 150
+  data_ebs_device_name  = ""
+  data_ebs_vol_size     = 0
+  logs_ebs_device_name  = ""
+  logs_ebs_vol_size     = 0
 
   # ASG parameters
   max_size         = "1"
@@ -137,6 +137,11 @@ resource "aws_s3_bucket_object" "gocd_build_ami" {
   bucket = "${module.config-bucket.bucket_name}"
   key = "gocd/scripts/build-ami.sh"
   source = "./data/gocd/scripts/build-ami.sh"
+}
+resource "aws_s3_bucket_object" "gocd_git_cloner" {
+  bucket = "${module.config-bucket.bucket_name}"
+  key = "gocd/scripts/git-cloner.sh"
+  source = "./data/gocd/scripts/git-cloner.sh"
 }
 resource "aws_s3_bucket_object" "clone_deployment_application_code" {
   bucket = "${module.config-bucket.bucket_name}"
