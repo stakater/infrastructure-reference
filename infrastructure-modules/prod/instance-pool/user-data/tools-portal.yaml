@@ -80,7 +80,7 @@ coreos:
         After=consul-agent.service
 
         [Service]
-        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment HOSTNAME=$(hostname -i)"
+        ExecStartPre=/usr/bin/bash -c "/usr/bin/systemctl set-environment HOSTNAME=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)"
         ExecStartPre=/usr/bin/docker pull stakater/nginx-with-consul-template:0.18.0-rc1
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/docker run --rm --name %n \
