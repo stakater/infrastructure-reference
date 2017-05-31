@@ -33,7 +33,6 @@
 # This script stops Stack for specified ',' separated environments in the current region
 #----------------------------------------------
 # Argument1: ENVIRONMENTS
-# Argument2: REGION
 #----------------------------------------------
 
 #Input Parameters
