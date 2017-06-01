@@ -41,7 +41,7 @@ done
 # else delete the downloaded files
 if [ -f ${regCertDir}/ca.pem ] && grep -q "BEGIN CERTIFICATE" ${regCertDir}/ca.pem ;
 then
-  dockerCertDir="/etc/docker/certs.d/registry.${stackName}.local:80/"
+  dockerCertDir="/etc/docker/certs.d/${stackName}-registry:5000/"
   mkdir -p ${dockerCertDir}
   #NOTE: Rename the ca.pem file to ca.crt
   mv ${regCertDir}/ca.pem ${regCertDir}/ca.crt
