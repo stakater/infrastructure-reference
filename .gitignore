@@ -10,3 +10,8 @@ build
 
 # File backups
 *~
+
+# Git SSH keys for gocd
+infrastructure-modules/global-admiral/instance-pool/data/gocd/git-ssh-key/*
+!infrastructure-modules/global-admiral/instance-pool/data/gocd/git-ssh-key/README.md
+*.pub
