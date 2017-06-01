@@ -48,10 +48,10 @@ module "etcd" {
   user_data        = "${data.template_file.bootstrap-user-data.rendered}"
   key_name         = "etcd"
   root_vol_size    = 20
-  data_ebs_device_name  = "/dev/sdf"
-  data_ebs_vol_size     = 12
-  logs_ebs_device_name  = "/dev/sdg"
-  logs_ebs_vol_size     = 12
+  data_ebs_device_name  = ""
+  data_ebs_vol_size     = 0
+  logs_ebs_device_name  = ""
+  logs_ebs_vol_size     = 0
 
   # ASG parameters
   max_size         = "1"

@@ -20,42 +20,6 @@ coreos:
               EnvironmentFile=/etc/sysconfig/etcd-peers
     - name: fleet.service
       command: start
-    - name: format-disk.service
-      command: start
-      content: |
-        [Unit]
-        Description=Formats the disk drive
-        [Service]
-        Type=oneshot
-        RemainAfterExit=yes
-        Environment="LABEL=var-lib-docker"
-        Environment="DEV=/dev/xvdf"
-        # Make Dev letter is same as the ebs device mounted e.g. xvdf for sdf
-        # Do not wipe the disk if it's already being used, so the docker images persistent cross reboot.
-        ExecStart=-/bin/bash -c "if ! findfs LABEL=$LABEL > /tmp/label.$LABEL; then wipefs -a -f $DEV && mkfs.ext4 -T news -F -L $LABEL $DEV && echo wiped; fi"
-    - name: var-lib-docker.mount
-      command: start
-      content: |
-        [Unit]
-        Description=Mount disk to /var/lib/docker
-        Requires=format-disk.service
-        After=format-disk.service
-        Before=docker.service
-        [Mount]
-        What=/dev/xvdf
-        Where=/var/lib/docker
-        Type=ext4
-    - name: docker.service
-      command: start
-      drop-ins:
-        - name: 60-docker-wait-for-var-lib.conf
-          content: |
-              [Unit]
-              Requires=var-lib-docker.mount
-              After=var-lib-docker.mount
-              [Service]
-              Restart=always
-              RestartSec=5
     - name: etcd-init.service
       command: start
       content: |
@@ -72,6 +36,29 @@ coreos:
         ExecStart=/opt/bin/etcd-init.sh
         [Install]
         WantedBy=multi-user.target
+    - name: consul.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Consul Server
+        Requires=docker.service
+        After=docker.service
+        Requires=etcd2.service
+        After=etcd2.service
+
+        [Service]
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull consul:0.8.3
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStartPre=/usr/bin/sh -c "etcdctl set /global-admiral/consul/server/endpoint $private_ipv4"
+        ExecStart=/usr/bin/docker run --rm --name %n \
+                                  --net="host" \
+                                  -v /consul/data:/consul/data \
+                                  consul:0.8.3 agent -server -ui -bind=$private_ipv4 -client=0.0.0.0 -bootstrap
+        ExecStop=/usr/bin/docker stop %n
+        RestartSec=250
+        Restart=always
 write_files:
   - path: /opt/bin/update-window.sh
     permissions: 0700
