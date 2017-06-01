@@ -74,7 +74,7 @@ done
 
 
 # Create gocd data directory
-gocdDataDir="/gocd-data"
+gocdDataDir="/stakater/gocd-data"
 mkdir -p ${gocdDataDir}
 
 # if sudoers file is downloaded and valid, copy to `gocd-data` directory
