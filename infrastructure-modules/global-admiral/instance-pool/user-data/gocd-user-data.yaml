@@ -56,7 +56,7 @@ coreos:
                                   --net="host" \
                                   -v /consul/data:/consul/data \
                                   -e 'CONSUL_ALLOW_PRIVILEGED_PORTS=' \
-                                  consul:0.8.3 agent -retry-join=${CONSUL_SERVER} -dns-port=53 -bind=$private_ipv4 -client=0.0.0.0 -recursor=${FALLBACK_HOST_DNS}
+                                  consul:0.8.3 agent -retry-join=$${CONSUL_SERVER} -dns-port=53 -bind=$private_ipv4 -client=0.0.0.0 -recursor=$${FALLBACK_HOST_DNS}
         ExecStop=/usr/bin/docker stop %n
         RestartSec=110
         Restart=always
@@ -136,7 +136,7 @@ coreos:
         ExecStartPre=/usr/bin/chown -R 1001:1001 /stakater/gocd-data/git-ssh-key/
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789abcdef \
-                -e GO_SERVER_URL=https://${GO_SERVER_IP}:${GO_SERVER_PORT}/go \
+                -e GO_SERVER_URL=https://$${GO_SERVER_IP}:$${GO_SERVER_PORT}/go \
                 -e CONSUL_DNS=$private_ipv4 \
                 -v /stakater/gocd-data/git-ssh-key/:/home/go/.ssh:z \
                 -v /var/run/docker.sock:/var/run/docker.sock \
@@ -175,7 +175,7 @@ coreos:
         ExecStartPre=/usr/bin/chown -R 1001:1001 /stakater/gocd-data/git-ssh-key/
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789zxcvb \
-                -e GO_SERVER_URL=https://${GO_SERVER_IP}:${GO_SERVER_PORT}/go \
+                -e GO_SERVER_URL=https://$${GO_SERVER_IP}:$${GO_SERVER_PORT}/go \
                 -e CONSUL_DNS=$private_ipv4 \
                 -v /stakater/gocd-data/git-ssh-key/:/home/go/.ssh:z \
                 -v /var/run/docker.sock:/var/run/docker.sock \
@@ -214,7 +214,7 @@ coreos:
         ExecStartPre=/usr/bin/chown -R 1001:1001 /stakater/gocd-data/git-ssh-key/
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789mnbvcx \
-                -e GO_SERVER_URL=https://${GO_SERVER_IP}:${GO_SERVER_PORT}/go \
+                -e GO_SERVER_URL=https://$${GO_SERVER_IP}:$${GO_SERVER_PORT}/go \
                 -e CONSUL_DNS=$private_ipv4 \
                 -v /stakater/gocd-data/git-ssh-key/:/home/go/.ssh:z \
                 -v /var/run/docker.sock:/var/run/docker.sock \
@@ -253,7 +253,7 @@ coreos:
         ExecStartPre=/usr/bin/chown -R 1001:1001 /stakater/gocd-data/git-ssh-key/
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789lkjhgf \
-                -e GO_SERVER_URL=https://${GO_SERVER_IP}:${GO_SERVER_PORT}/go \
+                -e GO_SERVER_URL=https://$${GO_SERVER_IP}:$${GO_SERVER_PORT}/go \
                 -e CONSUL_DNS=$private_ipv4 \
                 -v /stakater/gocd-data/git-ssh-key/:/home/go/.ssh:z \
                 -v /var/run/docker.sock:/var/run/docker.sock \
@@ -292,7 +292,7 @@ coreos:
         ExecStartPre=/usr/bin/chown -R 1001:1001 /stakater/gocd-data/git-ssh-key/
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789ytrewq \
-                -e GO_SERVER_URL=https://${GO_SERVER_IP}:${GO_SERVER_PORT}/go \
+                -e GO_SERVER_URL=https://$${GO_SERVER_IP}:$${GO_SERVER_PORT}/go \
                 -e CONSUL_DNS=$private_ipv4 \
                 -v /stakater/gocd-data/git-ssh-key/:/home/go/.ssh:z \
                 -v /var/run/docker.sock:/var/run/docker.sock \
