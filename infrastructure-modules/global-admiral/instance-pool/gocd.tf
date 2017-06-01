@@ -95,8 +95,6 @@ data "template_file" "gocd-user-data" {
   template = "${file("./user-data/gocd-user-data.yaml")}"
 
   vars {
-    stack_name = "${var.stack_name}"
-    s3_bucket_uri = "s3://${module.cloudinit-bucket.bucket_name}"
   }
 }
 
