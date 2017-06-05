@@ -148,8 +148,8 @@ coreos:
         ExecStartPre=-/bin/mkdir -p /opt/data/registry/config
         ExecStart=/usr/bin/docker run --rm --name %n \
                   -v /opt/data/registry/ssl:/certs \
-                  -e CA_SUBJECT=${stack_name}-registry \
-                  -e SSL_DNS=${stack_name}-registry \
+                  -e CA_SUBJECT=registry.${stack_name}.local \
+                  -e SSL_DNS=registry.${stack_name}.local \
                   -e SSL_EXPIRE=24820 \
                   -e CA_EXPIRE=24820 \
                   stakater/ssl-certs-generator:1.0
