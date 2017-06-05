@@ -1,6 +1,7 @@
 build
 .vagrant
 .idea
+.history
 # Compiled files
 *.tfstate
 *.tfstate.backup
