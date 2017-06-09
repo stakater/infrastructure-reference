@@ -46,7 +46,7 @@ write_files:
         REPO=$1
         #clone repos
         cd /house-keeper
-        sudo ./git-cloner.sh https://github.com/stakater/house-keeper.git?ref=0.1.0 house-keeper
+        sudo ./git-cloner.sh https://github.com/stakater/house-keeper.git?ref=v0.1.0 house-keeper
         sudo ./git-cloner.sh $REPO house-keeper-config
         sudo cp house-keeper/units/* /etc/systemd/system/
         /opt/bin/python house-keeper/scripts/parser.py

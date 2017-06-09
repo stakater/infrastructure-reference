@@ -29,7 +29,7 @@
 ###############################################################################
 
 module "aurora-db" {
-  source = "github.com/stakater/blueprint-storage-aws.git//modules/rds/aurora-db?ref=0.1.0"
+  source = "github.com/stakater/blueprint-storage-aws.git//modules/rds/aurora-db?ref=v0.1.0"
 
   name = "${var.stack_name}-qa"
   vpc_id = "${module.network.vpc_id}"

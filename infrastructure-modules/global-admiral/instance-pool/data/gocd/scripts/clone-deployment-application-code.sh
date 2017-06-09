@@ -50,6 +50,6 @@ if [ -d ${DEPLOY_CODE_LOCATION}/.git ]; then
   echo "${DEPLOY_CODE_LOCATION} is a git repository.";
 else
   echo "${DEPLOY_CODE_LOCATION} is not a git repository. Cloning ...."
-  sudo git clone https://github.com/stakater/prod-deployment-reference.git?ref=0.1.0 ${DEPLOY_CODE_LOCATION};
+  sudo git clone https://github.com/stakater/prod-deployment-reference.git?ref=v0.1.0 ${DEPLOY_CODE_LOCATION};
 fi;
 

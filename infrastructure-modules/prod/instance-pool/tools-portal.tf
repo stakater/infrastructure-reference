@@ -28,7 +28,7 @@
 # limitations under the License.
 ###############################################################################
 module "tools-portal" {
-  source                      = "git::https://github.com/stakater/blueprint-solo-instance-aws.git//modules?ref=0.1.0"
+  source                      = "git::https://github.com/stakater/blueprint-solo-instance-aws.git//modules?ref=v0.1.0"
   name                        = "${var.stack_name}-prod-tools-portal"
   vpc_id                      = "${module.network.vpc_id}"
   subnet_id                   = "${element(split(",", module.network.public_subnet_ids), 0)}" # First subnet

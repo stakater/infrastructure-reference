@@ -29,7 +29,7 @@
 ###############################################################################
 
 module "route53-private" {
-  source         = "github.com/stakater/blueprint-utilities-aws.git//modules/route53/private?ref=0.1.0"
+  source         = "github.com/stakater/blueprint-utilities-aws.git//modules/route53/private?ref=v0.1.0"
   private_domain = "${var.stack_name}.local"
   vpc_id         = "${module.network.vpc_id}"
 }

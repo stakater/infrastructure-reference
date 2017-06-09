@@ -30,7 +30,7 @@
 
 ## Provisions basic autoscaling group
 module "consul" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=0.1.0"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=v0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-dev-consul"
@@ -321,7 +321,7 @@ resource "aws_security_group_rule" "sg-consul-8500" {
 ####################################
 ## Provisions autoscaling policies and associated resources
 module "consul_scale_up_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=0.1.0"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=v0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-dev-consul-scaleup-policy"
@@ -346,7 +346,7 @@ module "consul_scale_up_policy" {
 }
 
 module "consul_scale_down_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=0.1.0"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=v0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-dev-consul-scaledown-policy"

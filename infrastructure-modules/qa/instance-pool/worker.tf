@@ -30,7 +30,7 @@
 
 ## Provisions basic autoscaling group
 module "worker" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=0.1.0"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=v0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-qa-worker"
@@ -267,7 +267,7 @@ resource "aws_route53_record" "worker-internal" {
 ####################################
 ## Provisions autoscaling policies and associated resources
 module "worker-scale-up-policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=0.1.0"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=v0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-qa-worker-scaleup-policy"
@@ -291,7 +291,7 @@ module "worker-scale-up-policy" {
 }
 
 module "worker-scale-down-policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=0.1.0"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=v0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-qa-worker-scaledown-policy"

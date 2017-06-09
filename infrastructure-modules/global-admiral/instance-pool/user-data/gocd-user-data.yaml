@@ -247,7 +247,7 @@ coreos:
         Type=oneshot
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
-        ExecStart=/usr/bin/sh -c "/gocd-data/scripts/git-cloner.sh 'https://github.com/stakater/pipeline-library.git?ref=0.1.0' /app/stakater/pipeline-library"
+        ExecStart=/usr/bin/sh -c "/gocd-data/scripts/git-cloner.sh 'https://github.com/stakater/pipeline-library.git?ref=v0.1.0' /app/stakater/pipeline-library"
 
 write_files:
   - path: /opt/bin/install-docker-compose.sh

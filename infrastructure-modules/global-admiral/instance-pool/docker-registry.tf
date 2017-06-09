@@ -30,7 +30,7 @@
 
 ## Provisions basic autoscaling group
 module "docker-registry" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=0.1.0"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=v0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-ga-registry"
@@ -198,7 +198,7 @@ resource "aws_route53_record" "docker-registry" {
 ####################################
 ## Provisions autoscaling policies and associated resources
 module "docker_registry_scale_up_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=0.1.0"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=v0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-ga-registry-scaleup-policy"
@@ -222,7 +222,7 @@ module "docker_registry_scale_up_policy" {
 }
 
 module "docker_registry_scale_down_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=0.1.0"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=v0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-ga-registry-scaledown-policy"

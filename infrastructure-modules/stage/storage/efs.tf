@@ -29,14 +29,14 @@
 ###############################################################################
 
 module "efs" {
-  source = "github.com/stakater/blueprint-storage-aws.git//modules/efs/file-system?ref=0.1.0"
+  source = "github.com/stakater/blueprint-storage-aws.git//modules/efs/file-system?ref=v0.1.0"
   name = "${var.stack_name}-stage"
   vpc_id = "${module.network.vpc_id}"
   vpc_cidr = "${module.network.vpc_cidr}"
 }
 
 module "efs-mount-targets" {
-  source = "github.com/stakater/blueprint-storage-aws.git//modules/efs/mount-target?ref=0.1.0"
+  source = "github.com/stakater/blueprint-storage-aws.git//modules/efs/mount-target?ref=v0.1.0"
   efs-id = "${module.efs.file-system-id}"
   subnets = "${module.network.private_persistence_subnet_ids}"
   mount-targets-count = "${length(var.availability_zones)}" # Send count for number of mount targets separately https://github.com/hashicorp/terraform/issues/3888
