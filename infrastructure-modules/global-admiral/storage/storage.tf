@@ -29,12 +29,12 @@
 ###############################################################################
 
 module "config-bucket" {
-  source = "github.com/stakater/blueprint-storage-aws.git//modules/s3"
+  source = "github.com/stakater/blueprint-storage-aws.git//modules/s3?ref=0.1.0"
   name = "${var.stack_name}-global-admiral-config"
 }
 
 module "cloudinit-bucket" {
-  source = "github.com/stakater/blueprint-storage-aws.git//modules/s3"
+  source = "github.com/stakater/blueprint-storage-aws.git//modules/s3?ref=0.1.0"
   name = "${var.stack_name}-global-admiral-cloudinit"
 }
 

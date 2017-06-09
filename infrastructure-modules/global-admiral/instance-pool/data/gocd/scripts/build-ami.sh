@@ -146,7 +146,7 @@ then
 fi;
 if [ ! "$(ls -A $AMI_BAKER_LOCATION)" ];
 then
-  sudo git clone https://github.com/stakater/ami-baker.git $AMI_BAKER_LOCATION;
+  sudo git clone https://github.com/stakater/ami-baker.git?ref=0.1.0 $AMI_BAKER_LOCATION;
 fi;
 
 cd $AMI_BAKER_LOCATION;

@@ -30,7 +30,7 @@
 
 ## Provisions basic autoscaling group
 module "gocd" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-ga-gocd"
@@ -381,7 +381,7 @@ resource "aws_lb_cookie_stickiness_policy" "gocd-elb-stickiness-policy" {
 ####################################
 ## Provisions autoscaling policies and associated resources
 module "gocd_scale_up_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-ga-gocd-scaleup-policy"
@@ -405,7 +405,7 @@ module "gocd_scale_up_policy" {
 }
 
 module "gocd_scale_down_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-ga-gocd-scaledown-policy"

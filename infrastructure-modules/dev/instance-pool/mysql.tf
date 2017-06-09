@@ -30,7 +30,7 @@
 
 ## Provisions basic autoscaling group
 module "mysql" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-dev-mysql"
@@ -189,7 +189,7 @@ resource "aws_route53_record" "mysql-internal" {
 ####################################
 ## Provisions autoscaling policies and associated resources
 module "mysql-scale-up-policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-dev-mysql-scaleup-policy"
@@ -213,7 +213,7 @@ module "mysql-scale-up-policy" {
 }
 
 module "mysql-scale-down-policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-dev-mysql-scaledown-policy"

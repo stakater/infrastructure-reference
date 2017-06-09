@@ -29,12 +29,12 @@
 ###############################################################################
 
 module "config-bucket" {
-  source = "github.com/stakater/blueprint-storage-aws.git//modules/s3"
+  source = "github.com/stakater/blueprint-storage-aws.git//modules/s3?ref=0.1.0"
   name = "${var.stage_config_bucket_name}"
 }
 
 module "cloudinit-bucket" {
-  source = "github.com/stakater/blueprint-storage-aws.git//modules/s3"
+  source = "github.com/stakater/blueprint-storage-aws.git//modules/s3?ref=0.1.0"
   name = "${var.stage_cloudinit_bucket_name}"
 }
 

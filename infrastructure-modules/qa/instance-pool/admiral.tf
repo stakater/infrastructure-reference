@@ -30,7 +30,7 @@
 
 ## Provisions basic autoscaling group
 module "admiral" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-qa-admiral"
@@ -262,7 +262,7 @@ resource "aws_route53_record" "admiral-internal" {
 ####################################
 ## Provisions autoscaling policies and associated resources
 module "admiral-scale-up-policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-qa-admiral-scaleup-policy"
@@ -286,7 +286,7 @@ module "admiral-scale-up-policy" {
 }
 
 module "admiral-scale-down-policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-qa-admiral-scaledown-policy"

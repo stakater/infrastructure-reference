@@ -189,7 +189,7 @@ if [ -d ${deployCodeLocation}/.git ]; then
   echo "${deployCodeLocation} is a git repository.";
 else
   echo "${deployCodeLocation} is not a git repository. Cloning ...."
-  sudo git clone https://github.com/stakater/admiral-deployment.git ${deployCodeLocation};
+  sudo git clone https://github.com/stakater/admiral-deployment.git?ref=0.1.0 ${deployCodeLocation};
 fi;
 
 ################################################################

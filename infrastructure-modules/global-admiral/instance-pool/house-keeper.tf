@@ -30,7 +30,7 @@
 
 ## Provisions basic autoscaling group
 module "house-keeper" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool"
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=0.1.0"
 
   # Resource tags
   name = "${var.stack_name}-ga-house-keeper"

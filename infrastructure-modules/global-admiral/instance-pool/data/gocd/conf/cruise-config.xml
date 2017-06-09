@@ -140,7 +140,7 @@
         <param name="CLUSTER_ENV">dev</param>
       </params>
       <materials>
-        <git url="https://github.com/stakater/infrastructure-app-units" shallowClone="true" autoUpdate="false" />
+        <git url="https://github.com/stakater/infrastructure-app-units?ref=0.1.0" shallowClone="true" autoUpdate="false" />
       </materials>
     </pipeline>
     <pipeline name="Build-Admiral-AMI-stage" template="stakater_build_admiral_ami">
@@ -152,7 +152,7 @@
         <param name="BAKER_INSTANCE_TYPE">t2.medium</param>
       </params>
       <materials>
-        <git url="https://github.com/stakater/infrastructure-app-units" shallowClone="true" autoUpdate="false" />
+        <git url="https://github.com/stakater/infrastructure-app-units?ref=0.1.0" shallowClone="true" autoUpdate="false" />
       </materials>
     </pipeline>
     <pipeline name="Deploy-Admiral-Stage" template="stakater_launch_admiral_ami">
@@ -164,7 +164,7 @@
         <param name="ENV_TF_STATE_KEY">stage/terraform.tfstate</param>
       </params>
       <materials>
-        <git url="https://github.com/stakater/infrastructure-app-units" shallowClone="true" autoUpdate="false" />
+        <git url="https://github.com/stakater/infrastructure-app-units?ref=0.1.0" shallowClone="true" autoUpdate="false" />
       </materials>
     </pipeline>
   </pipelines>
@@ -178,7 +178,7 @@
         <param name="BAKER_INSTANCE_TYPE">t2.medium</param>
       </params>
       <materials>
-        <git url="https://github.com/stakater/infrastructure-app-units" shallowClone="true" autoUpdate="false" />
+        <git url="https://github.com/stakater/infrastructure-app-units?ref=0.1.0" shallowClone="true" autoUpdate="false" />
       </materials>
     </pipeline>
     <pipeline name="Deploy-Admiral-Prod" template="stakater_launch_admiral_ami">
@@ -190,7 +190,7 @@
         <param name="ENV_TF_STATE_KEY">prod/terraform.tfstate</param>
       </params>
       <materials>
-        <git url="https://github.com/stakater/infrastructure-app-units" shallowClone="true" autoUpdate="false" />
+        <git url="https://github.com/stakater/infrastructure-app-units?ref=0.1.0" shallowClone="true" autoUpdate="false" />
       </materials>
     </pipeline>
   </pipelines>
@@ -201,7 +201,7 @@
         <param name="ENVIRONMENT">dev</param>
       </params>
       <materials>
-        <git url="https://github.com/stakater/dummy-repo.git" shallowClone="true" autoUpdate="false" />
+        <git url="https://github.com/stakater/dummy-repo.git?ref=0.1.0" shallowClone="true" autoUpdate="false" />
       </materials>
     </pipeline>
     <pipeline name="Start-Dev" template="start_infra">
@@ -210,7 +210,7 @@
         <param name="ENVIRONMENT">dev</param>
       </params>
       <materials>
-        <git url="https://github.com/stakater/dummy-repo.git" shallowClone="true" autoUpdate="false" />
+        <git url="https://github.com/stakater/dummy-repo.git?ref=0.1.0" shallowClone="true" autoUpdate="false" />
       </materials>
     </pipeline>
   </pipelines>
@@ -222,7 +222,7 @@
               <param name="ENVIRONMENT">prod</param>
           </params>
           <materials>
-              <git url="https://github.com/stakater/dummy-repo.git" shallowClone="true" autoUpdate="false" />
+              <git url="https://github.com/stakater/dummy-repo.git?ref=0.1.0" shallowClone="true" autoUpdate="false" />
           </materials>
       </pipeline>
   </pipelines>

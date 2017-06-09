@@ -64,7 +64,7 @@ then
 fi;
 if [ ! "$(ls -A /app/application-unit)" ];
 then
-  git clone https://github.com/stakater/application-unit.git /app/application-unit;
+  git clone https://github.com/stakater/application-unit.git?ref=0.1.0 /app/application-unit;
 else
   cd /app/application-unit;
   git pull origin master;

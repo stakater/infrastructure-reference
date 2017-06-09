@@ -29,7 +29,7 @@
 ###############################################################################
 
 module "network" {
-    source = "github.com/stakater/blueprint-network-aws.git//modules"
+    source = "github.com/stakater/blueprint-network-aws.git//modules?ref=0.1.0"
 
     vpc_cidr = "10.0.0.0/16"
     name = "${var.stack_name}-global-admiral"
