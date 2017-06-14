@@ -11,7 +11,7 @@ STACK_NAME := stakater-reference
 #ALLOWED_ACCOUNT_IDS := "123456789012","012345678901"
 
 # Bucket which stores terraform remote state
-TF_STATE_BUCKET_NAME := stakater-terraform-state
+TF_STATE_BUCKET_NAME := $(STACK_NAME)-terraform-state
 TF_STATE_GLOBAL_ADMIRAL_KEY := global-admiral/terraform.tfstate
 TF_STATE_DEV_KEY := dev/terraform.tfstate
 TF_STATE_QA_KEY := qa/terraform.tfstate
@@ -98,6 +98,7 @@ TF_PROVIDER_PROD := $(BUILD_PROD)/provider.tf
 TF_PROVIDER_STAGE := $(BUILD_STAGE)/provider.tf
 TF_PROVIDER_GLOBAL_ADMIRAL := $(BUILD_GLOBAL_ADMIRAL)/provider.tf
 
+TF_BACKEND_CONFIG_GLOBAL_ADMIRAL := $(BUILD_GLOBAL_ADMIRAL)/backend-config.tfvars
 # Terraform commands
 TF_GET := terraform get -update
 TF_SHOW := terraform show -module-depth=2
