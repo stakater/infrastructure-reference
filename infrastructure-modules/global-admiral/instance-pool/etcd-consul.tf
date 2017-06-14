@@ -29,11 +29,11 @@
 ###############################################################################
 
 ## Provisions basic autoscaling group
-module "etcd" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool"
+module "etcd-consul" {
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool?ref=develop"
 
   # Resource tags
-  name = "${var.stack_name}-ga-etcd"
+  name = "${var.stack_name}-ga-etcd-consul"
 
   # VPC parameters
   vpc_id  = "${module.network.vpc_id}"
@@ -44,9 +44,9 @@ module "etcd" {
   ami              = "${var.ami}"
   instance_type    = "t2.nano"
   iam_assume_role_policy = "${file("./policy/assume-role-policy.json")}"
-  iam_role_policy  = "${data.template_file.etcd-policy.rendered}"
-  user_data        = "${data.template_file.bootstrap-user-data.rendered}"
-  key_name         = "etcd"
+  iam_role_policy  = "${data.template_file.etcd-consul-policy.rendered}"
+  user_data        = "${data.template_file.etcd-consul-bootstrap-user-data.rendered}"
+  key_name         = "etcd-consul"
   root_vol_size    = 20
   data_ebs_device_name  = ""
   data_ebs_vol_size     = 0
@@ -58,12 +58,12 @@ module "etcd" {
   min_size         = "1"
   desired_size     = "1"
   min_elb_capacity = "1"
-  load_balancers   = "${aws_elb.elb.id}"
+  load_balancers   = "${aws_elb.etcd-consul-elb.id}"
 }
 
 ## Template files
-data "template_file" "etcd-policy" {
-  template = "${file("./policy/etcd-role-policy.json")}"
+data "template_file" "etcd-consul-policy" {
+  template = "${file("./policy/etcd-consul-role-policy.json")}"
 
   vars {
     config_bucket_arn = "${module.config-bucket.arn}"
@@ -71,20 +71,20 @@ data "template_file" "etcd-policy" {
   }
 }
 
-data "template_file" "bootstrap-user-data" {
+data "template_file" "etcd-consul-bootstrap-user-data" {
   template = "${file("./user-data/bootstrap-user-data.sh.tmpl")}"
 
   vars {
     stack_name = "${var.stack_name}"
     config_bucket_name = "${module.config-bucket.bucket_name}"
     cloudinit_bucket_name = "${module.cloudinit-bucket.bucket_name}"
-    module_name = "etcd"
+    module_name = "etcd-consul"
     additional_user_data_scripts = ""
   }
 }
 
-data "template_file" "etcd-user-data" {
-  template = "${file("./user-data/etcd-user-data.yaml")}"
+data "template_file" "etcd-consul-user-data" {
+  template = "${file("./user-data/etcd-consul-user-data.yaml")}"
 
   vars {
     stack_name = "${var.stack_name}"
@@ -95,19 +95,19 @@ data "template_file" "etcd-user-data" {
 # Upload CoreOS cloud-config to a s3 bucket; bootstrap-user-data.sh script in user-data will download
 # the cloud-config upon reboot to configure the system. This avoids rebuilding machines when
 # changing cloud-config.
-resource "aws_s3_bucket_object" "etcd_cloud_config" {
+resource "aws_s3_bucket_object" "etcd_consul_cloud_config" {
   bucket = "${module.cloudinit-bucket.bucket_name}"
-  key = "etcd/cloud-config.yaml"
-  content = "${data.template_file.etcd-user-data.rendered}"
+  key = "etcd-consul/cloud-config.yaml"
+  content = "${data.template_file.etcd-consul-user-data.rendered}"
 }
 
 ## Creates ELB security group
-resource "aws_security_group" "sg_elb" {
-  name_prefix = "${var.stack_name}-elb-"
+resource "aws_security_group" "sg-etcd-consul-elb" {
+  name_prefix = "${var.stack_name}-etcd-consul-elb-"
   vpc_id      = "${module.network.vpc_id}"
 
   tags {
-    Name        = "${var.stack_name}-elb"
+    Name        = "${var.stack_name}-etcd-consul-elb"
     managed_by  = "Stakater"
   }
 
@@ -117,9 +117,17 @@ resource "aws_security_group" "sg_elb" {
 
   # Allow HTTP traffic
   ingress {
+    cidr_blocks = ["${module.network.vpc_cidr}"]
+    from_port   = 2379
+    to_port     = 2379
+    protocol    = "tcp"
+  }
+
+  # Allow HTTP traffic
+  ingress {
     cidr_blocks = ["0.0.0.0/0"]
-    from_port   = 80
-    to_port     = 80
+    from_port   = 8500
+    to_port     = 8500
     protocol    = "tcp"
   }
 
@@ -132,23 +140,30 @@ resource "aws_security_group" "sg_elb" {
 }
 
 ## Creates ELB
-resource "aws_elb" "elb" {
-  name                      = "${var.stack_name}-etcd"
-  security_groups           = ["${aws_security_group.sg_elb.id}"]
+resource "aws_elb" "etcd-consul-elb" {
+  name                      = "${var.stack_name}-etcd-consul"
+  security_groups           = ["${aws_security_group.sg-etcd-consul-elb.id}"]
   subnets                   = ["${split(",",module.network.public_subnet_ids)}"]
   internal                  = false
   cross_zone_load_balancing = true
   connection_draining       = true
 
   tags {
-    Name        = "${var.stack_name}-etcd"
+    Name        = "${var.stack_name}-etcd-consul"
     managed_by  = "Stakater"
   }
 
   listener {
     instance_port     = 2379
     instance_protocol = "http"
-    lb_port           = 80
+    lb_port           = 2379
+    lb_protocol       = "http"
+  }
+
+  listener {
+    instance_port     = 8500
+    instance_protocol = "http"
+    lb_port           = 8500
     lb_protocol       = "http"
   }
 
@@ -165,24 +180,17 @@ resource "aws_elb" "elb" {
   }
 }
 
-# ELB Stickiness policy
-resource "aws_lb_cookie_stickiness_policy" "elb_stickiness_policy" {
-      name = "${aws_elb.elb.name}-stickiness"
-      load_balancer = "${aws_elb.elb.id}"
-      lb_port = 80
-}
-
 ##############################
 ## Security Group Rules
 ##############################
 # Allow ssh from within vpc
-resource "aws_security_group_rule" "sg-etcd-ssh" {
+resource "aws_security_group_rule" "sg-etcd-consul-ssh" {
   type                     = "ingress"
   from_port                = 22
   to_port                  = 22
   protocol                 = "tcp"
   cidr_blocks              = ["${module.network.vpc_cidr}"]
-  security_group_id        = "${module.etcd.security_group_id}"
+  security_group_id        = "${module.etcd-consul.security_group_id}"
 
   lifecycle {
     create_before_destroy = true
@@ -190,13 +198,13 @@ resource "aws_security_group_rule" "sg-etcd-ssh" {
 }
 
 # Allow Outgoing traffic
-resource "aws_security_group_rule" "sg-etcd-outgoing" {
+resource "aws_security_group_rule" "sg-etcd-consul-outgoing" {
   type                     = "egress"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   cidr_blocks              = ["0.0.0.0/0"]
-  security_group_id        = "${module.etcd.security_group_id}"
+  security_group_id        = "${module.etcd-consul.security_group_id}"
 
   lifecycle {
     create_before_destroy = true
@@ -209,7 +217,7 @@ resource "aws_security_group_rule" "sg-etcd" {
   to_port                  = 2380
   protocol                 = "tcp"
   cidr_blocks              = ["${module.network.vpc_cidr}"]
-  security_group_id        = "${module.etcd.security_group_id}"
+  security_group_id        = "${module.etcd-consul.security_group_id}"
 
   lifecycle {
     create_before_destroy = true
@@ -222,7 +230,33 @@ resource "aws_security_group_rule" "sg-fleet" {
   to_port                  = 4001
   protocol                 = "tcp"
   cidr_blocks              = ["${module.network.vpc_cidr}"]
-  security_group_id        = "${module.etcd.security_group_id}"
+  security_group_id        = "${module.etcd-consul.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group_rule" "sg-consul-ui" {
+  type                     = "ingress"
+  from_port                = 8500
+  to_port                  = 8500
+  protocol                 = "tcp"
+  cidr_blocks              = ["${module.network.vpc_cidr}"]
+  security_group_id        = "${module.etcd-consul.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group_rule" "sg-consul-cluster" {
+  type                     = "ingress"
+  from_port                = 8300
+  to_port                  = 8302
+  protocol                 = "tcp"
+  cidr_blocks              = ["${module.network.vpc_cidr}"]
+  security_group_id        = "${module.etcd-consul.security_group_id}"
 
   lifecycle {
     create_before_destroy = true
@@ -233,15 +267,15 @@ resource "aws_security_group_rule" "sg-fleet" {
 # ASG Scaling Policies
 ####################################
 ## Provisions autoscaling policies and associated resources
-module "etcd_scale_up_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
+module "etcd_consul_scale_up_policy" {
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=develop"
 
   # Resource tags
-  name = "${var.stack_name}-ga-etcd-scaleup-policy"
+  name = "${var.stack_name}-ga-etcd-consul-scaleup-policy"
 
   # ASG parameters
-  asg_name = "${module.etcd.asg_name}"
-  asg_id   = "${module.etcd.asg_id}"
+  asg_name = "${module.etcd-consul.asg_name}"
+  asg_id   = "${module.etcd-consul.asg_id}"
 
   # Notification parameters
   notifications = "autoscaling:EC2_INSTANCE_LAUNCH_ERROR,autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
@@ -257,15 +291,15 @@ module "etcd_scale_up_policy" {
   threshold                = 80
 }
 
-module "etcd_scale_down_policy" {
-  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
+module "etcd_consul_scale_down_policy" {
+  source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy?ref=develop"
 
   # Resource tags
-  name = "${var.stack_name}-ga-etcd-scaledown-policy"
+  name = "${var.stack_name}-ga-etcd-consul-scaledown-policy"
 
   # ASG parameters
-  asg_name = "${module.etcd.asg_name}"
-  asg_id   = "${module.etcd.asg_id}"
+  asg_name = "${module.etcd-consul.asg_name}"
+  asg_id   = "${module.etcd-consul.asg_id}"
 
   # Notification parameters
   notifications = "autoscaling:EC2_INSTANCE_LAUNCH_ERROR,autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
@@ -282,6 +316,6 @@ module "etcd_scale_down_policy" {
 }
 
 # Outputs to be accessible through remote state
-output "etcd-security-group-id" {
-  value = "${module.etcd.security_group_id}"
+output "etcd-consul-security-group-id" {
+  value = "${module.etcd-consul.security_group_id}"
 }

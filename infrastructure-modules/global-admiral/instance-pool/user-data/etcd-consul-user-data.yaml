@@ -92,9 +92,9 @@ write_files:
       #!/bin/bash
 
       # dyamically create/join the etcd cluster by querying autoscaling group
-      # see https://github.com/dockerage/etcd-aws-cluster
-      image=dockerage/etcd-aws-cluster
+      # see https://github.com/stakater/etcd-aws-cluster
+      image=stakater/etcd-aws-cluster
       /usr/bin/docker run -v /etc/sysconfig/:/etc/sysconfig/ $image
 
       # upload etcd initial-cluster urls to s3 bucket for cluster's etcd_proxy
-      /usr/bin/docker run -e S3BUCKET="${s3_bucket_uri}" -v /etc/sysconfig/:/etc/sysconfig/ --entrypoint /etcd-aws-proxy $image
+      /usr/bin/docker run -e S3BUCKET="${s3_bucket_uri}" -e ETCD_FOLDER_NAME="etcd-consul" -v /etc/sysconfig/:/etc/sysconfig/ --entrypoint /etcd-aws-proxy $image
