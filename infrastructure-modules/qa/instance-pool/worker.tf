@@ -394,7 +394,7 @@ resource "aws_security_group_rule" "sg-worker-etcd" {
   to_port                  = 2380
   protocol                 = "tcp"
   cidr_blocks              = ["${module.network.vpc_cidr}"]
-  security_group_id        = "${data.terraform_remote_state.global-admiral.etcd-security-group-id}"
+  security_group_id        = "${data.terraform_remote_state.global-admiral.etcd-consul-security-group-id}"
 
   lifecycle {
     create_before_destroy = true

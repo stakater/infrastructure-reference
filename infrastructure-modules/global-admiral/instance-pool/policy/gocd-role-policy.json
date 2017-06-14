@@ -44,7 +44,7 @@
         "s3:Get*"
       ],
       "Resource": [
-        "${config_bucket_arn}/etcd/initial-cluster",
+        "${config_bucket_arn}/etcd-consul/initial-cluster",
         "${config_bucket_arn}/docker-registry/registry-certificates/*",
         "arn:aws:s3:::${prod_cloudinit_bucket_name}/",
         "arn:aws:s3:::${prod_cloudinit_bucket_name}/*",

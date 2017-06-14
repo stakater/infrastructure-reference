@@ -14,10 +14,10 @@
         "s3:*"
       ],
       "Resource": [
-        "${config_bucket_arn}/etcd",
-        "${config_bucket_arn}/etcd/*",
-        "${cloudinit_bucket_arn}/etcd",
-        "${cloudinit_bucket_arn}/etcd/*"
+        "${config_bucket_arn}/etcd-consul",
+        "${config_bucket_arn}/etcd-consul/*",
+        "${cloudinit_bucket_arn}/etcd-consul",
+        "${cloudinit_bucket_arn}/etcd-consul/*"
       ]
     },
     {

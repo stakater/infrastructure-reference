@@ -66,7 +66,7 @@ roleProfile=$${instanceProfile}
 cloudConfigYaml="$${module}/cloud-config.yaml"
 
 # path to initial-cluster urls file
-initialCluster="etcd/initial-cluster"
+initialCluster="etcd-consul/initial-cluster"
 
 # Find token, AccessKeyId,  line, remove leading space, quote, commas
 s3Token=$(get_value "Token")

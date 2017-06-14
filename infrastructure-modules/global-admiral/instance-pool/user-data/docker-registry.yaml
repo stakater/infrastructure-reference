@@ -31,7 +31,7 @@ coreos:
         [Service]
         Type=oneshot
         TimeoutStartSec=0
-        ExecStart=/usr/bin/sh -c "/opt/bin/update-initial-cluster.sh -b ${global_admiral_config_bucket}"
+        ExecStart=/usr/bin/sh -c "/opt/bin/update-initial-cluster.sh -b ${config_bucket_name}"
     - name: docker-tcp.socket
       command: start
       enable: true
@@ -210,7 +210,7 @@ write_files:
           fi
 
           # Download initial cluster file from S3 bucket
-          docker run --rm --name aws-cli -v $(pwd)/aws-cli:/aws stakater/aws-cli aws s3 cp s3://$BUCKET_NAME/etcd/initial-cluster .
+          docker run --rm --name aws-cli -v $(pwd)/aws-cli:/aws stakater/aws-cli aws s3 cp s3://$BUCKET_NAME/etcd-consul/initial-cluster .
 
           # Wait for file to download
           sleep 5;

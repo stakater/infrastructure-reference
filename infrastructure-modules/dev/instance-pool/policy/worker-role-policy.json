@@ -27,7 +27,7 @@
         "s3:Get*"
       ],
       "Resource": [
-        "${global_admiral_config_bucket_arn}/etcd/initial-cluster",
+        "${global_admiral_config_bucket_arn}/etcd-consul/initial-cluster",
         "${global_admiral_config_bucket_arn}/docker-registry/registry-certificates/*"
       ]
     },

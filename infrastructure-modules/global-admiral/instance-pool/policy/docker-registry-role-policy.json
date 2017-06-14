@@ -27,7 +27,7 @@
         "s3:Get*"
       ],
       "Resource": [
-        "${config_bucket_arn}/etcd/initial-cluster"
+        "${config_bucket_arn}/etcd-consul/initial-cluster"
       ]
     },
     {
