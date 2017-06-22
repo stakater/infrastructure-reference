@@ -99,6 +99,7 @@ coreos:
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStartPre=/usr/bin/bash -c "mkdir -p /stakater/gocd-data/git-ssh-key/"
         ExecStartPre=/usr/bin/chown -R 1001:1001 /stakater/gocd-data/git-ssh-key/
+        ExecStartPre=/usr/bin/chown -R 1001:1001 /stakater/gocd-data/conf/cruise-config.xml
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                                   -p 8153:8153 \
                                   -p 8154:8154 \
