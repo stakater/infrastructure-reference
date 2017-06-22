@@ -86,7 +86,7 @@ then
 fi
 
 # if cruise-config file is downloaded and valid, copy to `gocd-data` directory
-if [ -f ${gocdDownloadDir}/cruise-config.xml ] && grep -q "pipeline" ${gocdDownloadDir}/cruise-config.xml ;
+if [ -f ${gocdDownloadDir}/cruise-config.xml ] && grep -q "server" ${gocdDownloadDir}/cruise-config.xml ;
 then
   confDir="${gocdDataDir}/conf/"
   mkdir -p ${confDir}
