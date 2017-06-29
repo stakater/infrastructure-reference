@@ -142,7 +142,7 @@ Advanced options such as:
 can be configured in the terraform files for modules in environments' folder inside `infrastructure-modules` folder. 
 
 ## Building Infrastructure
-###To Create:
+### To Create:
 
 To Build your infrastructure consisting of Global Admiral and Dev,QA,Prod Environments run the following command:
 
