@@ -1,5 +1,5 @@
 # Stakater Infrastructure Reference
-## Table of Contents##
+## Table of Contents
 
 - [Overview](#overview)
 - [Setup AWS credentials](#setup-aws-credentials)
