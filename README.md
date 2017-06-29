@@ -184,30 +184,30 @@ Once your infrastructure has been set up, you'll need to perform the following s
 
 
 #### Known Issues while making Infrastructure
-* ####Error Creating Launch Configuration
+* #### Error Creating Launch Configuration
 
     **Error**:  
     `aws_launch_configuration.lc_ebs: Error creating launch configuration: ValidationError: Invalid IamInstanceProfile`
 
     This is an intermittent and can be avoided by performing the specific step again
 
-    #####Reference:
+    ##### Reference:
       * https://github.com/hashicorp/terraform/issues/1885
       * https://github.com/hashicorp/terraform/issues/9474
       
-* ####Error Creating Launch Configuration 
+* #### Error Creating Launch Configuration 
 
     **Error**:  
     `aws_launch_configuration.lc: Error creating launch configuration: ValidationError: You are not authorized to perform this operation.`
 
     This is an intermittent and can be avoided by performing the specific step again
     
-    #####Reference:
+    ##### Reference:
       * https://github.com/hashicorp/terraform/issues/5862
       * https://github.com/hashicorp/terraform/issues/7198
 
 
-* ####Attribute missing from Remote State
+* #### Attribute missing from Remote State
 
     **Error**:  
     `Resource 'data.terraform_remote_state.global-admiral' does not have attribute 'variable_name' for variable 'data.terraform_remote_state.global-admiral.variable_name'`
@@ -216,16 +216,16 @@ Once your infrastructure has been set up, you'll need to perform the following s
     
     In case make fails due to unknown output referenced in global-admiral state, call `make refresh_global_admiral` and then make.
     
-    #####Reference: 
+    ##### Reference: 
       * https://github.com/hashicorp/terraform/issues/2598
 
-    #####NOTE:
+    ##### NOTE:
       Once you refresh global admiral state, global admiral will remove vpc-peering connections created by other VPCs (in their tf states), as global admiral is not aware of them.
     Please be sure to re-make the network module of other environments in order to re-create the vpc-connection IF it is removed as a result of refreshing. (Work in progress to solve this issue)
     
     e.g. `make network_dev`, `make network_qa` or `make network_prod`
 
-* ####Network Timeout Error 
+* #### Network Timeout Error 
     
     **Error**: 
       `timeout while waiting for state to become 'successful'` OR `Network time out waiting for I/O...` 
@@ -234,14 +234,14 @@ Once your infrastructure has been set up, you'll need to perform the following s
     
     Retry using a better internet connection. 
     
-* ####Error while Creating Keypair
+* #### Error while Creating Keypair
     
     **Error**: 
     `Cannot create keypair: Permission denied`
     
     Issue occurs while creating keypair using the aws-keypair.sh script, this is an intermittent in issue, and can be avoided by retrying
     
-* ####Error while Uploading Keypair
+* #### Error while Uploading Keypair
     
     **Error**: 
     `Could not upload keypair: Access Denied`
